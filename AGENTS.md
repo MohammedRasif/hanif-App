@@ -1,243 +1,200 @@
+# Product: Barbers Bay
+
+Barbers Bay is a **multi-location salon & barbershop booking platform** built as a mobile-first React Native app.
+
+## What It Is
+
+A SaaS-style, multi-tenant booking system (comparable to Booksy / Fresha) that lets customers discover, book, and pay for appointments across multiple salon locations owned by a single operator.
+
+## Core User Roles
+
+- **Customer** — browses salons, books/reschedules/cancels appointments, pays in-app, leaves reviews
+- **Barber** — manages own availability, services, client notes, and portfolio; largely self-employed
+- **Salon Manager** — manages a single location's schedule, staff, and reporting
+- **Owner / Super Admin** — oversees all salon locations from one dashboard with full reporting and config control
+
+## Key Capabilities
+
+- Appointment booking with real-time availability (prevents double-booking)
+- Multi-location management from a single owner account
+- In-app payments via third-party gateway (e.g., Stripe)
+- Automated reminders (push, email, SMS) and post-appointment review prompts
+- Barber-specific portfolio, private client notes, and personal waitlist
+- Revenue, occupancy, and no-show reporting at owner and barber level
+- Social media integration (Facebook/Instagram posting) and Telegram confirmation bot
+- Unified communication inbox
+
+## Design Reference
+
+Figma prototype: https://www.figma.com/design/vPw5w8BmdJW4vNflQxWwla/personal
+Primary coverage: customer onboarding, discovery, booking flow, appointment management, reviews.
+Admin/barber screens are outstanding deliverables.
+
+
+
+
+<!-- strcuture -->
+
 # Project Structure
-
-## Root Layout
-
-```
-Barbers-Bay/
-├── src/                  # All application source code
-├── .kiro/steering/       # AI steering rules
-├── .agents/skills/       # Agent skill definitions
-├── app.json              # Expo app configuration
-├── biome.jsonc           # Linter/formatter config (extends ultracite)
-├── metro.config.js       # Metro bundler config (Uniwind + Reanimated)
-├── tsconfig.json         # TypeScript config
-├── lefthook.yml          # Git hook definitions
-└── PROJECT-BRD.md        # Business requirements document
-```
-
-## Source Directory (`src/`)
 
 ```
 src/
 ├── app/                  # Expo Router screens (file-based routing)
-│   ├── _layout.tsx       # Root layout — providers and navigation shell
+│   ├── _layout.tsx       # Root layout — providers, Stack navigator
 │   ├── index.tsx         # Home screen
 │   └── +not-found.tsx    # 404 fallback
-├── components/           # Shared reusable UI components
-│   ├── container.tsx     # Base scrollable/non-scrollable screen wrapper
-│   └── theme-toggle.tsx  # Light/dark theme switcher
+│
+├── components/           # Shared, reusable UI components
+│   ├── container.tsx     # Base screen wrapper (safe area + optional scroll)
+│   └── theme-toggle.tsx  # Light/dark theme switch
+│
 ├── contexts/             # React context providers and hooks
 │   └── app-theme-context.tsx
-├── lib/                  # Utilities, helpers, config
-│   └── env.ts            # Type-safe env vars via @t3-oss/env-core + zod
+│
+├── lib/                  # Utilities, configs, non-UI modules
+│   └── env.ts            # Type-safe env vars
+│
 ├── assets/
 │   └── images/           # Static image assets
-└── global.css            # Tailwind/Uniwind/HeroUI style entry point
+│
+└── global.css            # Tailwind + Uniwind + HeroUI Native CSS entry
 ```
 
 ## Conventions
 
-### File Naming
-- All files use **kebab-case**: `theme-toggle.tsx`, `app-theme-context.tsx`
+### File & Folder Naming
+- All files and folders use **kebab-case** (e.g., `app-theme-context.tsx`, `theme-toggle.tsx`)
 - Screen files live directly in `src/app/` following Expo Router conventions
-- Layout files are named `_layout.tsx`
+- Group related screens with route groups: `src/app/(group)/screen.tsx`
 
-### Imports
-- Use the `@/` alias for all internal imports (e.g., `@/components/container`)
-- Use `import type` for type-only imports (`verbatimModuleSyntax` is enforced)
-
-### Components
-- Named exports for components (not default, except Expo Router screens)
-- Expo Router screen files use default exports
-- Wrap third-party icon/native components with `withUniwind()` to enable `className` prop
-
-### Providers (root layout order)
-The `_layout.tsx` wraps the app in this order:
-1. `GestureHandlerRootView` — gesture support
-2. `KeyboardProvider` — keyboard-aware layouts
-3. `AppThemeProvider` — theme context
-4. `HeroUINativeProvider` — design system tokens
+### Component Pattern
+- Named exports for components (not default exports, except for Expo Router screens)
+- Props typed inline with `type Props = ...` above the component
+- Use `PropsWithChildren<Props>` when children are accepted
+- Wrap third-party components with `withUniwind()` to enable `className` prop (e.g., `withUniwind(Ionicons)`)
 
 ### Styling
-- Use `className` with Tailwind/Uniwind utility classes — no inline `StyleSheet` objects
-- Use HeroUI design tokens for colors: `text-foreground`, `bg-background`, `bg-content1`, `text-primary`, `text-default-400`, etc.
+- Use **className** with Uniwind/Tailwind utility classes exclusively — no `StyleSheet.create()`
+- Use **semantic color tokens** from HeroUI Native (`text-foreground`, `bg-background`, `bg-content1`, `text-primary`, `text-default-400`, etc.)
 - Use `cn()` from `heroui-native` for conditional class merging
-- Use `tailwind-variants` for component variant definitions
+- Apply safe area insets via `useSafeAreaInsets()` in the `Container` component — do not re-apply in individual screens
+
+### Provider Stack (Root Layout)
+Providers must be nested in this order in `_layout.tsx`:
+1. `GestureHandlerRootView` (outermost)
+2. `KeyboardProvider`
+3. `AppThemeProvider`
+4. `HeroUINativeProvider`
+5. Navigator (Stack/Drawer)
 
 ### Context Pattern
-- Context + Provider + typed hook in a single file under `src/contexts/`
+- Context value built with `useMemo` to prevent unnecessary re-renders
+- Callbacks stabilised with `useCallback`
+- Export both the Provider (`AppThemeProvider`) and the hook (`useAppTheme`) from the same file
 - Hook throws if used outside its provider
-- Memoize context values with `useMemo`; memoize callbacks with `useCallback`
+
+### Path Aliases
+- `@/*` maps to `src/*` — always use this alias for internal imports
+  ```ts
+  import { Container } from "@/components/container";
+  ```
 
 ### Environment Variables
-- All env vars defined and validated in `src/lib/env.ts`
-- Client-side vars must be prefixed with `EXPO_PUBLIC_`
-- Access via the `env` object — never read `process.env` directly elsewhere
+- Add new vars to `src/lib/env.ts` with a Zod schema
+- Client vars must be prefixed `EXPO_PUBLIC_`
+- Never access `process.env` directly — always import from `@/lib/env`
 
-### Screen Layout
-- Wrap every screen in `<Container>` for consistent safe-area and scroll handling
-- `Container` handles `paddingBottom` from safe area insets automatically
-
-
-<!-- STRCUTURE -->
-
-# Project Structure
-
-## Root Layout
-
-```
-Barbers-Bay/
-├── src/                  # All application source code
-├── .kiro/steering/       # AI steering rules
-├── .agents/skills/       # Agent skill definitions
-├── app.json              # Expo app configuration
-├── biome.jsonc           # Linter/formatter config (extends ultracite)
-├── metro.config.js       # Metro bundler config (Uniwind + Reanimated)
-├── tsconfig.json         # TypeScript config
-├── lefthook.yml          # Git hook definitions
-└── PROJECT-BRD.md        # Business requirements document
-```
-
-## Source Directory (`src/`)
-
-```
-src/
-├── app/                  # Expo Router screens (file-based routing)
-│   ├── _layout.tsx       # Root layout — providers and navigation shell
-│   ├── index.tsx         # Home screen
-│   └── +not-found.tsx    # 404 fallback
-├── components/           # Shared reusable UI components
-│   ├── container.tsx     # Base scrollable/non-scrollable screen wrapper
-│   └── theme-toggle.tsx  # Light/dark theme switcher
-├── contexts/             # React context providers and hooks
-│   └── app-theme-context.tsx
-├── lib/                  # Utilities, helpers, config
-│   └── env.ts            # Type-safe env vars via @t3-oss/env-core + zod
-├── assets/
-│   └── images/           # Static image assets
-└── global.css            # Tailwind/Uniwind/HeroUI style entry point
-```
-
-## Conventions
-
-### File Naming
-- All files use **kebab-case**: `theme-toggle.tsx`, `app-theme-context.tsx`
-- Screen files live directly in `src/app/` following Expo Router conventions
-- Layout files are named `_layout.tsx`
-
-### Imports
-- Use the `@/` alias for all internal imports (e.g., `@/components/container`)
-- Use `import type` for type-only imports (`verbatimModuleSyntax` is enforced)
-
-### Components
-- Named exports for components (not default, except Expo Router screens)
-- Expo Router screen files use default exports
-- Wrap third-party icon/native components with `withUniwind()` to enable `className` prop
-
-### Providers (root layout order)
-The `_layout.tsx` wraps the app in this order:
-1. `GestureHandlerRootView` — gesture support
-2. `KeyboardProvider` — keyboard-aware layouts
-3. `AppThemeProvider` — theme context
-4. `HeroUINativeProvider` — design system tokens
-
-### Styling
-- Use `className` with Tailwind/Uniwind utility classes — no inline `StyleSheet` objects
-- Use HeroUI design tokens for colors: `text-foreground`, `bg-background`, `bg-content1`, `text-primary`, `text-default-400`, etc.
-- Use `cn()` from `heroui-native` for conditional class merging
-- Use `tailwind-variants` for component variant definitions
-
-### Context Pattern
-- Context + Provider + typed hook in a single file under `src/contexts/`
-- Hook throws if used outside its provider
-- Memoize context values with `useMemo`; memoize callbacks with `useCallback`
-
-### Environment Variables
-- All env vars defined and validated in `src/lib/env.ts`
-- Client-side vars must be prefixed with `EXPO_PUBLIC_`
-- Access via the `env` object — never read `process.env` directly elsewhere
-
-### Screen Layout
-- Wrap every screen in `<Container>` for consistent safe-area and scroll handling
-- `Container` handles `paddingBottom` from safe area insets automatically
+### TypeScript
+- Strict mode enabled; `noUnusedLocals` and `noUnusedParameters` are errors
+- Use `type` imports (`import type`) for type-only imports (`verbatimModuleSyntax` is on)
+- `noUncheckedIndexedAccess` is enabled — handle possible `undefined` on array/object access
 
 
-<!-- TECH -->
+<!-- tech -->
 
 # Tech Stack
 
 ## Runtime & Framework
 
-- **React Native 0.83** with **Expo 55** (managed + bare workflow via `expo prebuild`)
-- **Expo Router 55** — file-based routing with typed routes enabled
-- **React 19** with React Compiler enabled (`experiments.reactCompiler: true`)
-
-## Language
-
-- **TypeScript 5.9** — strict mode, `noUncheckedIndexedAccess`, `noUnusedLocals/Parameters`
-- Path alias: `@/*` → `./src/*`
-- `verbatimModuleSyntax: true` — use `import type` for type-only imports
+- **React Native 0.83** with **React 19**
+- **Expo SDK 55** with **Expo Router 55** (file-based routing, typed routes enabled)
+- **React Compiler** enabled via Expo experiments (`reactCompiler: true`)
 
 ## Styling
 
-- **Uniwind** — Tailwind CSS v4 utility classes for React Native via `withUniwind()` HOC
-- **HeroUI Native** — component library providing design tokens and primitives
-- `tailwind-variants` and `tailwind-merge` for conditional/merged class strings
-- Global CSS entry: `src/global.css` (imports tailwindcss, uniwind, heroui-native styles)
-- Theming: light/dark via `Uniwind.setTheme()`, tokens accessed as `text-foreground`, `bg-background`, `bg-content1`, `text-primary`, etc.
+- **Uniwind** — Tailwind-for-React-Native utility classes via `withUniwind()` HOC; configured in `metro.config.js`
+- **Tailwind CSS 4** — underlying utility system; CSS entry at `src/global.css`
+- **HeroUI Native** — component library providing tokens (`cn`, semantic color names like `text-foreground`, `bg-content1`, `bg-primary`)
+- **tailwind-variants** and **tailwind-merge** — for composing and merging class strings
+- Use semantic color tokens (`foreground`, `background`, `primary`, `default-400`, etc.) rather than hardcoded colors
 
 ## Navigation
 
-- Expo Router (file-based, `src/app/` directory)
-- `@react-navigation/drawer` available for drawer navigation
-- `react-native-screens` and `react-native-safe-area-context` for native screen management
+- **Expo Router** (file-based) — screens live in `src/app/`
+- **React Navigation Drawer** available for drawer-style navigation
 
-## Animation & Gestures
+## Animations & Gestures
 
-- **Reanimated 4** (`react-native-reanimated`) — use `Animated` components and hooks
-- **React Native Gesture Handler** — wrap root in `<GestureHandlerRootView>`
-- **React Native Worklets** — for worklet functions used with Reanimated
+- **React Native Reanimated 4** — all animations; use `Animated.View`, `ZoomIn`, `FadeOut`, etc.
+- **React Native Gesture Handler** — wrap root in `<GestureHandlerRootView style={{ flex: 1 }}>`
+- **React Native Worklets** — for worklet-based animation logic
 
-## Other Key Libraries
+## Forms & Validation
 
-- `@gorhom/bottom-sheet` — bottom sheet component
-- `react-native-keyboard-controller` — keyboard-aware layouts
-- `expo-haptics` — haptic feedback (iOS only guard with `Platform.OS`)
-- `expo-secure-store` — secure key-value storage
-- `@expo/vector-icons` (Ionicons etc.) — wrap with `withUniwind()` to apply className styling
-- `zod` v4 — schema validation
-- `@t3-oss/env-core` — type-safe environment variables (see `src/lib/env.ts`)
+- **Zod 4** — schema validation
+- **@t3-oss/env-core** — type-safe environment variables (see `src/lib/env.ts`)
+
+## UI Utilities
+
+- **@gorhom/bottom-sheet** — bottom sheet modals
+- **expo-haptics** — haptic feedback (iOS-gated: `if (Platform.OS === 'ios')`)
+- **react-native-keyboard-controller** — wrap root in `<KeyboardProvider>`
+- **react-native-safe-area-context** — `useSafeAreaInsets()` for safe area padding
+- **@expo/vector-icons** (Ionicons) — icon set; use `withUniwind(Ionicons)` to apply className styling
+
+## Package Manager & Build
+
+- **Bun** — package manager (`bun.lock` present)
+- **Metro** — bundler (configured in `metro.config.js` with Reanimated + Uniwind wrappers)
 
 ## Linting & Formatting
 
-- **Biome** (via `ultracite/biome/core` preset) — primary linter + formatter
-- **oxlint** + **oxfmt** — run on staged files via git pre-commit hooks (lefthook)
-- **Lefthook** manages pre-commit hooks (parallel: oxlint --fix, oxfmt --write)
-- `bun` is the package manager (`bun.lock` present)
+- **Biome 2** — extends `ultracite/biome/core`; runs via `ultracite`
+- **oxlint** + **oxfmt** — fast lint/format tools run as pre-commit hooks via **Lefthook**
+- **Knip** — unused exports/files detection
 
 ## Common Commands
 
 ```bash
 # Start dev server (clear cache)
-bun run dev
+bun dev
 
-# Start dev server
-bun run start
+# Start dev server (no clear)
+bun start
 
-# Run on Android / iOS
-bun run android
-bun run ios
+# Run on Android
+bun android
 
-# Prebuild native projects (clean)
-bun run prebuild
+# Run on iOS
+bun ios
 
-# Type check
-bun run check-types
+# Type-check (no emit)
+bun check-types
 
-# Lint check / auto-fix
-bun run check
-bun run fix
+# Lint check
+bun check
 
-# Find unused exports/deps
-bun run knip
+# Lint fix
+bun fix
+
+# Find unused code
+bun knip
+
+# Prebuild native (clean)
+bun prebuild
 ```
+
+## Environment Variables
+
+Defined and validated in `src/lib/env.ts` using `@t3-oss/env-core` + Zod.
+All client-side vars must be prefixed `EXPO_PUBLIC_`.
