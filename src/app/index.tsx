@@ -8,6 +8,45 @@ import { withUniwind } from "uniwind";
 
 const StyledIonicons = withUniwind(Ionicons);
 
+const authScreens = [
+  {
+    title: "Splash Screen",
+    desc: "First splash / welcome page",
+    href: "/splash" as const,
+    icon: "flash-outline" as const,
+  },
+  {
+    title: "Login Screen",
+    desc: "Sign in to continue your journey",
+    href: "/(auth)/login" as const,
+    icon: "log-in-outline" as const,
+  },
+  {
+    title: "Register Screen",
+    desc: "Create a new account",
+    href: "/(auth)/register" as const,
+    icon: "person-add-outline" as const,
+  },
+  {
+    title: "Forgot Password",
+    desc: "Request password reset",
+    href: "/(auth)/forgot-password" as const,
+    icon: "help-circle-outline" as const,
+  },
+  {
+    title: "OTP Verification",
+    desc: "Verify OTP code input",
+    href: "/(auth)/otp-code" as const,
+    icon: "key-outline" as const,
+  },
+  {
+    title: "Change Password",
+    desc: "Reset new password / PIN",
+    href: "/(auth)/change-password" as const,
+    icon: "lock-closed-outline" as const,
+  },
+];
+
 export default function HomePage() {
   const { currentTheme } = useAppTheme();
 
@@ -67,38 +106,7 @@ export default function HomePage() {
           Auth Screens
         </Text>
         <View className="gap-2.5">
-          {[
-            {
-              title: "Login Screen",
-              desc: "Sign in to continue your journey",
-              href: "/(auth)/login" as const,
-              icon: "log-in-outline" as const,
-            },
-            {
-              title: "Register Screen",
-              desc: "Create a new account",
-              href: "/(auth)/register" as const,
-              icon: "person-add-outline" as const,
-            },
-            {
-              title: "Forgot Password",
-              desc: "Request password reset",
-              href: "/(auth)/forgot-password" as const,
-              icon: "help-circle-outline" as const,
-            },
-            {
-              title: "OTP Verification",
-              desc: "Verify OTP code input",
-              href: "/(auth)/otp-code" as const,
-              icon: "key-outline" as const,
-            },
-            {
-              title: "Change Password",
-              desc: "Reset new password / PIN",
-              href: "/(auth)/change-password" as const,
-              icon: "lock-closed-outline" as const,
-            },
-          ].map((item) => (
+          {authScreens.map((item) => (
             <Link asChild href={item.href} key={item.title}>
               <Pressable className="flex-row items-center gap-4 rounded-2xl bg-content1 p-4 active:opacity-75">
                 <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
