@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Get complete component documentation (MDX) for HeroUI Native components.
+ * Get complete component documentation (MDX) for HeroUI v3 components.
  *
  * Usage:
  *   node get_component_docs.mjs Button
@@ -10,10 +10,9 @@
  *   MDX documentation including imports, usage, variants, props, examples
  */
 
-const API_BASE =
-  process.env.HEROUI_NATIVE_API_BASE || "https://native-mcp-api.heroui.com";
+const API_BASE = process.env.HEROUI_API_BASE || "https://mcp-api.heroui.com";
 const FALLBACK_BASE = "https://heroui.com";
-const APP_PARAM = "app=native-skills";
+const APP_PARAM = "app=react-skills";
 
 /**
  * Convert PascalCase to kebab-case.
@@ -26,7 +25,7 @@ function toKebabCase(name) {
 }
 
 /**
- * Fetch data from HeroUI Native API with app parameter for analytics.
+ * Fetch data from HeroUI API with app parameter for analytics.
  */
 async function fetchApi(endpoint, method = "GET", body = null) {
   const separator = endpoint.includes("?") ? "&" : "?";
@@ -36,7 +35,7 @@ async function fetchApi(endpoint, method = "GET", body = null) {
     const options = {
       headers: {
         "Content-Type": "application/json",
-        "User-Agent": "HeroUI-Native-Skill/1.0",
+        "User-Agent": "HeroUI-Skill/1.0",
       },
       method,
       signal: AbortSignal.timeout(30000),
@@ -63,11 +62,11 @@ async function fetchApi(endpoint, method = "GET", body = null) {
  */
 async function fetchFallback(component) {
   const kebabName = toKebabCase(component);
-  const url = `${FALLBACK_BASE}/docs/native/components/${kebabName}.mdx`;
+  const url = `${FALLBACK_BASE}/docs/react/components/${kebabName}.mdx`;
 
   try {
     const response = await fetch(url, {
-      headers: { "User-Agent": "HeroUI-Native-Skill/1.0" },
+      headers: { "User-Agent": "HeroUI-Skill/1.0" },
       signal: AbortSignal.timeout(30000),
     });
 
@@ -106,7 +105,7 @@ async function main() {
   const components = args;
 
   // Try API first - use POST /v1/components/docs for batch requests
-  console.error(`# Fetching Native docs for: ${components.join(", ")}...`);
+  console.error(`# Fetching docs for: ${components.join(", ")}...`);
   const data = await fetchApi("/v1/components/docs", "POST", { components });
 
   if (data && data.results) {

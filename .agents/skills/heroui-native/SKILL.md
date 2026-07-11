@@ -3,7 +3,7 @@ name: heroui-native
 description: "HeroUI Native component library for React Native (Tailwind v4 via Uniwind). Use when building mobile UIs with HeroUI Native — creating Buttons, Cards, TextFields, Dialogs; installing heroui-native; configuring dark/light themes; or fetching component docs. Keywords: HeroUI Native, heroui-native, React Native UI, Uniwind, mobile components."
 metadata:
   author: heroui
-  version: "1.0.0"
+  version: "2.0.1"
 ---
 
 # HeroUI Native Development Guide
@@ -12,16 +12,24 @@ HeroUI Native is a component library built on **Uniwind (Tailwind CSS for React 
 
 ---
 
-## CRITICAL: Native Only — Do Not Use Web Patterns
+## Installation
+
+```bash
+curl -fsSL https://heroui.com/install | bash -s heroui-native
+```
+
+---
+
+## CRITICAL: Native Only - Do Not Use Web Patterns
 
 **This guide is for HeroUI Native ONLY.** Do NOT apply HeroUI React (web) patterns — the package, styling engine, and color format all differ:
 
-| Feature      | React (Web)          | Native (Mobile)                     |
-| ------------ | -------------------- | ----------------------------------- |
-| **Styling**  | Tailwind CSS v4      | Uniwind (Tailwind for React Native) |
-| **Colors**   | oklch format         | HSL format                          |
-| **Package**  | `@heroui/react@beta` | `heroui-native`                     |
-| **Platform** | Web browsers         | iOS & Android                       |
+| Feature      | React (Web)     | Native (Mobile)                     |
+| ------------ | --------------- | ----------------------------------- |
+| **Styling**  | Tailwind CSS v4 | Uniwind (Tailwind for React Native) |
+| **Colors**   | oklch format    | HSL format                          |
+| **Package**  | `@heroui/react` | `heroui-native`                     |
+| **Platform** | Web browsers    | iOS & Android                       |
 
 ```tsx
 // CORRECT — Native pattern
@@ -68,23 +76,21 @@ node scripts/get_docs.mjs /docs/native/getting-started/theming
 
 ### Direct MDX URLs
 
-Component docs: `https://v3.heroui.com/docs/native/components/{component-name}.mdx`
+Component docs: `https://heroui.com/docs/native/components/{component-name}.mdx`
 
 Examples:
 
-- Button: `https://v3.heroui.com/docs/native/components/button.mdx`
-- Dialog: `https://v3.heroui.com/docs/native/components/dialog.mdx`
-- TextField: `https://v3.heroui.com/docs/native/components/text-field.mdx`
+- Button: `https://heroui.com/docs/native/components/button.mdx`
+- Dialog: `https://heroui.com/docs/native/components/dialog.mdx`
+- TextField: `https://heroui.com/docs/native/components/text-field.mdx`
 
-Getting started guides: `https://v3.heroui.com/docs/native/getting-started/{topic}.mdx`
+Getting started guides: `https://heroui.com/docs/native/getting-started/{topic}.mdx`
 
 **Important:** Always fetch component docs before implementing. The MDX docs include complete examples, props, anatomy, and API references.
 
 ---
 
 ## Installation Essentials
-
-**CRITICAL**: HeroUI Native is currently in BETA.
 
 ### Quick Install
 
@@ -144,7 +150,27 @@ export default function Layout() {
 
 ## Component Patterns
 
-All components use the **compound pattern** with dot-notation subcomponents (e.g., `Card.Header`, `Card.Body`, `Card.Footer`). Don't flatten to props — always compose with subcomponents. Fetch component docs for complete anatomy and examples.
+HeroUI Native uses **compound component patterns**. Each component has subcomponents accessed via dot notation.
+
+**Example - Card:**
+
+```tsx
+<Card>
+  <Card.Header>{/* Icons, badges */}</Card.Header>
+  <Card.Body>
+    <Card.Title>Title</Card.Title>
+    <Card.Description>Description</Card.Description>
+  </Card.Body>
+  <Card.Footer>{/* Actions */}</Card.Footer>
+</Card>
+```
+
+**Key Points:**
+
+- Always use compound structure - don't flatten to props
+- Subcomponents are accessed via dot notation (e.g., `Card.Header`)
+- Native Card uses `Card.Body` (not `Card.Content`); Title and Description go inside Body
+- **Fetch component docs for complete anatomy and examples**
 
 ---
 
@@ -200,4 +226,4 @@ const { theme } = useUniwind();
 Uniwind.setTheme(theme === "light" ? "dark" : "light");
 ```
 
-For detailed theming, fetch: `https://v3.heroui.com/docs/native/getting-started/theming.mdx`
+For detailed theming, fetch: `https://heroui.com/docs/native/getting-started/theming.mdx`
