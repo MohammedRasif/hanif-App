@@ -1,12 +1,14 @@
-# Lefthook configuration
-# https://github.com/evilmartians/lefthook
+# lefthook.yml
 
 pre-commit:
-  parallel: true
+  parallel: false
   jobs:
-    - name: oxlint
-      run: pnpm oxlint --fix {staged_files}
+    - name: prettier
+      run: ./node_modules/.bin/prettier --write --ignore-unknown -- {staged_files}
+      glob: "*.{js,jsx,ts,tsx,cjs,mjs,json,md,css,yml,yaml}"
       stage_fixed: true
-    - name: oxfmt
-      run: pnpm oxfmt --write {staged_files}
-      stage_fixed: true
+
+    # - name: eslint
+    #   run: pnpm exec eslint --fix -- {staged_files}
+    #   glob: "*.{js,jsx,ts,tsx,cjs,mjs}"
+    #   stage_fixed: true

@@ -1,22 +1,25 @@
 {
   "expo": {
-    "scheme": "expo-starter",
+    "icon": "./src/assets/logo.png",
+    "scheme": "barbers-bay",
     "userInterfaceStyle": "automatic",
     "orientation": "default",
     "web": {
       "bundler": "metro"
     },
-    "name": "expo-starter",
-    "slug": "expo-starter",
-    "plugins": [
-      "expo-font"
-    ],
+    "name": "barbers-bay",
+    "slug": "barbers-bay",
+    "plugins": ["expo-font"],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
     },
     "android": {
-      "package": "com.yeasin.outside.expostarter"
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/logo.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.yeasin.outside.barbersbay"
     }
   }
 }
