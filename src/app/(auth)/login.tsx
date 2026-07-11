@@ -1,12 +1,13 @@
+import { Lobster_400Regular, useFonts } from "@expo-google-fonts/lobster";
 import { Ionicons } from "@expo/vector-icons";
-import { useFonts, Lobster_400Regular } from "@expo-google-fonts/lobster";
 import { Link, Stack } from "expo-router";
+import { Button, InputGroup, TextField } from "heroui-native";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import { Button, InputGroup, TextField } from "heroui-native";
 import { withUniwind } from "uniwind";
 
 import { Container } from "@/components/container";
+import { SocialAuth } from "@/feature/social-auth";
 
 const StyledIonicons = withUniwind(Ionicons);
 
@@ -22,7 +23,7 @@ export default function LoginScreen() {
     <Container>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <View className="flex-1 justify-center px-6">
+      <View className="flex-1 justify-center px-6 bg-[#FFFFFF]">
         {/* Header */}
         <View className="mb-10 items-center">
           <Text
@@ -156,22 +157,7 @@ export default function LoginScreen() {
           <View className="h-px flex-1 bg-default-200" />
         </View>
 
-        {/* Social Login */}
-        <View className="mb-8 flex-row justify-center gap-4">
-          {/* Google */}
-          <Pressable className="h-14 w-14 items-center justify-center rounded-2xl bg-content1 border border-default-200">
-            <Text style={{ fontSize: 22, fontWeight: "bold" }}>G</Text>
-          </Pressable>
-
-          {/* Apple */}
-          <Pressable className="h-14 w-14 items-center justify-center rounded-2xl bg-content1 border border-default-200">
-            <StyledIonicons
-              name="logo-apple"
-              size={24}
-              className="text-foreground"
-            />
-          </Pressable>
-        </View>
+        <SocialAuth />
 
         {/* Sign Up Link */}
         <View className="flex-row items-center justify-center gap-1">

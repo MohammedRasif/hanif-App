@@ -1,11 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
+import { Link } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { withUniwind } from "uniwind";
-
 import { Container } from "@/components/container";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useAppTheme } from "@/contexts/app-theme-context";
-import { Link } from "expo-router";
 
 const StyledIonicons = withUniwind(Ionicons);
 
@@ -18,16 +17,16 @@ export default function HomePage() {
       <View className="flex-row items-center justify-between px-6 pt-14 pb-4">
         <Text className="font-bold text-2xl text-foreground">Home</Text>
         <ThemeToggle />
-        <Link href="/(auth)/login" asChild>
+        <Link asChild href="/(auth)/login">
           <Pressable>
-            <Text className="text-sm font-semibold text-primary">Login</Text>
+            <Text className="font-semibold text-primary text-sm">Login</Text>
           </Pressable>
         </Link>
       </View>
 
       {/* Hero section */}
       <View className="items-center px-6 pt-8 pb-10">
-        <View className="mb-6 h-20 w-20 items-center justify-center rounded-full bg-primary">
+        <View className="mb-6 h-20 w-20 items-center justify-center rounded-full bg-white">
           <StyledIonicons
             className="text-primary-foreground"
             name="rocket-outline"
