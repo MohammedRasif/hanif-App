@@ -1,15 +1,15 @@
+import { Container } from "@/components/container";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { useAppTheme } from "@/contexts/app-theme-context";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { withUniwind } from "uniwind";
-import { Container } from "@/components/container";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { useAppTheme } from "@/contexts/app-theme-context";
 
 const StyledIonicons = withUniwind(Ionicons);
 
 export default function HomePage() {
-  const { currentTheme, isDark } = useAppTheme();
+  const { currentTheme } = useAppTheme();
 
   return (
     <Container>
@@ -61,51 +61,70 @@ export default function HomePage() {
         ))}
       </View>
 
-      {/* Feature cards */}
-      <View className="gap-3 px-6 pb-10">
-        {[
-          {
-            icon: "color-palette-outline" as const,
-            title: "Theming",
-            desc: isDark ? "Dark mode is active" : "Light mode is active",
-          },
-          {
-            icon: "layers-outline" as const,
-            title: "Navigation",
-            desc: "File-based routing with Expo Router",
-          },
-          {
-            icon: "flash-outline" as const,
-            title: "Animations",
-            desc: "Powered by Reanimated 4",
-          },
-        ].map((card) => (
-          <View
-            className="flex-row items-center gap-4 rounded-2xl bg-content1 p-4"
-            key={card.title}
-          >
-            <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-              <StyledIonicons
-                className="text-primary"
-                name={card.icon}
-                size={20}
-              />
-            </View>
-            <View className="flex-1">
-              <Text className="font-semibold text-foreground text-sm">
-                {card.title}
-              </Text>
-              <Text className="mt-0.5 text-default-400 text-xs">
-                {card.desc}
-              </Text>
-            </View>
-            <StyledIonicons
-              className="text-default-300"
-              name="chevron-forward"
-              size={16}
-            />
-          </View>
-        ))}
+      {/* Auth Screen Navigator (For testing) */}
+      <View className="mb-6 px-6">
+        <Text className="mb-3 font-semibold text-default-400 text-xs uppercase tracking-wider">
+          Auth Screens
+        </Text>
+        <View className="gap-2.5">
+          {[
+            {
+              title: "Login Screen",
+              desc: "Sign in to continue your journey",
+              href: "/(auth)/login" as const,
+              icon: "log-in-outline" as const,
+            },
+            {
+              title: "Register Screen",
+              desc: "Create a new account",
+              href: "/(auth)/register" as const,
+              icon: "person-add-outline" as const,
+            },
+            {
+              title: "Forgot Password",
+              desc: "Request password reset",
+              href: "/(auth)/forgot-password" as const,
+              icon: "help-circle-outline" as const,
+            },
+            {
+              title: "OTP Verification",
+              desc: "Verify OTP code input",
+              href: "/(auth)/otp-code" as const,
+              icon: "key-outline" as const,
+            },
+            {
+              title: "Change Password",
+              desc: "Reset new password / PIN",
+              href: "/(auth)/change-password" as const,
+              icon: "lock-closed-outline" as const,
+            },
+          ].map((item) => (
+            <Link asChild href={item.href} key={item.title}>
+              <Pressable className="flex-row items-center gap-4 rounded-2xl bg-content1 p-4 active:opacity-75">
+                <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                  <StyledIonicons
+                    className="text-primary"
+                    name={item.icon}
+                    size={20}
+                  />
+                </View>
+                <View className="flex-1">
+                  <Text className="font-semibold text-foreground text-sm">
+                    {item.title}
+                  </Text>
+                  <Text className="mt-0.5 text-default-400 text-xs">
+                    {item.desc}
+                  </Text>
+                </View>
+                <StyledIonicons
+                  className="text-default-300"
+                  name="chevron-forward"
+                  size={16}
+                />
+              </Pressable>
+            </Link>
+          ))}
+        </View>
       </View>
     </Container>
   );
