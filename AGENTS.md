@@ -30,9 +30,6 @@ Figma prototype: https://www.figma.com/design/vPw5w8BmdJW4vNflQxWwla/personal
 Primary coverage: customer onboarding, discovery, booking flow, appointment management, reviews.
 Admin/barber screens are outstanding deliverables.
 
-
-
-
 <!-- strcuture -->
 
 # Project Structure
@@ -47,6 +44,11 @@ src/
 ├── components/           # Shared, reusable UI components
 │   ├── container.tsx     # Base screen wrapper (safe area + optional scroll)
 │   └── theme-toggle.tsx  # Light/dark theme switch
+│
+├── feature/          # all feature/page based components. that are not shared with other module or pages .
+│   ├── auth/             # authentication related components
+│   │   ├──social-login.tsx     # login related component
+│   └── ...               # other features
 │
 ├── contexts/             # React context providers and hooks
 │   └── app-theme-context.tsx
@@ -63,24 +65,29 @@ src/
 ## Conventions
 
 ### File & Folder Naming
+
 - All files and folders use **kebab-case** (e.g., `app-theme-context.tsx`, `theme-toggle.tsx`)
 - Screen files live directly in `src/app/` following Expo Router conventions
 - Group related screens with route groups: `src/app/(group)/screen.tsx`
 
 ### Component Pattern
+
 - Named exports for components (not default exports, except for Expo Router screens)
 - Props typed inline with `type Props = ...` above the component
 - Use `PropsWithChildren<Props>` when children are accepted
 - Wrap third-party components with `withUniwind()` to enable `className` prop (e.g., `withUniwind(Ionicons)`)
 
 ### Styling
+
 - Use **className** with Uniwind/Tailwind utility classes exclusively — no `StyleSheet.create()`
 - Use **semantic color tokens** from HeroUI Native (`text-foreground`, `bg-background`, `bg-content1`, `text-primary`, `text-default-400`, etc.)
 - Use `cn()` from `heroui-native` for conditional class merging
 - Apply safe area insets via `useSafeAreaInsets()` in the `Container` component — do not re-apply in individual screens
 
 ### Provider Stack (Root Layout)
+
 Providers must be nested in this order in `_layout.tsx`:
+
 1. `GestureHandlerRootView` (outermost)
 2. `KeyboardProvider`
 3. `AppThemeProvider`
@@ -88,27 +95,30 @@ Providers must be nested in this order in `_layout.tsx`:
 5. Navigator (Stack/Drawer)
 
 ### Context Pattern
+
 - Context value built with `useMemo` to prevent unnecessary re-renders
 - Callbacks stabilised with `useCallback`
 - Export both the Provider (`AppThemeProvider`) and the hook (`useAppTheme`) from the same file
 - Hook throws if used outside its provider
 
 ### Path Aliases
+
 - `@/*` maps to `src/*` — always use this alias for internal imports
   ```ts
   import { Container } from "@/components/container";
   ```
 
 ### Environment Variables
+
 - Add new vars to `src/lib/env.ts` with a Zod schema
 - Client vars must be prefixed `EXPO_PUBLIC_`
 - Never access `process.env` directly — always import from `@/lib/env`
 
 ### TypeScript
+
 - Strict mode enabled; `noUnusedLocals` and `noUnusedParameters` are errors
 - Use `type` imports (`import type`) for type-only imports (`verbatimModuleSyntax` is on)
 - `noUncheckedIndexedAccess` is enabled — handle possible `undefined` on array/object access
-
 
 <!-- tech -->
 
@@ -199,10 +209,6 @@ bun prebuild
 Defined and validated in `src/lib/env.ts` using `@t3-oss/env-core` + Zod.
 All client-side vars must be prefixed `EXPO_PUBLIC_`.
 
-
-
-
-
 <!-- BEGIN:behavioral-guidelines -->
 
 ## 1. Think Before Coding
@@ -277,3 +283,66 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
 
 <!-- END:behavioral-guidelines -->
+
+<!-- BEGIN:hero-ui-guide -->
+<page url="/en/docs/native/getting-started/agents-md">
+# AGENTS.md
+
+**Category**: native
+**URL**: https://www.heroui.com/en/docs/native/getting-started/agents-md
+**Source**: https://raw.githubusercontent.com/heroui-inc/heroui/refs/heads/v3/apps/docs/content/docs/en/native/getting-started/(ui-for-agents)/agents-md.mdx
+
+> Download HeroUI Native documentation for AI coding agents
+
+---
+
+Download HeroUI Native documentation directly into your project for AI assistants to reference.
+
+<Callout>
+  **Note:** The `agents-md` command is specifically for HeroUI React v3 and HeroUI Native. Other CLI commands (like `add`, `init`, `upgrade`, etc.) are for HeroUI v2 (for now).
+</Callout>
+
+<DocsImage
+  src="https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/agents-md-native.jpg"
+  darkSrc="https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/docs/agents-md-native-dark.jpg"
+  alt="HeroUI Native AGENTS.md"
+/>
+
+### Usage
+
+```bash
+bunx heroui-cli@latest agents-md --native
+
+```
+
+Or specify output file:
+
+```bash
+bunx heroui-cli@latest agents-md --native --output AGENTS.md
+
+```
+
+### What It Does
+
+- Downloads latest HeroUI Native docs to `.heroui-docs/native/`
+- Generates an index in `AGENTS.md` or `CLAUDE.md`
+- Adds `.heroui-docs/` to `.gitignore` automatically
+
+### Options
+
+- `--native` - Download Native docs only
+- `--output <files...>` - Target file(s) (e.g., `AGENTS.md` or `AGENTS.md CLAUDE.md`)
+- `--ssh` - Use SSH for git clone
+
+### Requirements
+
+- Tailwind CSS >= v4 (via Uniwind)
+
+### Related Documentation
+
+- [AGENTS.md](https://agents.md/) - Learn about the AGENTS.md format for coding agents
+- [CLAUDE.md](https://code.claude.com/docs/en/best-practices#write-an-effective-claude-md) - Claude equivalent of AGENTS.md
+- [AGENTS.md vs Skills](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals) - AGENTS.md performance
+</page>
+
+<!-- END:hero-ui-guide -->

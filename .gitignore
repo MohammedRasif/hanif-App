@@ -26,3 +26,5 @@ uniwind-types.d.ts
 expo-env.d.ts
 # @end expo-cli
 /android
+# heroui-agents-md
+.heroui-docs/

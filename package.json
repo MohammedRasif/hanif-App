@@ -16,6 +16,7 @@
     "knip": "knip"
   },
   "dependencies": {
+    "@expo-google-fonts/lobster": "^0.4.1",
     "@expo/metro-runtime": "~55.0.6",
     "@expo/vector-icons": "^15.0.3",
     "@gorhom/bottom-sheet": "^5",
@@ -28,7 +29,7 @@
     "eslint": "^10.0.3",
     "expo": "^55.0.0",
     "expo-constants": "~55.0.7",
-    "expo-font": "~55.0.4",
+    "expo-font": "~55.0.8",
     "expo-haptics": "~55.0.8",
     "expo-linking": "~55.0.7",
     "expo-network": "~55.0.8",
