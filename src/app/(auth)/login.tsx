@@ -45,7 +45,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <Container>
+    <Container keyboardAvoiding>
       <Stack.Screen options={{ headerShown: false }} />
 
       <View className="flex-1 justify-center bg-[#FFFFFF] px-6">

@@ -51,7 +51,7 @@ export default function ChangePasswordScreen() {
   };
 
   return (
-    <Container>
+    <Container keyboardAvoiding>
       <Stack.Screen options={{ headerShown: false }} />
 
       <View className="flex-1 justify-between bg-[#FFFFFF] px-6 pt-14 pb-8">

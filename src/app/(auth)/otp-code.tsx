@@ -30,7 +30,7 @@ export default function OtpCodeScreen() {
   };
 
   return (
-    <Container>
+    <Container keyboardAvoiding>
       <Stack.Screen options={{ headerShown: false }} />
 
       <View className="flex-1 bg-[#FFFFFF] px-6 pt-14 pb-8">

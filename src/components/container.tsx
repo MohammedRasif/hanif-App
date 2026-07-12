@@ -1,11 +1,15 @@
 import { cn } from "heroui-native";
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 import {
   ScrollView,
   type ScrollViewProps,
   View,
   type ViewProps,
 } from "react-native";
+import {
+  KeyboardAvoidingView,
+  KeyboardAwareScrollView,
+} from "react-native-keyboard-controller";
 import Animated, { type AnimatedProps } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -14,6 +18,7 @@ const AnimatedView = Animated.createAnimatedComponent(View);
 type Props = AnimatedProps<ViewProps> & {
   className?: string;
   isScrollable?: boolean;
+  keyboardAvoiding?: boolean;
   scrollViewProps?: Omit<ScrollViewProps, "contentContainerStyle">;
 };
 
@@ -21,10 +26,47 @@ export function Container({
   children,
   className,
   isScrollable = true,
+  keyboardAvoiding = false,
   scrollViewProps,
   ...props
 }: PropsWithChildren<Props>) {
   const insets = useSafeAreaInsets();
+
+  let content: ReactNode;
+  if (isScrollable) {
+    if (keyboardAvoiding) {
+      content = (
+        <KeyboardAwareScrollView
+          bottomOffset={50}
+          contentContainerStyle={{ flexGrow: 1 }}
+          contentInsetAdjustmentBehavior="automatic"
+          keyboardShouldPersistTaps="handled"
+          {...scrollViewProps}
+        >
+          {children}
+        </KeyboardAwareScrollView>
+      );
+    } else {
+      content = (
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          contentInsetAdjustmentBehavior="automatic"
+          keyboardShouldPersistTaps="handled"
+          {...scrollViewProps}
+        >
+          {children}
+        </ScrollView>
+      );
+    }
+  } else if (keyboardAvoiding) {
+    content = (
+      <KeyboardAvoidingView behavior="padding" className="flex-1">
+        {children}
+      </KeyboardAvoidingView>
+    );
+  } else {
+    content = <View className="flex-1">{children}</View>;
+  }
 
   return (
     <AnimatedView
@@ -34,18 +76,7 @@ export function Container({
       }}
       {...props}
     >
-      {isScrollable ? (
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          contentInsetAdjustmentBehavior="automatic"
-          keyboardShouldPersistTaps="handled"
-          {...scrollViewProps}
-        >
-          {children}
-        </ScrollView>
-      ) : (
-        <View className="flex-1">{children}</View>
-      )}
+      {content}
     </AnimatedView>
   );
 }

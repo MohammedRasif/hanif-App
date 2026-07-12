@@ -1,10 +1,10 @@
-import { Container } from "@/components/container";
-import { notificationData } from "@/data/notification.data";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 import { withUniwind } from "uniwind";
+import { Container } from "@/components/container";
+import { notificationData } from "@/data/notification.data";
 
 const StyledIonicons = withUniwind(Ionicons);
 

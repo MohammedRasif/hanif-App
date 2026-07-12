@@ -1,10 +1,10 @@
-import { Container } from "@/components/container";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { useAppTheme } from "@/contexts/app-theme-context";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { withUniwind } from "uniwind";
+import { Container } from "@/components/container";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { useAppTheme } from "@/contexts/app-theme-context";
 
 import { authScreens, otherScreens, type Screen } from "../data/screen-lists";
 
