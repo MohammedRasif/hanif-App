@@ -7,7 +7,7 @@
     "web": {
       "bundler": "metro"
     },
-    "name": "barbers-bay",
+    "name": "Barbers Bay",
     "slug": "barbers-bay",
     "plugins": ["expo-font"],
     "experiments": {
