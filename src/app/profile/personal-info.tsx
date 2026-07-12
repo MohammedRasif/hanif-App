@@ -13,6 +13,7 @@ import { z } from "zod";
 import { Container } from "@/components/container";
 
 const StyledIonicons = withUniwind(Ionicons);
+const StyledImage = withUniwind(Image);
 
 const personalInfoSchema = z.object({
   fullName: z.string().min(1, "Name is required"),
@@ -93,10 +94,11 @@ export default function PersonalInfoScreen() {
               onPress={pickImage}
             >
               <View className="h-28 w-28 overflow-hidden rounded-full border-2 border-default-100 bg-default-100">
-                <Image
+                <StyledImage
                   className="h-full w-full"
                   contentFit="cover"
                   source={{ uri: image ?? "" }}
+                  style={{ width: "100%", height: "100%" }}
                 />
               </View>
               {/* Camera icon overlay badge */}
