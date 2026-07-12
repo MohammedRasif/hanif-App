@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Link, Stack, type Href } from "expo-router";
+import { type Href, Link, Stack } from "expo-router";
 import { Image, Pressable, Text, View } from "react-native";
 import { withUniwind } from "uniwind";
 

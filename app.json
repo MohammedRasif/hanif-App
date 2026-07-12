@@ -9,7 +9,7 @@
     },
     "name": "Barbers Bay",
     "slug": "barbers-bay",
-    "plugins": ["expo-font"],
+    "plugins": ["expo-font", "expo-image"],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
