@@ -12,7 +12,7 @@ type Props = {
 export const AuthHeader = ({ title, desc, className }: Props) => {
   const [fontsLoaded] = useFonts({ Lobster_400Regular });
   return (
-    <View className={cn(`mb-10 items-center`, className)}>
+    <View className={cn("mb-10 items-center", className)}>
       <Text
         className="mb-2 w-full text-center font-normal text-4xl text-foreground"
         style={fontsLoaded ? { fontFamily: "Lobster_400Regular" } : undefined}

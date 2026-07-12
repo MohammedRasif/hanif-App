@@ -70,9 +70,9 @@ export default function RegisterScreen() {
 
       <View className="flex-1 justify-center bg-[#FFFFFF] px-6 py-8">
         <AuthHeader
+          className="mt-10"
           desc="Join us and Start your beauty journey today"
           title="Create Account!"
-          className="mt-10"
         />
 
         {/* Full Name Field */}
