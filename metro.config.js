@@ -5,7 +5,7 @@ const {
 const { withUniwindConfig } = require("uniwind/metro");
 
 /** @type {import("expo/metro-config").MetroConfig} */
-const config = getDefaultConfig(import.meta.dirname);
+const config = getDefaultConfig(__dirname);
 
 module.exports = withUniwindConfig(wrapWithReanimatedMetroConfig(config), {
   cssEntryFile: "./src/global.css",
