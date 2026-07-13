@@ -1,12 +1,9 @@
-import { Ionicons } from "@expo/vector-icons";
 import { type Href, Link, useRouter } from "expo-router";
 import { InputGroup, TextField } from "heroui-native";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
 
 import { Container } from "@/components/container";
-
-const StyledIonicons = withUniwind(Ionicons);
+import { StyledIcons } from "@/lib";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -76,9 +73,9 @@ export default function HomeScreen() {
           </View>
           <Pressable
             className="h-11 w-11 items-center justify-center rounded-full bg-default-100 active:opacity-75"
-            onPress={() => router.push("/(tabs)/notification")}
+            onPress={() => router.push("/notification")}
           >
-            <StyledIonicons
+            <StyledIcons
               className="text-default-600"
               name="notifications"
               size={20}
@@ -91,7 +88,7 @@ export default function HomeScreen() {
           <TextField>
             <InputGroup className="h-12 flex-row items-center rounded-full border-transparent bg-[#F8F9FA] px-4">
               <InputGroup.Prefix className="mr-2">
-                <StyledIonicons
+                <StyledIcons
                   className="text-default-400"
                   name="search"
                   size={20}

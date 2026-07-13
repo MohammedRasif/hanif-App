@@ -1,11 +1,9 @@
-import { Ionicons } from "@expo/vector-icons";
-import { type Href, Link, Stack } from "expo-router";
+import type { Ionicons } from "@expo/vector-icons";
+import { Link, Stack, type Href } from "expo-router";
 import { Image, Pressable, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
 
 import { Container } from "@/components/container";
-
-const StyledIonicons = withUniwind(Ionicons);
+import { StyledIcons } from "@/lib";
 
 interface MenuItem {
   href: Href;
@@ -89,7 +87,7 @@ export default function ProfileScreen() {
           </View>
           {/* Edit icon button */}
           <Pressable className="h-10 w-10 items-center justify-center rounded-full bg-default-100 active:opacity-75">
-            <StyledIonicons
+            <StyledIcons
               className="text-default-700"
               name="create-outline"
               size={18}
@@ -122,7 +120,7 @@ function MenuSection({ items }: { items: MenuItem[] }) {
           <Pressable>
             <View className="flex-row items-center gap-4 rounded-2xl px-2 py-3 active:bg-default-100">
               <View className="h-10 w-10 items-center justify-center rounded-full bg-white">
-                <StyledIonicons
+                <StyledIcons
                   className="text-default-600"
                   name={item.icon}
                   size={20}
@@ -133,7 +131,7 @@ function MenuSection({ items }: { items: MenuItem[] }) {
                   {item.title}
                 </Text>
               </View>
-              <StyledIonicons
+              <StyledIcons
                 className="text-default-400"
                 name="chevron-forward"
                 size={18}
