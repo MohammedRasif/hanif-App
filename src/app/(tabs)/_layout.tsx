@@ -1,5 +1,5 @@
-import { Tabs } from "expo-router";
 import { StyledIcons } from "@/lib";
+import { Tabs } from "expo-router";
 
 export default function MainLayout() {
   return (
@@ -49,7 +49,7 @@ export default function MainLayout() {
       />
 
       {/* Notifications Tab Screen */}
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="notification"
         options={{
           title: "Notification",
@@ -61,7 +61,7 @@ export default function MainLayout() {
             />
           ),
         }}
-      />
+      /> */}
 
       {/* Profile Tab Screen */}
       <Tabs.Screen
