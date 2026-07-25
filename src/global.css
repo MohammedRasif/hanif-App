@@ -4,6 +4,17 @@
 
 @source "./node_modules/heroui-native/lib";
 
+@layer theme {
+  :root {
+    @variant light {
+      --color-accent: var(--accent, #f0b100);
+    }
+    @variant dark {
+      --color-accent: var(--accent, #f0b100);
+    }
+  }
+}
+
 @theme {
   --color-accent: #f0b100;
 }
