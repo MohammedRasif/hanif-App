@@ -1,0 +1,9 @@
+import {
+  DEFAULT_APPOINTMENTS,
+  DEFAULT_BARBERS,
+  DEFAULT_DAYS,
+} from "@/lib/calender/mock-data";
+
+export const MOCK_BARBERS = DEFAULT_BARBERS;
+export const MOCK_DAYS = DEFAULT_DAYS;
+export const MOCK_APPOINTMENTS = DEFAULT_APPOINTMENTS;

@@ -1,8 +1,11 @@
 import { Stack } from "expo-router";
 import React from "react";
 
-const CalenderLayout = () => {
-  return <Stack></Stack>;
-};
-
-export default CalenderLayout;
+export default function CalenderLayout() {
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" />
+      <Stack.Screen name="custom-calendar" />
+    </Stack>
+  );
+}

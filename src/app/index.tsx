@@ -7,6 +7,7 @@ import { withUniwind } from "uniwind";
 
 import {
   authScreens,
+  calendarScreens,
   mainScreens,
   otherScreens,
   type Screen,
@@ -29,6 +30,10 @@ export default function HomePage() {
         </Text>
       </View>
 
+      <ShowScreenItems
+        screens={calendarScreens}
+        title="Calendar Schedule Views"
+      />
       <ShowScreenItems screens={mainScreens} title="Main Screen" />
       <ShowScreenItems screens={authScreens} title="Auth Screen" />
       <ShowScreenItems screens={otherScreens} title="Other Screen" />
