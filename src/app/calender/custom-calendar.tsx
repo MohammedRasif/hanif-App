@@ -120,7 +120,9 @@ export default function CustomCalendarScreen() {
                   return (
                     <View
                       className={`flex-1 relative ${
-                        barberIndex === 0 ? "border-r border-gray-100" : ""
+                        barberIndex < MOCK_BARBERS.length - 1
+                          ? "border-r border-gray-100"
+                          : ""
                       }`}
                       key={barber.id}
                     >

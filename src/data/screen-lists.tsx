@@ -58,28 +58,10 @@ export const otherScreens: Screen[] = [
 
 export const calendarScreens: Screen[] = [
   {
-    title: "Calendar Kit View",
-    desc: "Schedule view using @howljs/calendar-kit",
-    href: "/calender/calendar-kit" as Href,
-    icon: "calendar-outline" as const,
-  },
-  {
-    title: "Big Calendar View",
-    desc: "Schedule view using react-native-big-calendar",
-    href: "/calender/big-calendar" as Href,
-    icon: "calendar-number-outline" as const,
-  },
-  {
-    title: "Week View",
-    desc: "Schedule view using react-native-week-view",
-    href: "/calender/week-view" as Href,
-    icon: "today-outline" as const,
-  },
-  {
-    title: "Custom Calendar View",
-    desc: "Custom zero-dependency schedule timeline view",
+    title: "Calendar Schedule View",
+    desc: "Production multi-barber schedule management timeline",
     href: "/calender/custom-calendar" as Href,
-    icon: "grid-outline" as const,
+    icon: "calendar-outline" as const,
   },
 ];
 

@@ -1,6 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { usePathname, useRouter } from "expo-router";
 import React from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { withUniwind } from "uniwind";
@@ -18,28 +17,6 @@ export function CalendarHeader({
   activeDateStr = "2026-07-18",
   onSelectDate,
 }: Props) {
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const libraryTabs = [
-    {
-      id: "calendar-kit",
-      label: "Calendar Kit",
-      path: "/calender/calendar-kit",
-    },
-    {
-      id: "big-calendar",
-      label: "Big Calendar",
-      path: "/calender/big-calendar",
-    },
-    { id: "week-view", label: "Week View", path: "/calender/week-view" },
-    {
-      id: "custom-calendar",
-      label: "Custom",
-      path: "/calender/custom-calendar",
-    },
-  ];
-
   return (
     <View className="bg-white border-b border-gray-100 pt-10">
       {/* Top Title & Header Actions */}
@@ -69,32 +46,6 @@ export function CalendarHeader({
               size={20}
             />
           </Pressable>
-        </View>
-      </View>
-
-      {/* Library Comparison Segment Switcher */}
-      <View className="px-5 my-2">
-        <View className="flex-row rounded-xl bg-gray-100 p-1">
-          {libraryTabs.map((tab) => {
-            const isActive = pathname === tab.path;
-            return (
-              <Pressable
-                className={`flex-1 items-center justify-center rounded-lg py-2 ${
-                  isActive ? "bg-white shadow-xs" : ""
-                }`}
-                key={tab.id}
-                onPress={() => router.replace(tab.path as any)}
-              >
-                <Text
-                  className={`font-medium text-xs ${
-                    isActive ? "font-semibold text-gray-900" : "text-gray-500"
-                  }`}
-                >
-                  {tab.label}
-                </Text>
-              </Pressable>
-            );
-          })}
         </View>
       </View>
 
@@ -135,26 +86,26 @@ export function CalendarHeader({
         </ScrollView>
       </View>
 
-      {/* Barber Columns Header (Multi-barber view matching mockup) */}
-      <View className="flex-row border-t border-gray-100 pt-3 pb-2 px-5 ml-14">
+      {/* Barber Columns Header (Multi-barber view supporting 4 barbers) */}
+      <View className="flex-row border-t border-gray-100 pt-3 pb-2 px-2 ml-14">
         {MOCK_BARBERS.map((barber) => (
           <View
-            className="flex-1 flex-row items-center gap-2 px-2"
+            className="flex-1 flex-row items-center gap-1.5 px-1"
             key={barber.id}
           >
             <Image
               contentFit="cover"
               source={{ uri: barber.avatar }}
-              style={{ width: 36, height: 36, borderRadius: 18 }}
+              style={{ width: 32, height: 32, borderRadius: 16 }}
             />
-            <View>
+            <View className="flex-1">
               <Text
-                className="font-semibold text-gray-900 text-xs"
+                className="font-semibold text-gray-900 text-[11px]"
                 numberOfLines={1}
               >
                 {barber.name}
               </Text>
-              <Text className="text-gray-400 text-[11px]">
+              <Text className="text-gray-400 text-[10px]" numberOfLines={1}>
                 {barber.workingHours}
               </Text>
             </View>
