@@ -1,10 +1,10 @@
+import { Container } from "@/components/container";
+import { notificationData } from "@/data/notification.data";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 import { withUniwind } from "uniwind";
-import { Container } from "@/components/container";
-import { notificationData } from "@/data/notification.data";
 
 const StyledIonicons = withUniwind(Ionicons);
 
@@ -77,7 +77,7 @@ export default function NotificationScreen() {
           >
             <Text
               className={`font-semibold text-sm ${
-                activeTab === "all" ? "text-[#F0B100]" : "text-foreground"
+                activeTab === "all" ? "text-accent" : "text-foreground"
               }`}
             >
               All
@@ -91,7 +91,7 @@ export default function NotificationScreen() {
           >
             <Text
               className={`font-semibold text-sm ${
-                activeTab === "unread" ? "text-[#F0B100]" : "text-foreground"
+                activeTab === "unread" ? "text-accent" : "text-foreground"
               }`}
             >
               Unread

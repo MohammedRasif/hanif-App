@@ -2,8 +2,8 @@
   "expo": {
     "icon": "./src/assets/logo.png",
     "scheme": "barbers-bay",
-    "userInterfaceStyle": "automatic",
     "orientation": "default",
+    "userInterfaceStyle": "light",
     "web": {
       "bundler": "metro"
     },

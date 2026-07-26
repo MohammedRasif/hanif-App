@@ -1,9 +1,9 @@
+import logo from "@/assets/logo.png";
+import { Container } from "@/components/container";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { Image, Pressable, Text, View } from "react-native";
 import { withUniwind } from "uniwind";
-import logo from "@/assets/logo.png";
-import { Container } from "@/components/container";
 
 import {
   authScreens,
@@ -16,12 +16,12 @@ const StyledIonicons = withUniwind(Ionicons);
 
 export default function HomePage() {
   return (
-    <Container>
+    <Container className={`bg-white`}>
       <View className="items-center px-6 pt-8 pb-10">
         <View className="mb-6 h-20 w-20 items-center justify-center rounded-full bg-white">
           <Image className="h-full w-full rounded-full p-10" source={logo} />
         </View>
-        <Text className="mb-3 text-center font-bold text-3xl text-foreground">
+        <Text className="mb-3 text-center font-bold text-3xl text-black">
           Barbers Bay
         </Text>
         <Text className="text-center text-base text-default-500 leading-6">

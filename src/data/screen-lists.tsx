@@ -51,7 +51,7 @@ export const otherScreens: Screen[] = [
   {
     title: "Notification Screen",
     desc: "View notifications list",
-    href: "/(tabs)/notification" as Href,
+    href: "/notification" as Href,
     icon: "notifications-outline" as const,
   },
 ];
@@ -68,12 +68,6 @@ export const mainScreens: Screen[] = [
     desc: "Bookings page",
     href: "/(tabs)/bookings" as Href,
     icon: "calendar-outline" as const,
-  },
-  {
-    title: "Notification Screen",
-    desc: "Notification page",
-    href: "/(tabs)/notification" as Href,
-    icon: "notifications-outline" as const,
   },
   {
     title: "Profile Screen",
