@@ -23,7 +23,7 @@ const StaffLayout = () => {
 
       {/* Staff Calendar Schedule Tab */}
       <Tabs.Screen
-        name="calender"
+        name="calender/index"
         options={{
           title: "Schedule",
           tabBarIcon: ({ color, focused }) => (
