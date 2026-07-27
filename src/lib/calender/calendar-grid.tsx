@@ -14,12 +14,14 @@ const BARBER_HEADER_HEIGHT = 52; // Fixed height for barber avatar header
 type Props = {
   appointments: Appointment[];
   barbers: Barber[];
+  children?: React.ReactNode;
   columnWidth?: number;
   endHour?: number;
   hourHeight?: number;
   onPressAppointment?: (appointment: Appointment) => void;
   onPressFab?: () => void;
   renderEventCard?: (appointment: Appointment) => React.ReactNode;
+  renderFab?: () => React.ReactNode;
   showFab?: boolean;
   startHour?: number;
 };
@@ -27,12 +29,14 @@ type Props = {
 export function CalendarGridTimeline({
   appointments,
   barbers,
+  children,
   columnWidth = 165,
   endHour = 19,
   hourHeight = 120,
   onPressAppointment,
   onPressFab,
   renderEventCard,
+  renderFab,
   showFab = true,
   startHour = 7,
 }: Props) {
@@ -240,15 +244,19 @@ export function CalendarGridTimeline({
         </ScrollView>
       </ScrollView>
 
-      {/* Floating Action Button (FAB) */}
-      {showFab && (
+      {/* Floating Action Button or Custom Non-Scrollable Overlay */}
+      {renderFab ? (
+        renderFab()
+      ) : children ? (
+        children
+      ) : showFab ? (
         <Pressable
           className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-black shadow-lg z-40 active:scale-95"
           onPress={onPressFab}
         >
           <StyledIonicons className="text-white" name="add" size={28} />
         </Pressable>
-      )}
+      ) : null}
     </View>
   );
 }

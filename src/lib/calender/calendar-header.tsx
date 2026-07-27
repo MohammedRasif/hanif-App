@@ -64,7 +64,7 @@ export function CalendarHeaderView({
             const isSelected = day.fullDateStr === activeDateStr;
             return (
               <Pressable
-                className={`items-center justify-center rounded-2xl px-4 py-3 min-w-[58px] ${
+                className={`items-center justify-center rounded-2xl px-4 py-3 min-w-14.5 ${
                   isSelected ? "bg-black" : "border border-gray-200 bg-white"
                 }`}
                 key={day.fullDateStr}

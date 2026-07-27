@@ -35,6 +35,7 @@ export interface CalendarProps {
   activeDateStr?: string;
   appointments?: Appointment[];
   barbers?: Barber[];
+  children?: React.ReactNode;
   columnWidth?: number;
   days?: DayItem[];
   endHour?: number;
@@ -43,6 +44,7 @@ export interface CalendarProps {
   onPressFab?: () => void;
   onSelectDate?: (day: DayItem) => void;
   renderEventCard?: (appointment: Appointment) => React.ReactNode;
+  renderFab?: () => React.ReactNode;
   showFab?: boolean;
   startHour?: number;
   workingHoursLabel?: string;

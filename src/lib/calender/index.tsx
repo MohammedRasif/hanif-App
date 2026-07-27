@@ -13,6 +13,7 @@ export function CustomCalendar({
   activeDateStr: propsActiveDateStr,
   appointments = DEFAULT_APPOINTMENTS,
   barbers = DEFAULT_BARBERS,
+  children,
   columnWidth = 165,
   days = DEFAULT_DAYS,
   endHour = 19,
@@ -21,6 +22,7 @@ export function CustomCalendar({
   onPressFab,
   onSelectDate: propsOnSelectDate,
   renderEventCard,
+  renderFab,
   showFab = true,
   startHour = 7,
   workingHoursLabel = "9.00 - 6.00 pm",
@@ -61,9 +63,12 @@ export function CustomCalendar({
         onPressAppointment={onPressAppointment}
         onPressFab={onPressFab}
         renderEventCard={renderEventCard}
+        renderFab={renderFab}
         showFab={showFab}
         startHour={startHour}
-      />
+      >
+        {children}
+      </CalendarGridTimeline>
     </View>
   );
 }
