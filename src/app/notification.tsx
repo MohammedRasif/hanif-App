@@ -77,7 +77,7 @@ export default function NotificationScreen() {
           >
             <Text
               className={`font-semibold text-sm ${
-                activeTab === "all" ? "text-accent" : "text-foreground"
+                activeTab === "all" ? "text-brand" : "text-foreground"
               }`}
             >
               All
@@ -91,7 +91,7 @@ export default function NotificationScreen() {
           >
             <Text
               className={`font-semibold text-sm ${
-                activeTab === "unread" ? "text-accent" : "text-foreground"
+                activeTab === "unread" ? "text-brand" : "text-foreground"
               }`}
             >
               Unread

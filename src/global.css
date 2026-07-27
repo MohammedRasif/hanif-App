@@ -7,14 +7,14 @@
 @layer theme {
   :root {
     @variant light {
-      --color-accent: var(--accent, #f0b100);
+      --color-brand: var(--brand, #f0b100);
     }
     @variant dark {
-      --color-accent: var(--accent, #f0b100);
+      --color-brand: var(--brand, #f0b100);
     }
   }
 }
 
 @theme {
-  --color-accent: #f0b100;
+  --color-brand: #f0b100;
 }
