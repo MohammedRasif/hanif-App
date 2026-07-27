@@ -4,17 +4,18 @@
 
 @source "./node_modules/heroui-native/lib";
 
-@layer theme {
-  :root {
-    @variant light {
-      --color-brand: var(--brand, #f0b100);
-    }
-    @variant dark {
-      --color-brand: var(--brand, #f0b100);
-    }
-  }
-}
-
 @theme {
   --color-brand: #f0b100;
+  --color-foreground: #000000;
+  --color-foreground-secondary: #6b7280;
+  --color-muted: #6b7280;
+  --color-background: #ffffff;
+  --color-card: #ffffff;
+  --color-content1: #ffffff;
+  --color-border: #e5e7eb;
+  --color-default-200: #e5e7eb;
+  --color-default-400: #9ca3af;
+  --color-default-500: #6b7280;
+  --color-primary: #f0b100;
+  --color-primary-foreground: #ffffff;
 }

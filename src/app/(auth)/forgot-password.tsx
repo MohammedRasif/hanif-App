@@ -74,7 +74,7 @@ export default function ForgotPasswordScreen() {
                 control={control}
                 name="email"
                 render={({ field: { onChange, onBlur, value } }) => (
-                  <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white dark:border-default-200 dark:bg-content1">
+                  <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white">
                     <InputGroup.Input
                       autoCapitalize="none"
                       className="h-full w-full border-transparent bg-transparent px-4 text-foreground"

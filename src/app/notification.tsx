@@ -115,7 +115,7 @@ export default function NotificationScreen() {
             const styles = typeStyles[item.type];
             return (
               <View className="mb-5">
-                <View className="flex-row items-center gap-4 rounded-2xl bg-[#F8F9FA] p-4 dark:bg-content1">
+                <View className="flex-row items-center gap-4 rounded-2xl bg-[#F8F9FA] p-4">
                   {/* Icon Circle */}
                   <View
                     className={`h-12 w-12 items-center justify-center rounded-full ${styles.bg}`}

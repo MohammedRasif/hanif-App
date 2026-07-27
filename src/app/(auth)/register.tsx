@@ -85,7 +85,7 @@ export default function RegisterScreen() {
               control={control}
               name="fullName"
               render={({ field: { onChange, onBlur, value } }) => (
-                <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white dark:border-default-200 dark:bg-content1">
+                <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white">
                   <InputGroup.Input
                     className="h-full w-full border-transparent bg-transparent px-4 text-foreground"
                     onBlur={onBlur}
@@ -110,7 +110,7 @@ export default function RegisterScreen() {
               control={control}
               name="email"
               render={({ field: { onChange, onBlur, value } }) => (
-                <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white dark:border-default-200 dark:bg-content1">
+                <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white">
                   <InputGroup.Input
                     autoCapitalize="none"
                     className="h-full w-full border-transparent bg-transparent px-4 text-foreground"
@@ -137,7 +137,7 @@ export default function RegisterScreen() {
               control={control}
               name="phoneNumber"
               render={({ field: { onChange, onBlur, value } }) => (
-                <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white dark:border-default-200 dark:bg-content1">
+                <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white">
                   <InputGroup.Input
                     className="h-full w-full border-transparent bg-transparent px-4 text-foreground"
                     keyboardType="phone-pad"
@@ -163,7 +163,7 @@ export default function RegisterScreen() {
               control={control}
               name="password"
               render={({ field: { onChange, onBlur, value } }) => (
-                <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white dark:border-default-200 dark:bg-content1">
+                <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white">
                   <InputGroup.Input
                     className="h-full w-full border-transparent bg-transparent pr-12 pl-4 text-foreground"
                     onBlur={onBlur}
@@ -203,7 +203,7 @@ export default function RegisterScreen() {
               control={control}
               name="confirmPassword"
               render={({ field: { onChange, onBlur, value } }) => (
-                <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white dark:border-default-200 dark:bg-content1">
+                <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white">
                   <InputGroup.Input
                     className="h-full w-full border-transparent bg-transparent pr-12 pl-4 text-foreground"
                     onBlur={onBlur}

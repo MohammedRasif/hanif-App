@@ -64,7 +64,7 @@ export default function LoginScreen() {
               control={control}
               name="email"
               render={({ field: { onChange, onBlur, value } }) => (
-                <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white dark:border-default-200 dark:bg-content1">
+                <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white">
                   <InputGroup.Prefix
                     className="absolute top-0 bottom-0 left-0 items-center justify-center pr-2 pl-4"
                     isDecorative
@@ -101,7 +101,7 @@ export default function LoginScreen() {
               control={control}
               name="password"
               render={({ field: { onChange, onBlur, value } }) => (
-                <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white dark:border-default-200 dark:bg-content1">
+                <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white">
                   <InputGroup.Prefix
                     className="absolute top-0 bottom-0 left-0 items-center justify-center pr-2 pl-4"
                     isDecorative
