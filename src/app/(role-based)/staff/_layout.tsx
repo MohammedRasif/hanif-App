@@ -2,10 +2,10 @@ import { TabBarIcon, defaultTabScreenOptions } from "@/components/shared";
 import { Tabs } from "expo-router";
 import React from "react";
 
-export default function MainLayout() {
+const StaffLayout = () => {
   return (
     <Tabs screenOptions={defaultTabScreenOptions}>
-      {/* Home Tab Screen */}
+      {/* Staff Home Dashboard Tab */}
       <Tabs.Screen
         name="index"
         options={{
@@ -21,11 +21,11 @@ export default function MainLayout() {
         }}
       />
 
-      {/* Bookings Tab Screen */}
+      {/* Staff Calendar Schedule Tab */}
       <Tabs.Screen
-        name="bookings"
+        name="calender"
         options={{
-          title: "Bookings",
+          title: "Schedule",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               color={color}
@@ -36,22 +36,8 @@ export default function MainLayout() {
           ),
         }}
       />
-
-      {/* Profile Tab Screen */}
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              color={color}
-              focused={focused}
-              focusedIconName="person"
-              iconName="person-outline"
-            />
-          ),
-        }}
-      />
     </Tabs>
   );
-}
+};
+
+export default StaffLayout;
