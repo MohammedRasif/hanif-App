@@ -1,33 +1,54 @@
 import { Container } from "@/components/container";
-import { StyledIcons } from "@/lib";
-import { useRouter } from "expo-router";
+import { StaffProfileTopHeader } from "@/components/staff/profile/staff-profile-top-header";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
+
+interface ServiceItem {
+  duration: string;
+  id: string;
+  name: string;
+  price: string;
+}
+
+const MOCK_SERVICES: ServiceItem[] = [
+  { id: "1", name: "Face wash", duration: "30 min", price: "$51" },
+  { id: "2", name: "Face wash", duration: "30 min", price: "$51" },
+  { id: "3", name: "Face wash", duration: "30 min", price: "$51" },
+];
 
 export default function StaffServiceScreen() {
-  const router = useRouter();
-
   return (
-    <Container className="bg-white flex-1">
-      <View className="flex-row items-center gap-3 px-6 pt-12 pb-4">
-        <Pressable
-          className="h-10 w-10 items-center justify-center rounded-full active:bg-gray-100"
-          onPress={() => router.back()}
-        >
-          <StyledIcons
-            className="text-gray-800"
-            name="chevron-back"
-            size={22}
-          />
-        </Pressable>
-        <Text className="font-poppins-bold text-xl text-gray-900">Service</Text>
-      </View>
+    <Container className="bg-white flex-1" isScrollable={false}>
+      {/* Reusable Header */}
+      <StaffProfileTopHeader title="Service" />
 
-      <View className="flex-1 items-center justify-center p-6">
-        <Text className="font-poppins-medium text-base text-gray-500 text-center">
-          Service Page
-        </Text>
-      </View>
+      {/* Service List */}
+      <FlatList
+        contentContainerStyle={{
+          paddingHorizontal: 24,
+          paddingTop: 8,
+          paddingBottom: 32,
+        }}
+        data={MOCK_SERVICES}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View className="mb-3.5 flex-row items-center justify-between rounded-2xl bg-gray-50/80 p-4">
+            <View>
+              <Text className="font-poppins-semibold text-base text-gray-900">
+                {item.name}
+              </Text>
+              <Text className="mt-1 font-poppins text-xs text-gray-400">
+                {item.duration}
+              </Text>
+            </View>
+
+            <Text className="font-poppins-semibold text-base text-gray-900">
+              {item.price}
+            </Text>
+          </View>
+        )}
+        showsVerticalScrollIndicator={false}
+      />
     </Container>
   );
 }

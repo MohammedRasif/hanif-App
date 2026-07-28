@@ -1,35 +1,63 @@
 import { Container } from "@/components/container";
-import { StyledIcons } from "@/lib";
-import { useRouter } from "expo-router";
+import { StaffProfileTopHeader } from "@/components/staff/profile/staff-profile-top-header";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
+
+interface WorkingHourItem {
+  breakTime?: string;
+  day: string;
+  hours: string;
+  id: string;
+}
+
+const MOCK_WORKING_HOURS: WorkingHourItem[] = [
+  {
+    id: "1",
+    day: "Saturday",
+    hours: "10:00 am - 05:00 pm",
+    breakTime: "Break: 2:00 pm -03:00 pm",
+  },
+  { id: "2", day: "Monday", hours: "10:00 am - 05:00 pm" },
+  { id: "3", day: "Thusday", hours: "10:00 am - 05:00 pm" },
+  { id: "4", day: "Thusday", hours: "10:00 am - 05:00 pm" },
+  { id: "5", day: "Thusday", hours: "Day off" },
+];
 
 export default function StaffWorkingHoursScreen() {
-  const router = useRouter();
-
   return (
-    <Container className="bg-white flex-1">
-      <View className="flex-row items-center gap-3 px-6 pt-12 pb-4">
-        <Pressable
-          className="h-10 w-10 items-center justify-center rounded-full active:bg-gray-100"
-          onPress={() => router.back()}
-        >
-          <StyledIcons
-            className="text-gray-800"
-            name="chevron-back"
-            size={22}
-          />
-        </Pressable>
-        <Text className="font-poppins-bold text-xl text-gray-900">
-          Working Days & Hours
-        </Text>
-      </View>
+    <Container className="bg-white flex-1" isScrollable={false}>
+      {/* Reusable Header */}
+      <StaffProfileTopHeader title="Working Days & Hours" />
 
-      <View className="flex-1 items-center justify-center p-6">
-        <Text className="font-poppins-medium text-base text-gray-500 text-center">
-          Working Days & Hours Page
-        </Text>
-      </View>
+      {/* Working Hours List */}
+      <FlatList
+        contentContainerStyle={{
+          paddingHorizontal: 24,
+          paddingTop: 16,
+          paddingBottom: 32,
+        }}
+        data={MOCK_WORKING_HOURS}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View className="flex-row items-start justify-between border-b border-gray-100/80 py-4">
+            <Text className="font-poppins-semibold text-sm text-gray-800">
+              {item.day}
+            </Text>
+
+            <View className="items-end">
+              <Text className="font-poppins-bold text-sm text-gray-800">
+                {item.hours}
+              </Text>
+              {item.breakTime && (
+                <Text className="mt-1 font-poppins text-xs text-gray-400">
+                  {item.breakTime}
+                </Text>
+              )}
+            </View>
+          </View>
+        )}
+        showsVerticalScrollIndicator={false}
+      />
     </Container>
   );
 }
