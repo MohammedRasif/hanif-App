@@ -58,3 +58,5 @@ export const defaultTabScreenOptions = {
     paddingTop: 8,
   },
 };
+
+export * from "./common-input";

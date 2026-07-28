@@ -1,7 +1,10 @@
+import { CommonInput } from "@/components/shared";
 import { StyledIcons } from "@/lib";
-import { Button, Dialog, InputGroup } from "heroui-native";
-import React, { useState } from "react";
-import { Text, View } from "react-native";
+import { useForm } from "@tanstack/react-form";
+import { Button, Dialog } from "heroui-native";
+import React from "react";
+import { View } from "react-native";
+import { z } from "zod";
 
 type Props = {
   isOpen: boolean;
@@ -9,19 +12,30 @@ type Props = {
   onSubmit: (data: { clientName: string; serviceName: string }) => void;
 };
 
+const addReservationSchema = z.object({
+  clientName: z.string().min(1, "Client name is required"),
+  serviceName: z.string().min(1, "Service name is required"),
+});
+
 export function AddReservationDialog({
   isOpen,
   onOpenChange,
   onSubmit,
 }: Props) {
-  const [clientName, setClientName] = useState("");
-  const [serviceName, setServiceName] = useState("");
-
-  const handleSave = () => {
-    onSubmit({ clientName, serviceName });
-    setClientName("");
-    setServiceName("");
-  };
+  const form = useForm({
+    defaultValues: {
+      clientName: "",
+      serviceName: "",
+    },
+    validators: {
+      onChange: addReservationSchema,
+    },
+    onSubmit: async ({ value }) => {
+      onSubmit(value);
+      form.reset();
+      onOpenChange(false);
+    },
+  });
 
   return (
     <Dialog isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -42,34 +56,26 @@ export function AddReservationDialog({
           </Dialog.Description>
 
           {/* Form Input Fields */}
-          <View className="gap-4">
-            <View>
-              <Text className="mb-1.5 font-semibold text-gray-700 text-xs">
-                Client Name
-              </Text>
-              <InputGroup className="h-12 w-full flex-row items-center rounded-xl border border-gray-200 bg-gray-50 px-3">
-                <InputGroup.Input
-                  className="flex-1 text-gray-900 text-sm"
-                  onChangeText={setClientName}
+          <View className="gap-2">
+            <form.Field name="clientName">
+              {(field) => (
+                <CommonInput
+                  field={field}
+                  label="Client Name"
                   placeholder="e.g. John Doe"
-                  value={clientName}
                 />
-              </InputGroup>
-            </View>
+              )}
+            </form.Field>
 
-            <View>
-              <Text className="mb-1.5 font-semibold text-gray-700 text-xs">
-                Service Name
-              </Text>
-              <InputGroup className="h-12 w-full flex-row items-center rounded-xl border border-gray-200 bg-gray-50 px-3">
-                <InputGroup.Input
-                  className="flex-1 text-gray-900 text-sm"
-                  onChangeText={setServiceName}
+            <form.Field name="serviceName">
+              {(field) => (
+                <CommonInput
+                  field={field}
+                  label="Service Name"
                   placeholder="e.g. Classic Haircut & Shave"
-                  value={serviceName}
                 />
-              </InputGroup>
-            </View>
+              )}
+            </form.Field>
           </View>
 
           {/* Dialog Actions */}
@@ -81,7 +87,7 @@ export function AddReservationDialog({
             </Dialog.Close>
             <Button
               className="rounded-xl bg-black px-5"
-              onPress={handleSave}
+              onPress={() => form.handleSubmit()}
               variant="primary"
             >
               Save Reservation
