@@ -23,7 +23,7 @@ export default function OtpCodeScreen() {
   const onComplete = (code: string) => {
     console.log("OTP code completed:", code);
     // Auto-navigate to change password screen
-    router.push("/(auth)/change-password");
+    router.push("/auth/change-password");
   };
 
   return (

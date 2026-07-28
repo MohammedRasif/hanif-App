@@ -12,31 +12,31 @@ export const authScreens: Screen[] = [
   {
     title: "Login Screen",
     desc: "Sign in to continue your journey",
-    href: "/(auth)/login" as const,
+    href: "/auth/login" as Href,
     icon: "log-in-outline" as const,
   },
   {
     title: "Register Screen",
     desc: "Create a new account",
-    href: "/(auth)/register" as const,
+    href: "/auth/register" as Href,
     icon: "person-add-outline" as const,
   },
   {
     title: "Forgot Password",
     desc: "Request password reset",
-    href: "/(auth)/forgot-password" as const,
+    href: "/auth/forgot-password" as Href,
     icon: "help-circle-outline" as const,
   },
   {
     title: "OTP Verification",
     desc: "Verify OTP code input",
-    href: "/(auth)/otp-code" as const,
+    href: "/auth/otp-code" as Href,
     icon: "key-outline" as const,
   },
   {
     title: "Change Password",
     desc: "Reset new password / PIN",
-    href: "/(auth)/change-password" as const,
+    href: "/auth/change-password" as Href,
     icon: "lock-closed-outline" as const,
   },
 ];
@@ -60,7 +60,7 @@ export const mainScreens: Screen[] = [
   {
     title: "Staff Screen",
     desc: "All staff related  page",
-    href: "/(role-based)/staff" as Href,
+    href: "/(role)/staff" as Href,
     icon: "home-outline" as const,
   },
 ];

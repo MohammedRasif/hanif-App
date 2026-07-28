@@ -32,7 +32,7 @@ export default function ForgotPasswordScreen() {
   const onSubmit = (data: ForgotPasswordSchemaType) => {
     console.log("Forgot password submit:", data);
     // Navigate to OTP code screen after submit
-    router.push("/(auth)/otp-code");
+    router.push("/auth/otp-code");
   };
 
   return (

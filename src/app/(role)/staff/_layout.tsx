@@ -5,7 +5,7 @@ import React from "react";
 const StaffLayout = () => {
   return (
     <Tabs screenOptions={defaultTabScreenOptions}>
-      {/* Staff Home Dashboard Tab */}
+      {/* 1. Staff Home Dashboard Tab */}
       <Tabs.Screen
         name="index"
         options={{
@@ -21,7 +21,7 @@ const StaffLayout = () => {
         }}
       />
 
-      {/* Staff Calendar Schedule Tab */}
+      {/* 2. Staff Calendar Schedule Tab */}
       <Tabs.Screen
         name="calender/index"
         options={{
@@ -32,6 +32,38 @@ const StaffLayout = () => {
               focused={focused}
               focusedIconName="calendar"
               iconName="calendar-outline"
+            />
+          ),
+        }}
+      />
+
+      {/* 3. Staff Client List Tab */}
+      <Tabs.Screen
+        name="client/index"
+        options={{
+          title: "Client",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon
+              color={color}
+              focused={focused}
+              focusedIconName="people"
+              iconName="people-outline"
+            />
+          ),
+        }}
+      />
+
+      {/* 4. Staff Profile & Settings Tab */}
+      <Tabs.Screen
+        name="profile/index"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon
+              color={color}
+              focused={focused}
+              focusedIconName="person"
+              iconName="person-outline"
             />
           ),
         }}
