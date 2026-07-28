@@ -1,11 +1,14 @@
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import { Button } from "heroui-native";
 import React from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 export default function StaffProfileScreen() {
+  const router = useRouter();
+
   return (
     <Container className="bg-white flex-1" isScrollable={false}>
       <ScrollView
@@ -41,7 +44,7 @@ export default function StaffProfileScreen() {
         </View>
 
         {/* Barbershop Location Title */}
-        <Text className="font-poppins-bold text-[18px] leading-6.5 text-gray-900 text-center px-6 mb-6 tracking-tight">
+        <Text className="font-poppins-bold text-[18px] leading-[26px] text-gray-900 text-center px-6 mb-6 tracking-tight">
           Jazz barber (Hampdenpark)
         </Text>
 
@@ -65,12 +68,12 @@ export default function StaffProfileScreen() {
             </View>
           </View>
 
-          {/* Menu Options Group - Styled with Poppins SemiBold 14px 20px line-height */}
+          {/* Menu Options Group */}
           <View className="mb-6 overflow-hidden rounded-3xl border border-gray-100/80 bg-white">
             {/* 1. Service */}
             <Pressable
               className="flex-row items-center justify-between border-b border-gray-100/70 p-4 active:bg-gray-50"
-              onPress={() => console.log("Service clicked")}
+              onPress={() => router.push("/(role)/staff/profile/service")}
             >
               <View className="flex-row items-center gap-3.5">
                 <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-50">
@@ -80,7 +83,7 @@ export default function StaffProfileScreen() {
                     size={18}
                   />
                 </View>
-                <Text className="font-poppins-semibold text-[14px] leading-[20px] text-gray-800">
+                <Text className="font-poppins-semibold text-[14px] leading-5 text-gray-800">
                   Service
                 </Text>
               </View>
@@ -94,7 +97,7 @@ export default function StaffProfileScreen() {
             {/* 2. Working Days & Hours */}
             <Pressable
               className="flex-row items-center justify-between border-b border-gray-100/70 p-4 active:bg-gray-50"
-              onPress={() => console.log("Working Days & Hours clicked")}
+              onPress={() => router.push("/(role)/staff/profile/working-hours")}
             >
               <View className="flex-row items-center gap-3.5">
                 <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-50">
@@ -104,7 +107,7 @@ export default function StaffProfileScreen() {
                     size={18}
                   />
                 </View>
-                <Text className="font-poppins-semibold text-[14px] leading-[20px] text-gray-800">
+                <Text className="font-poppins-semibold text-[14px] leading-5 text-gray-800">
                   Working Days & Hours
                 </Text>
               </View>
@@ -118,7 +121,7 @@ export default function StaffProfileScreen() {
             {/* 3. Reports */}
             <Pressable
               className="flex-row items-center justify-between border-b border-gray-100/70 p-4 active:bg-gray-50"
-              onPress={() => console.log("Reports clicked")}
+              onPress={() => router.push("/(role)/staff/profile/reports")}
             >
               <View className="flex-row items-center gap-3.5">
                 <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-50">
@@ -128,7 +131,7 @@ export default function StaffProfileScreen() {
                     size={18}
                   />
                 </View>
-                <Text className="font-poppins-semibold text-[14px] leading-[20px] text-gray-800">
+                <Text className="font-poppins-semibold text-[14px] leading-5 text-gray-800">
                   Reports
                 </Text>
               </View>
@@ -142,7 +145,9 @@ export default function StaffProfileScreen() {
             {/* 4. Break Schedule */}
             <Pressable
               className="flex-row items-center justify-between border-b border-gray-100/70 p-4 active:bg-gray-50"
-              onPress={() => console.log("Break Schedule clicked")}
+              onPress={() =>
+                router.push("/(role)/staff/profile/break-schedule")
+              }
             >
               <View className="flex-row items-center gap-3.5">
                 <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-50">
@@ -166,7 +171,7 @@ export default function StaffProfileScreen() {
             {/* 5. Reviews */}
             <Pressable
               className="flex-row items-center justify-between p-4 active:bg-gray-50"
-              onPress={() => console.log("Reviews clicked")}
+              onPress={() => router.push("/(role)/staff/profile/reviews")}
             >
               <View className="flex-row items-center gap-3.5">
                 <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-50">
@@ -176,7 +181,7 @@ export default function StaffProfileScreen() {
                     size={18}
                   />
                 </View>
-                <Text className="font-poppins-semibold text-[14px] leading-[20px] text-gray-800">
+                <Text className="font-poppins-semibold text-[14px] leading-5 text-gray-800">
                   Reviews
                 </Text>
               </View>

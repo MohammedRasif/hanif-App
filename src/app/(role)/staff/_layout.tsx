@@ -55,7 +55,7 @@ const StaffLayout = () => {
 
       {/* 4. Staff Profile & Settings Tab */}
       <Tabs.Screen
-        name="profile/index"
+        name="profile"
         options={{
           title: "Profile",
           tabBarIcon: ({ color, focused }) => (
