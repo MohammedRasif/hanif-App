@@ -1,6 +1,7 @@
 import { Container } from "@/components/container";
 import { CommonInput } from "@/components/shared";
 import { StyledIcons } from "@/lib";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 
@@ -33,7 +34,7 @@ const MOCK_GROUPS: ClientGroupItem[] = [
 ];
 
 export default function StaffClientScreen() {
-  const [activeTab, setActiveTab] = useState<"list" | "grope">("list");
+  const [activeTab, setActiveTab] = useState<"list" | "groups">("list");
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredClients = MOCK_CLIENT_LIST.filter(
@@ -64,7 +65,7 @@ export default function StaffClientScreen() {
         />
       </View>
 
-      {/* Segmented Tab Switcher (List (211) | Grope) */}
+      {/* Segmented Tab Switcher (List (211) | groups) */}
       <View className="px-6 mb-3">
         <View className="flex-row rounded-full bg-gray-100/80 p-1.5 gap-2">
           <Pressable
@@ -84,16 +85,16 @@ export default function StaffClientScreen() {
 
           <Pressable
             className={`flex-1 items-center justify-center py-2.5 px-4 rounded-full ${
-              activeTab === "grope" ? "bg-black shadow-xs" : "bg-transparent"
+              activeTab === "groups" ? "bg-black shadow-xs" : "bg-transparent"
             }`}
-            onPress={() => setActiveTab("grope")}
+            onPress={() => setActiveTab("groups")}
           >
             <Text
               className={`font-semibold text-xs ${
-                activeTab === "grope" ? "text-white" : "text-gray-600"
+                activeTab === "groups" ? "text-white" : "text-gray-600"
               }`}
             >
-              Grope
+              groups
             </Text>
           </Pressable>
         </View>
@@ -131,8 +132,8 @@ export default function StaffClientScreen() {
         />
       )}
 
-      {/* TAB 2: Grope (Groups) View - Matches Group Design Screenshot */}
-      {activeTab === "grope" && (
+      {/* TAB 2: groups (Groups) View - Matches Group Design Screenshot */}
+      {activeTab === "groups" && (
         <FlatList
           contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 100 }}
           data={MOCK_GROUPS}
@@ -142,6 +143,7 @@ export default function StaffClientScreen() {
               className="flex-row items-center justify-between border-b border-gray-100/80 py-3.5 active:bg-gray-50/50"
               onPress={() => {
                 console.log("Selected group:", item.title);
+                router.push("/(role)/staff/client/group-client-select");
               }}
             >
               <View className="flex-row items-center gap-3.5">

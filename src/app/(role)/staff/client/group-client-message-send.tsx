@@ -6,7 +6,7 @@ import { Button } from "heroui-native";
 import React from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
-export default function GroupClientMessage() {
+export default function GroupClientMessageSend() {
   const router = useRouter();
 
   return (
@@ -100,7 +100,8 @@ export default function GroupClientMessage() {
         <Button
           className="h-14 w-full flex-row items-center justify-center gap-2 rounded-2xl bg-main-primary focus:bg-main-primary/90"
           onPress={() => {
-            console.log("Send message clicked");
+            console.log("Create message clicked");
+            router.push("/(role)/staff/client/group-client-message");
           }}
         >
           <Text className="font-semibold text-base text-white">
