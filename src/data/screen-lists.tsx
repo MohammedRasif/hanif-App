@@ -63,6 +63,12 @@ export const mainScreens: Screen[] = [
     href: "/(role)/staff" as Href,
     icon: "home-outline" as const,
   },
+  {
+    title: "User Screen",
+    desc: "All User related  page",
+    href: "/(role)/user" as Href,
+    icon: "man-outline" as const,
+  },
 ];
 
 // export const mainScreens: Screen[] = [

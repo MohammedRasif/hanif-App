@@ -2,10 +2,10 @@ import { TabBarIcon, defaultTabScreenOptions } from "@/components/shared";
 import { Tabs } from "expo-router";
 import React from "react";
 
-export default function MainLayout() {
+export default function UserLayout() {
   return (
     <Tabs screenOptions={defaultTabScreenOptions}>
-      {/* Home Tab Screen */}
+      {/* 1. Home Tab Screen */}
       <Tabs.Screen
         name="index"
         options={{
@@ -21,11 +21,11 @@ export default function MainLayout() {
         }}
       />
 
-      {/* Bookings Tab Screen */}
+      {/* 2. Booking Tab Screen */}
       <Tabs.Screen
         name="bookings"
         options={{
-          title: "Bookings",
+          title: "Booking",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               color={color}
@@ -37,7 +37,7 @@ export default function MainLayout() {
         }}
       />
 
-      {/* Profile Tab Screen */}
+      {/* 3. Profile Tab Screen */}
       <Tabs.Screen
         name="profile"
         options={{
@@ -51,6 +51,56 @@ export default function MainLayout() {
             />
           ),
         }}
+      />
+
+      {/* Hidden Sub-Routes (Hidden from bottom tab bar) */}
+      <Tabs.Screen
+        name="profile/change-password"
+        options={{ href: null, tabBarItemStyle: { display: "none" } }}
+      />
+      <Tabs.Screen
+        name="profile/contact-us"
+        options={{ href: null, tabBarItemStyle: { display: "none" } }}
+      />
+      <Tabs.Screen
+        name="profile/help-center"
+        options={{ href: null, tabBarItemStyle: { display: "none" } }}
+      />
+      <Tabs.Screen
+        name="profile/location-services"
+        options={{ href: null, tabBarItemStyle: { display: "none" } }}
+      />
+      <Tabs.Screen
+        name="profile/personal-info"
+        options={{ href: null, tabBarItemStyle: { display: "none" } }}
+      />
+      <Tabs.Screen
+        name="profile/privacy"
+        options={{ href: null, tabBarItemStyle: { display: "none" } }}
+      />
+      <Tabs.Screen
+        name="profile/refund"
+        options={{ href: null, tabBarItemStyle: { display: "none" } }}
+      />
+      <Tabs.Screen
+        name="profile/terms"
+        options={{ href: null, tabBarItemStyle: { display: "none" } }}
+      />
+      <Tabs.Screen
+        name="salon/[id]"
+        options={{ href: null, tabBarItemStyle: { display: "none" } }}
+      />
+      <Tabs.Screen
+        name="salon/book"
+        options={{ href: null, tabBarItemStyle: { display: "none" } }}
+      />
+      <Tabs.Screen
+        name="salon/choose-shop"
+        options={{ href: null, tabBarItemStyle: { display: "none" } }}
+      />
+      <Tabs.Screen
+        name="salon/confirm"
+        options={{ href: null, tabBarItemStyle: { display: "none" } }}
       />
     </Tabs>
   );
