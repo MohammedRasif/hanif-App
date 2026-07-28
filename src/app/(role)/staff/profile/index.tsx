@@ -9,139 +9,201 @@ export default function StaffProfileScreen() {
   return (
     <Container className="bg-white flex-1" isScrollable={false}>
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 32 }}
+        contentContainerStyle={{ paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header Title */}
-        <View className="pt-12 pb-6">
-          <Text className="font-bold text-2xl text-gray-900 tracking-tight">
-            Profile
-          </Text>
-          <Text className="mt-1 text-gray-400 text-sm">
-            Manage your barber schedule and personal account
-          </Text>
-        </View>
-
-        {/* Barber Profile Card */}
-        <View className="mb-6 items-center rounded-3xl border border-gray-100 bg-gray-50/70 p-6 shadow-xs">
+        {/* Top Cover Banner */}
+        <View className="relative w-full h-44 bg-gray-100">
           <Image
             contentFit="cover"
             source={{
-              uri: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+              uri: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=800",
             }}
-            style={{ width: 80, height: 80, borderRadius: 40 }}
+            style={{ width: "100%", height: "100%" }}
           />
-          <Text className="mt-3 font-bold text-xl text-gray-900">Maïa</Text>
-          <Text className="mt-0.5 font-medium text-gray-400 text-sm">
-            Master Barber & Stylist
-          </Text>
+        </View>
 
-          {/* Rating & Location Tag */}
-          <View className="mt-3 flex-row items-center gap-2 rounded-full bg-amber-50 px-3 py-1 border border-amber-200/60">
-            <StyledIcons className="text-amber-500" name="star" size={16} />
-            <Text className="font-semibold text-amber-800 text-xs">
-              4.9 (128 reviews)
+        {/* Overlapping Profile Avatar */}
+        <View className="items-center -mt-14 mb-3">
+          <Image
+            contentFit="cover"
+            source={{
+              uri: "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=300",
+            }}
+            style={{
+              borderColor: "#ffffff",
+              borderRadius: 50,
+              borderWidth: 4,
+              height: 100,
+              width: 100,
+            }}
+          />
+        </View>
+
+        {/* Barbershop Location Title */}
+        <Text className="font-poppins-bold text-[18px] leading-6.5 text-gray-900 text-center px-6 mb-6 tracking-tight">
+          Jazz barber (Hampdenpark)
+        </Text>
+
+        <View className="px-6">
+          {/* Barber Info Card */}
+          <View className="mb-5 flex-row items-center gap-3.5 rounded-2xl bg-gray-50/80 p-4">
+            <Image
+              contentFit="cover"
+              source={{
+                uri: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+              }}
+              style={{ borderRadius: 24, height: 48, width: 48 }}
+            />
+            <View>
+              <Text className="font-poppins-bold text-[16px] text-gray-900">
+                James Carter
+              </Text>
+              <Text className="mt-0.5 font-poppins text-[12px] text-gray-500">
+                Barber
+              </Text>
+            </View>
+          </View>
+
+          {/* Menu Options Group - Styled with Poppins SemiBold 14px 20px line-height */}
+          <View className="mb-6 overflow-hidden rounded-3xl border border-gray-100/80 bg-white">
+            {/* 1. Service */}
+            <Pressable
+              className="flex-row items-center justify-between border-b border-gray-100/70 p-4 active:bg-gray-50"
+              onPress={() => console.log("Service clicked")}
+            >
+              <View className="flex-row items-center gap-3.5">
+                <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-50">
+                  <StyledIcons
+                    className="text-gray-700"
+                    name="cut-outline"
+                    size={18}
+                  />
+                </View>
+                <Text className="font-poppins-semibold text-[14px] leading-[20px] text-gray-800">
+                  Service
+                </Text>
+              </View>
+              <StyledIcons
+                className="text-gray-400"
+                name="chevron-forward"
+                size={16}
+              />
+            </Pressable>
+
+            {/* 2. Working Days & Hours */}
+            <Pressable
+              className="flex-row items-center justify-between border-b border-gray-100/70 p-4 active:bg-gray-50"
+              onPress={() => console.log("Working Days & Hours clicked")}
+            >
+              <View className="flex-row items-center gap-3.5">
+                <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-50">
+                  <StyledIcons
+                    className="text-gray-700"
+                    name="calendar-outline"
+                    size={18}
+                  />
+                </View>
+                <Text className="font-poppins-semibold text-[14px] leading-[20px] text-gray-800">
+                  Working Days & Hours
+                </Text>
+              </View>
+              <StyledIcons
+                className="text-gray-400"
+                name="chevron-forward"
+                size={16}
+              />
+            </Pressable>
+
+            {/* 3. Reports */}
+            <Pressable
+              className="flex-row items-center justify-between border-b border-gray-100/70 p-4 active:bg-gray-50"
+              onPress={() => console.log("Reports clicked")}
+            >
+              <View className="flex-row items-center gap-3.5">
+                <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-50">
+                  <StyledIcons
+                    className="text-gray-700"
+                    name="bar-chart-outline"
+                    size={18}
+                  />
+                </View>
+                <Text className="font-poppins-semibold text-[14px] leading-[20px] text-gray-800">
+                  Reports
+                </Text>
+              </View>
+              <StyledIcons
+                className="text-gray-400"
+                name="chevron-forward"
+                size={16}
+              />
+            </Pressable>
+
+            {/* 4. Break Schedule */}
+            <Pressable
+              className="flex-row items-center justify-between border-b border-gray-100/70 p-4 active:bg-gray-50"
+              onPress={() => console.log("Break Schedule clicked")}
+            >
+              <View className="flex-row items-center gap-3.5">
+                <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-50">
+                  <StyledIcons
+                    className="text-gray-700"
+                    name="settings-outline"
+                    size={18}
+                  />
+                </View>
+                <Text className="font-poppins-semibold text-[14px] leading-5 text-gray-800">
+                  Break Schedule
+                </Text>
+              </View>
+              <StyledIcons
+                className="text-gray-400"
+                name="chevron-forward"
+                size={16}
+              />
+            </Pressable>
+
+            {/* 5. Reviews */}
+            <Pressable
+              className="flex-row items-center justify-between p-4 active:bg-gray-50"
+              onPress={() => console.log("Reviews clicked")}
+            >
+              <View className="flex-row items-center gap-3.5">
+                <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-50">
+                  <StyledIcons
+                    className="text-gray-700"
+                    name="notifications-outline"
+                    size={18}
+                  />
+                </View>
+                <Text className="font-poppins-semibold text-[14px] leading-[20px] text-gray-800">
+                  Reviews
+                </Text>
+              </View>
+              <StyledIcons
+                className="text-gray-400"
+                name="chevron-forward"
+                size={16}
+              />
+            </Pressable>
+          </View>
+
+          {/* Sign Out Button */}
+          <Button
+            className="h-13 w-full flex-row items-center justify-center gap-2 rounded-2xl bg-red-50/80 active:bg-red-100/80"
+            onPress={() => console.log("Sign Out clicked")}
+            variant="tertiary"
+          >
+            <StyledIcons
+              className="text-red-500"
+              name="exit-outline"
+              size={18}
+            />
+            <Text className="font-poppins-semibold text-[14px] text-red-500">
+              Sign Out
             </Text>
-          </View>
+          </Button>
         </View>
-
-        {/* Schedule & Working Hours Card */}
-        <View className="mb-6 rounded-3xl border border-gray-100 bg-white p-5 shadow-xs">
-          <Text className="mb-3 font-bold text-base text-gray-900">
-            Working Schedule
-          </Text>
-          <View className="gap-2.5">
-            <View className="flex-row items-center justify-between border-b border-gray-100 pb-2">
-              <Text className="text-gray-500 text-sm">Monday - Friday</Text>
-              <Text className="font-semibold text-gray-900 text-sm">
-                09:00 AM - 07:00 PM
-              </Text>
-            </View>
-            <View className="flex-row items-center justify-between border-b border-gray-100 pb-2">
-              <Text className="text-gray-500 text-sm">Saturday</Text>
-              <Text className="font-semibold text-gray-900 text-sm">
-                10:00 AM - 05:00 PM
-              </Text>
-            </View>
-            <View className="flex-row items-center justify-between">
-              <Text className="text-gray-500 text-sm">Sunday</Text>
-              <Text className="font-semibold text-rose-500 text-sm">
-                Day Off
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Quick Menu Options */}
-        <View className="mb-6 rounded-3xl border border-gray-100 bg-white p-2 shadow-xs">
-          <Pressable className="flex-row items-center justify-between rounded-2xl p-3.5 active:bg-gray-50">
-            <View className="flex-row items-center gap-3">
-              <View className="h-9 w-9 items-center justify-center rounded-xl bg-gray-100">
-                <StyledIcons
-                  className="text-gray-700"
-                  name="calendar-outline"
-                  size={18}
-                />
-              </View>
-              <Text className="font-semibold text-gray-900 text-sm">
-                Calendar Settings
-              </Text>
-            </View>
-            <StyledIcons
-              className="text-gray-400"
-              name="chevron-forward"
-              size={18}
-            />
-          </Pressable>
-
-          <Pressable className="flex-row items-center justify-between rounded-2xl p-3.5 active:bg-gray-50">
-            <View className="flex-row items-center gap-3">
-              <View className="h-9 w-9 items-center justify-center rounded-xl bg-gray-100">
-                <StyledIcons
-                  className="text-gray-700"
-                  name="notifications-outline"
-                  size={18}
-                />
-              </View>
-              <Text className="font-semibold text-gray-900 text-sm">
-                Notification Preferences
-              </Text>
-            </View>
-            <StyledIcons
-              className="text-gray-400"
-              name="chevron-forward"
-              size={18}
-            />
-          </Pressable>
-
-          <Pressable className="flex-row items-center justify-between rounded-2xl p-3.5 active:bg-gray-50">
-            <View className="flex-row items-center gap-3">
-              <View className="h-9 w-9 items-center justify-center rounded-xl bg-gray-100">
-                <StyledIcons
-                  className="text-gray-700"
-                  name="lock-closed-outline"
-                  size={18}
-                />
-              </View>
-              <Text className="font-semibold text-gray-900 text-sm">
-                Security & Password
-              </Text>
-            </View>
-            <StyledIcons
-              className="text-gray-400"
-              name="chevron-forward"
-              size={18}
-            />
-          </Pressable>
-        </View>
-
-        {/* Logout Action */}
-        <Button
-          className="h-13 w-full rounded-2xl border border-gray-200 bg-white active:bg-gray-50"
-          variant="tertiary"
-        >
-          <Text className="font-semibold text-rose-600 text-sm">Log Out</Text>
-        </Button>
       </ScrollView>
     </Container>
   );

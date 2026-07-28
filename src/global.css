@@ -22,3 +22,19 @@
   /* custom */
   --color-main-primary: #fe9a00;
 }
+
+@utility font-poppins {
+  font-family: Poppins_400Regular;
+}
+
+@utility font-poppins-medium {
+  font-family: Poppins_500Medium;
+}
+
+@utility font-poppins-semibold {
+  font-family: Poppins_600SemiBold;
+}
+
+@utility font-poppins-bold {
+  font-family: Poppins_700Bold;
+}
