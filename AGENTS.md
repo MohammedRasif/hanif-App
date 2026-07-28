@@ -76,6 +76,12 @@ src/
 - Props typed inline with `type Props = ...` above the component
 - Use `PropsWithChildren<Props>` when children are accepted
 - Wrap third-party components with `withUniwind()` to enable `className` prop (e.g., `withUniwind(Ionicons)`)
+- for icons no need to import withUniwind and then initialize it. import directly from `src\lib\styled-icons.tsx` just like this:
+  ```
+  import { StyledIcons } from "@/lib";
+  // use like these:
+  <StyledIcons name="home" size={20} />
+  ```
 
 ### Styling
 

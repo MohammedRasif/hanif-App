@@ -1,10 +1,7 @@
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
+import { StyledIcons } from "../styled-icons";
 import type { Appointment } from "./types";
-
-const StyledIonicons = withUniwind(Ionicons);
 
 type Props = {
   appointment: Appointment;
@@ -30,7 +27,7 @@ export function CalendarAppointmentCard({ appointment, onPress }: Props) {
           {appointment.timeDisplay}
         </Text>
         {isCompleted && (
-          <StyledIonicons
+          <StyledIcons
             className="text-emerald-600"
             name="checkmark-circle"
             size={16}

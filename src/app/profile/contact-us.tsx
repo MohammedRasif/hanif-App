@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image } from "expo-image";
 import { launchImageLibraryAsync } from "expo-image-picker";
@@ -11,8 +10,8 @@ import { withUniwind } from "uniwind";
 import { z } from "zod";
 
 import { Container } from "@/components/container";
+import { StyledIcons } from "@/lib";
 
-const StyledIonicons = withUniwind(Ionicons);
 const StyledImage = withUniwind(Image);
 
 const contactUsSchema = z.object({
@@ -80,7 +79,7 @@ export default function ContactUsScreen() {
           {/* Header row */}
           <View className="relative mb-8 flex-row items-center justify-between">
             <Pressable className="py-2 pr-4" onPress={() => router.back()}>
-              <StyledIonicons
+              <StyledIcons
                 className="text-foreground"
                 name="arrow-back"
                 size={24}
@@ -152,7 +151,7 @@ export default function ContactUsScreen() {
               className="mt-2 flex-row items-center justify-center gap-2 rounded-2xl bg-[#F3F4F6] bg-default-100 py-3.5 active:opacity-75"
               onPress={addAttachment}
             >
-              <StyledIonicons
+              <StyledIcons
                 className="text-foreground"
                 name="attach-outline"
                 size={18}
@@ -187,7 +186,7 @@ export default function ContactUsScreen() {
                         className="absolute top-1.5 right-1.5 h-6 w-6 items-center justify-center rounded-full bg-black/60 active:bg-black"
                         onPress={() => removeAttachment(uri)}
                       >
-                        <StyledIonicons
+                        <StyledIcons
                           className="text-white"
                           name="close"
                           size={14}

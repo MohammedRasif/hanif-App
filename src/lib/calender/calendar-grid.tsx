@@ -1,12 +1,9 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import React, { useMemo } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
+import { StyledIcons } from "../styled-icons";
 import { CalendarAppointmentCard } from "./appointment-card";
 import type { Appointment, Barber } from "./types";
-
-const StyledIonicons = withUniwind(Ionicons);
 
 const TIME_AXIS_WIDTH = 56; // Fixed width for sticky left time column
 const BARBER_HEADER_HEIGHT = 52; // Fixed height for barber avatar header
@@ -236,7 +233,7 @@ export function CalendarGridTimeline({
                 }}
               >
                 <View className="w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[8px] border-l-red-500" />
-                <View className="flex-1 h-[2px] bg-red-500" />
+                <View className="flex-1 h-0.5 bg-red-500" />
                 <View className="w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[8px] border-r-red-500" />
               </View>
             </View>
@@ -254,7 +251,7 @@ export function CalendarGridTimeline({
           className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-black shadow-lg z-40 active:scale-95"
           onPress={onPressFab}
         >
-          <StyledIonicons className="text-white" name="add" size={28} />
+          <StyledIcons className="text-white" name="add" size={28} />
         </Pressable>
       ) : null}
     </View>

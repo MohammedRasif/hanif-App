@@ -1,12 +1,9 @@
-import { Ionicons } from "@expo/vector-icons";
+import { StyledIcons } from "@/lib";
 import { Stack, useRouter } from "expo-router";
 import { Button } from "heroui-native";
 import { Pressable, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
 
 import { Container } from "@/components/container";
-
-const StyledIonicons = withUniwind(Ionicons);
 
 export default function BookScreen() {
   const router = useRouter();
@@ -20,7 +17,7 @@ export default function BookScreen() {
           {/* Header row */}
           <View className="relative mb-8 flex-row items-center justify-between">
             <Pressable className="py-2 pr-4" onPress={() => router.back()}>
-              <StyledIonicons
+              <StyledIcons
                 className="text-foreground"
                 name="arrow-back"
                 size={24}

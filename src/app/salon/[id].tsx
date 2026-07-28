@@ -1,12 +1,9 @@
-import { Ionicons } from "@expo/vector-icons";
+import { StyledIcons } from "@/lib";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Button } from "heroui-native";
 import { Pressable, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
 
 import { Container } from "@/components/container";
-
-const StyledIonicons = withUniwind(Ionicons);
 
 export default function SalonDetailScreen() {
   const router = useRouter();
@@ -32,7 +29,7 @@ export default function SalonDetailScreen() {
                 className="h-10 w-10 items-center justify-center rounded-full bg-white/80"
                 onPress={() => router.back()}
               >
-                <StyledIonicons
+                <StyledIcons
                   className="text-foreground"
                   name="arrow-back"
                   size={20}
@@ -40,14 +37,14 @@ export default function SalonDetailScreen() {
               </Pressable>
               <View className="flex-row gap-3">
                 <Pressable className="h-10 w-10 items-center justify-center rounded-full bg-white/80">
-                  <StyledIonicons
+                  <StyledIcons
                     className="text-foreground"
                     name="share-social-outline"
                     size={20}
                   />
                 </Pressable>
                 <Pressable className="h-10 w-10 items-center justify-center rounded-full bg-white/80">
-                  <StyledIonicons
+                  <StyledIcons
                     className="text-foreground"
                     name="heart-outline"
                     size={20}
@@ -64,11 +61,7 @@ export default function SalonDetailScreen() {
                 Glam Beauty Salon
               </Text>
               <View className="flex-row items-center gap-1 rounded-lg bg-[#FFF9E6] px-2.5 py-1">
-                <StyledIonicons
-                  className="text-[#F0B100]"
-                  name="star"
-                  size={14}
-                />
+                <StyledIcons className="text-[#F0B100]" name="star" size={14} />
                 <Text className="font-bold text-[#F0B100] text-xs">4.9</Text>
               </View>
             </View>

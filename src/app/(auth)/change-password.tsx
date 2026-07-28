@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Href } from "expo-router";
 import { Stack, useRouter } from "expo-router";
@@ -6,12 +5,10 @@ import { Button, FieldError, InputGroup, TextField } from "heroui-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
 import { z } from "zod";
 
 import { Container } from "@/components/container";
-
-const StyledIonicons = withUniwind(Ionicons);
+import { StyledIcons } from "@/lib";
 
 const changePasswordSchema = z
   .object({
@@ -58,7 +55,7 @@ export default function ChangePasswordScreen() {
         <View>
           {/* Back button */}
           <Pressable className="mb-6 self-start" onPress={() => router.back()}>
-            <StyledIonicons
+            <StyledIcons
               className="text-foreground"
               name="arrow-back"
               size={24}
@@ -96,7 +93,7 @@ export default function ChangePasswordScreen() {
                         hitSlop={12}
                         onPress={() => setIsPasswordVisible(!isPasswordVisible)}
                       >
-                        <StyledIonicons
+                        <StyledIcons
                           className="text-muted"
                           name={
                             isPasswordVisible
@@ -140,7 +137,7 @@ export default function ChangePasswordScreen() {
                           setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
                         }
                       >
-                        <StyledIonicons
+                        <StyledIcons
                           className="text-muted"
                           name={
                             isConfirmPasswordVisible

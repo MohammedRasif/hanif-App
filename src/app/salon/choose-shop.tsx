@@ -1,23 +1,19 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import { Button } from "heroui-native";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
+import { StyledIcons } from "@/lib";
 
 import { Container } from "@/components/container";
-
-const StyledIonicons = withUniwind(Ionicons);
 
 export default function ChooseShopScreen() {
   const router = useRouter();
   const [selected, setSelected] = useState("Glam Haven");
 
   const shops = [
-    { name: "Glam Haven", address: "Los Angeles, CA • 0.8 mi" },
-    { name: "Radiance Retreat", address: "Los Angeles, CA • 0.8 mi" },
-    { name: "Chic Boutique", address: "Los Angeles, CA • 0.8 mi" },
-    { name: "Serenity Spa", address: "Los Angeles, CA • 0.8 mi" },
+    { name: "Glam Haven", address: "123 Beauty St, Downtown" },
+    { name: "Luxury Cuts", address: "456 Fashion Ave, Uptown" },
+    { name: "Style Studio", address: "789 Main St, City Center" },
   ];
 
   return (
@@ -29,7 +25,7 @@ export default function ChooseShopScreen() {
           {/* Header row */}
           <View className="relative mb-8 flex-row items-center justify-between">
             <Pressable className="py-2 pr-4" onPress={() => router.back()}>
-              <StyledIonicons
+              <StyledIcons
                 className="text-foreground"
                 name="arrow-back"
                 size={24}
@@ -54,7 +50,7 @@ export default function ChooseShopScreen() {
                 onPress={() => setSelected(shop.name)}
               >
                 <View className="h-10 w-10 items-center justify-center rounded-xl bg-default-200">
-                  <StyledIonicons
+                  <StyledIcons
                     className="text-default-500"
                     name="business"
                     size={20}

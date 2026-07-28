@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Href } from "expo-router";
 import { Link, Stack } from "expo-router";
@@ -6,14 +5,12 @@ import { Button, FieldError, InputGroup, TextField } from "heroui-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
 import { z } from "zod";
 
 import { Container } from "@/components/container";
 import { AuthHeader } from "@/feature/auth-header";
 import { SocialAuth } from "@/feature/social-auth";
-
-const StyledIonicons = withUniwind(Ionicons);
+import { StyledIcons } from "@/lib";
 
 const registerSchema = z
   .object({
@@ -177,7 +174,7 @@ export default function RegisterScreen() {
                       hitSlop={12}
                       onPress={() => setIsPasswordVisible(!isPasswordVisible)}
                     >
-                      <StyledIonicons
+                      <StyledIcons
                         className="text-muted"
                         name={
                           isPasswordVisible ? "eye-off-outline" : "eye-outline"
@@ -219,7 +216,7 @@ export default function RegisterScreen() {
                         setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
                       }
                     >
-                      <StyledIonicons
+                      <StyledIcons
                         className="text-muted"
                         name={
                           isConfirmPasswordVisible
@@ -256,7 +253,7 @@ export default function RegisterScreen() {
                     }`}
                   >
                     {value && (
-                      <StyledIonicons
+                      <StyledIcons
                         className="text-primary-foreground"
                         name="checkmark"
                         size={12}

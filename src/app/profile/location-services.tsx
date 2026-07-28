@@ -1,12 +1,9 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import { Button } from "heroui-native";
 import { Pressable, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
 
 import { Container } from "@/components/container";
-
-const StyledIonicons = withUniwind(Ionicons);
+import { StyledIcons } from "@/lib";
 
 export default function LocationServicesScreen() {
   const router = useRouter();
@@ -20,7 +17,7 @@ export default function LocationServicesScreen() {
           {/* Header row */}
           <View className="relative mb-8 flex-row items-center justify-between">
             <Pressable className="py-2 pr-4" onPress={() => router.back()}>
-              <StyledIonicons
+              <StyledIcons
                 className="text-foreground"
                 name="arrow-back"
                 size={24}
@@ -38,7 +35,7 @@ export default function LocationServicesScreen() {
           </Text>
           <View className="mb-4 flex-row items-center gap-4 rounded-2xl bg-[#F8F9FA] p-4">
             <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-              <StyledIonicons
+              <StyledIcons
                 className="text-[#F0B100]"
                 name="location"
                 size={20}
@@ -56,7 +53,7 @@ export default function LocationServicesScreen() {
 
           {/* Use current location trigger */}
           <Pressable className="flex-row items-center justify-center gap-2 rounded-2xl border border-[#F0B100] py-3">
-            <StyledIonicons
+            <StyledIcons
               className="text-[#F0B100]"
               name="locate-outline"
               size={18}

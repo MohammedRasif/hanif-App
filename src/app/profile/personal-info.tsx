@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image } from "expo-image";
 import { launchImageLibraryAsync } from "expo-image-picker";
@@ -11,8 +10,8 @@ import { withUniwind } from "uniwind";
 import { z } from "zod";
 
 import { Container } from "@/components/container";
+import { StyledIcons } from "@/lib";
 
-const StyledIonicons = withUniwind(Ionicons);
 const StyledImage = withUniwind(Image);
 
 const personalInfoSchema = z.object({
@@ -75,7 +74,7 @@ export default function PersonalInfoScreen() {
           {/* Header row */}
           <View className="relative mb-8 flex-row items-center justify-between">
             <Pressable className="py-2 pr-4" onPress={() => router.back()}>
-              <StyledIonicons
+              <StyledIcons
                 className="text-foreground"
                 name="arrow-back"
                 size={24}
@@ -103,11 +102,7 @@ export default function PersonalInfoScreen() {
               </View>
               {/* Camera icon overlay badge */}
               <View className="absolute right-0 bottom-0 h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#F0B100]">
-                <StyledIonicons
-                  className="text-white"
-                  name="camera"
-                  size={14}
-                />
+                <StyledIcons className="text-white" name="camera" size={14} />
               </View>
             </Pressable>
             <Pressable className="mt-3" onPress={pickImage}>

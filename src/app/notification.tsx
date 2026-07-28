@@ -1,12 +1,9 @@
 import { Container } from "@/components/container";
 import { notificationData } from "@/data/notification.data";
-import { Ionicons } from "@expo/vector-icons";
+import { StyledIcons } from "@/lib";
 import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
-
-const StyledIonicons = withUniwind(Ionicons);
 
 const typeStyles = {
   confirmed: {
@@ -55,7 +52,7 @@ export default function NotificationScreen() {
         {/* Header Row */}
         <View className="relative mb-6 flex-row items-center justify-between">
           <Pressable className="py-2 pr-4" onPress={() => router.back()}>
-            <StyledIonicons
+            <StyledIcons
               className="text-foreground"
               name="arrow-back"
               size={24}
@@ -120,7 +117,7 @@ export default function NotificationScreen() {
                   <View
                     className={`h-12 w-12 items-center justify-center rounded-full ${styles.bg}`}
                   >
-                    <StyledIonicons
+                    <StyledIcons
                       className={styles.color}
                       name={styles.icon}
                       size={22}

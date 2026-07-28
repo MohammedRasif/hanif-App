@@ -1,13 +1,10 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import { InputOTP } from "heroui-native";
 import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
 
 import { Container } from "@/components/container";
-
-const StyledIonicons = withUniwind(Ionicons);
+import { StyledIcons } from "@/lib";
 
 export default function OtpCodeScreen() {
   const router = useRouter();
@@ -36,7 +33,7 @@ export default function OtpCodeScreen() {
       <View className="flex-1 bg-[#FFFFFF] px-6 pt-14 pb-8">
         {/* Back button */}
         <Pressable className="mb-6 self-start" onPress={() => router.back()}>
-          <StyledIonicons
+          <StyledIcons
             className="text-foreground"
             name="arrow-back"
             size={24}

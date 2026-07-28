@@ -1,13 +1,10 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import { Button, InputGroup, TextField } from "heroui-native";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
 
 import { Container } from "@/components/container";
-
-const StyledIonicons = withUniwind(Ionicons);
+import { StyledIcons } from "@/lib";
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
@@ -24,7 +21,7 @@ export default function ChangePasswordScreen() {
           {/* Header row */}
           <View className="relative mb-8 flex-row items-center justify-between">
             <Pressable className="py-2 pr-4" onPress={() => router.back()}>
-              <StyledIonicons
+              <StyledIcons
                 className="text-foreground"
                 name="arrow-back"
                 size={24}
@@ -51,7 +48,7 @@ export default function ChangePasswordScreen() {
                   />
                   <InputGroup.Suffix className="absolute top-0 right-0 bottom-0 items-center justify-center pr-4 pl-2">
                     <Pressable onPress={() => setVis1(!vis1)}>
-                      <StyledIonicons
+                      <StyledIcons
                         className="text-default-400"
                         name={vis1 ? "eye-off-outline" : "eye-outline"}
                         size={20}
@@ -75,7 +72,7 @@ export default function ChangePasswordScreen() {
                   />
                   <InputGroup.Suffix className="absolute top-0 right-0 bottom-0 items-center justify-center pr-4 pl-2">
                     <Pressable onPress={() => setVis2(!vis2)}>
-                      <StyledIonicons
+                      <StyledIcons
                         className="text-default-400"
                         name={vis2 ? "eye-off-outline" : "eye-outline"}
                         size={20}
@@ -99,7 +96,7 @@ export default function ChangePasswordScreen() {
                   />
                   <InputGroup.Suffix className="absolute top-0 right-0 bottom-0 items-center justify-center pr-4 pl-2">
                     <Pressable onPress={() => setVis3(!vis3)}>
-                      <StyledIonicons
+                      <StyledIcons
                         className="text-default-400"
                         name={vis3 ? "eye-off-outline" : "eye-outline"}
                         size={20}

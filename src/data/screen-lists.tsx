@@ -56,15 +56,6 @@ export const otherScreens: Screen[] = [
   },
 ];
 
-export const calendarScreens: Screen[] = [
-  {
-    title: "Calendar Schedule View",
-    desc: "Production multi-barber schedule management timeline",
-    href: "/calender/custom-calendar" as Href,
-    icon: "calendar-outline" as const,
-  },
-];
-
 export const mainScreens: Screen[] = [
   {
     title: "Staff Screen",

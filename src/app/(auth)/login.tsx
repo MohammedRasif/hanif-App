@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Href } from "expo-router";
 import { Link, Stack } from "expo-router";
@@ -6,14 +5,12 @@ import { Button, FieldError, InputGroup, TextField } from "heroui-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
 import { z } from "zod";
 
 import { Container } from "@/components/container";
 import { AuthHeader } from "@/feature/auth-header";
 import { SocialAuth } from "@/feature/social-auth";
-
-const StyledIonicons = withUniwind(Ionicons);
+import { StyledIcons } from "@/lib";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -69,7 +66,7 @@ export default function LoginScreen() {
                     className="absolute top-0 bottom-0 left-0 items-center justify-center pr-2 pl-4"
                     isDecorative
                   >
-                    <StyledIonicons
+                    <StyledIcons
                       className="text-muted"
                       name="mail-outline"
                       size={20}
@@ -106,7 +103,7 @@ export default function LoginScreen() {
                     className="absolute top-0 bottom-0 left-0 items-center justify-center pr-2 pl-4"
                     isDecorative
                   >
-                    <StyledIonicons
+                    <StyledIcons
                       className="text-muted"
                       name="lock-closed-outline"
                       size={20}
@@ -125,7 +122,7 @@ export default function LoginScreen() {
                       hitSlop={12}
                       onPress={() => setIsPasswordVisible(!isPasswordVisible)}
                     >
-                      <StyledIonicons
+                      <StyledIcons
                         className="text-muted"
                         name={
                           isPasswordVisible ? "eye-off-outline" : "eye-outline"
@@ -159,7 +156,7 @@ export default function LoginScreen() {
                   }`}
                 >
                   {value && (
-                    <StyledIonicons
+                    <StyledIcons
                       className="text-primary-foreground"
                       name="checkmark"
                       size={12}

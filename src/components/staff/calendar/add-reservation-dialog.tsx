@@ -1,10 +1,7 @@
-import { Ionicons } from "@expo/vector-icons";
+import { StyledIcons } from "@/lib";
 import { Button, Dialog, InputGroup } from "heroui-native";
 import React, { useState } from "react";
 import { Text, View } from "react-native";
-import { withUniwind } from "uniwind";
-
-const StyledIonicons = withUniwind(Ionicons);
 
 type Props = {
   isOpen: boolean;
@@ -36,11 +33,7 @@ export function AddReservationDialog({
               Add New Reservation
             </Dialog.Title>
             <Dialog.Close>
-              <StyledIonicons
-                className="text-gray-500"
-                name="close"
-                size={20}
-              />
+              <StyledIcons className="text-gray-500" name="close" size={20} />
             </Dialog.Close>
           </View>
 

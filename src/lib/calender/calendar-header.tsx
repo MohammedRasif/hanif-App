@@ -1,10 +1,7 @@
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
+import { StyledIcons } from "../styled-icons";
 import type { DayItem } from "./types";
-
-const StyledIonicons = withUniwind(Ionicons);
 
 type Props = {
   activeDateStr?: string;
@@ -37,14 +34,14 @@ export function CalendarHeaderView({
         {/* Top Right Action Icons */}
         <View className="flex-row items-center gap-3">
           <Pressable className="h-11 w-11 items-center justify-center rounded-full bg-gray-100 active:opacity-70">
-            <StyledIonicons
+            <StyledIcons
               className="text-gray-700"
               name="options-outline"
               size={20}
             />
           </Pressable>
           <Pressable className="h-11 w-11 items-center justify-center rounded-full bg-gray-100 active:opacity-70">
-            <StyledIonicons
+            <StyledIcons
               className="text-gray-700"
               name="list-outline"
               size={20}

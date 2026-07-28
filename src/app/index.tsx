@@ -1,19 +1,15 @@
 import logo from "@/assets/logo.png";
 import { Container } from "@/components/container";
-import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { Image, Pressable, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
 
 import {
   authScreens,
-  calendarScreens,
   mainScreens,
   otherScreens,
   type Screen,
-} from "../data/screen-lists";
-
-const StyledIonicons = withUniwind(Ionicons);
+} from "@/data/screen-lists";
+import { StyledIcons } from "@/lib";
 
 export default function HomePage() {
   return (
@@ -30,10 +26,6 @@ export default function HomePage() {
         </Text>
       </View>
 
-      <ShowScreenItems
-        screens={calendarScreens}
-        title="Calendar Schedule Views"
-      />
       <ShowScreenItems screens={mainScreens} title="Main Screen" />
       <ShowScreenItems screens={authScreens} title="Auth Screen" />
       <ShowScreenItems screens={otherScreens} title="Other Screen" />
@@ -56,11 +48,7 @@ const ShowScreenItems = ({
       <Link asChild href={item.href} key={item.title}>
         <Pressable className="flex-row items-center gap-4 rounded-2xl bg-content1 p-4 active:opacity-75">
           <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-            <StyledIonicons
-              className="text-primary"
-              name={item.icon}
-              size={20}
-            />
+            <StyledIcons className="text-primary" name={item.icon} size={20} />
           </View>
           <View className="flex-1">
             <Text className="font-semibold text-foreground text-sm">
@@ -68,7 +56,7 @@ const ShowScreenItems = ({
             </Text>
             <Text className="mt-0.5 text-default-400 text-xs">{item.desc}</Text>
           </View>
-          <StyledIonicons
+          <StyledIcons
             className="text-default-300"
             name="chevron-forward"
             size={16}

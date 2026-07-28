@@ -1,15 +1,12 @@
-import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Stack, useRouter } from "expo-router";
 import { Button, FieldError, InputGroup, TextField } from "heroui-native";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
 import { z } from "zod";
 
 import { Container } from "@/components/container";
-
-const StyledIonicons = withUniwind(Ionicons);
+import { StyledIcons } from "@/lib";
 
 const forgotPasswordSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -46,7 +43,7 @@ export default function ForgotPasswordScreen() {
         <View>
           {/* Back button */}
           <Pressable className="mb-6 self-start" onPress={() => router.back()}>
-            <StyledIonicons
+            <StyledIcons
               className="text-foreground"
               name="arrow-back"
               size={24}

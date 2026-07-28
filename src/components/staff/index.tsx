@@ -1,10 +1,7 @@
-import { Ionicons } from "@expo/vector-icons";
+import { StyledIcons } from "@/lib";
 import { Image } from "expo-image";
 import React from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
-import { withUniwind } from "uniwind";
-
-const StyledIonicons = withUniwind(Ionicons);
 
 export interface StaffMetric {
   id: string;
@@ -91,11 +88,7 @@ export function StaffHeader({
         className="h-11 w-11 items-center justify-center rounded-full bg-gray-100 active:opacity-75"
         onPress={onPressNotification}
       >
-        <StyledIonicons
-          className="text-gray-800"
-          name="notifications"
-          size={20}
-        />
+        <StyledIcons className="text-gray-800" name="notifications" size={20} />
       </Pressable>
     </View>
   );
@@ -159,7 +152,7 @@ export function StaffNextAppointments({
                 />
               ) : (
                 <View className="h-11 w-11 items-center justify-center rounded-full bg-gray-200">
-                  <StyledIonicons
+                  <StyledIcons
                     className="text-gray-500"
                     name="person"
                     size={20}

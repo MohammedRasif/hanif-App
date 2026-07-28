@@ -1,10 +1,7 @@
-import { Ionicons } from "@expo/vector-icons";
+import { StyledIcons } from "@/lib";
 import { Menu } from "heroui-native";
 import React from "react";
 import { Pressable, View } from "react-native";
-import { withUniwind } from "uniwind";
-
-const StyledIonicons = withUniwind(Ionicons);
 
 type Props = {
   onOpenReservationDialog: () => void;
@@ -20,7 +17,7 @@ export function StaffCalendarMenu({
       <Menu>
         <Menu.Trigger asChild>
           <Pressable className="h-14 w-14 items-center justify-center rounded-full bg-black shadow-lg active:scale-95">
-            <StyledIonicons className="text-white" name="add" size={28} />
+            <StyledIcons className="text-white" name="add" size={28} />
           </Pressable>
         </Menu.Trigger>
         <Menu.Portal>
@@ -35,7 +32,7 @@ export function StaffCalendarMenu({
               className="flex-row items-center gap-3 rounded-xl px-3 py-3 active:bg-gray-100"
               onPress={onOpenReservationDialog}
             >
-              <StyledIonicons
+              <StyledIcons
                 className="text-gray-700"
                 name="calendar-outline"
                 size={18}
@@ -49,7 +46,7 @@ export function StaffCalendarMenu({
               className="flex-row items-center gap-3 rounded-xl px-3 py-3 active:bg-gray-100"
               onPress={onOpenTimeOffDialog}
             >
-              <StyledIonicons
+              <StyledIcons
                 className="text-gray-700"
                 name="time-outline"
                 size={18}
