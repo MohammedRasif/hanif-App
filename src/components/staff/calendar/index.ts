@@ -3,4 +3,6 @@ export * from "./add-time-off-dialog";
 export * from "./appointment-card";
 export * from "./calendar-header";
 export * from "./calendar-types";
+export * from "./confirm-add-reservation-dialog";
+export * from "./final-add-reservation-dialog";
 export * from "./staff-calendar-menu";

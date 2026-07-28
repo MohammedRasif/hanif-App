@@ -30,7 +30,7 @@ export function CommonInput({
   isInvalid,
   prefix,
   suffix,
-  containerClassName = "mb-4",
+  containerClassName = "mb-3",
   inputGroupClassName,
   inputClassName,
   labelClassName,
@@ -71,7 +71,7 @@ export function CommonInput({
         {label && (
           <Label
             className={cn(
-              "mb-2 font-semibold text-foreground text-sm",
+              "mb-1 font-semibold text-foreground text-xs",
               labelClassName,
             )}
           >
@@ -81,7 +81,7 @@ export function CommonInput({
 
         <InputGroup
           className={cn(
-            "h-14 w-full flex-row items-center rounded-2xl border border-default-200 bg-white px-4",
+            "h-12 w-full flex-row items-center rounded-xl border border-default-200 bg-white px-3.5",
             invalid && "border-danger",
             isDisabled && "opacity-50",
             inputGroupClassName,
@@ -112,12 +112,12 @@ export function CommonInput({
 
         {errorText ? (
           <FieldError
-            className={cn("mt-1.5 text-danger text-xs", errorClassName)}
+            className={cn("mt-1 text-danger text-xs", errorClassName)}
           >
             {errorText}
           </FieldError>
         ) : helperText ? (
-          <Text className="mt-1.5 text-default-400 text-xs">{helperText}</Text>
+          <Text className="mt-1 text-default-400 text-xs">{helperText}</Text>
         ) : null}
       </TextField>
     </View>
