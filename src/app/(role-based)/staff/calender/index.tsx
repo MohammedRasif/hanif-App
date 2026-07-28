@@ -5,7 +5,7 @@ import {
   AddReservationDialog,
   AddTimeOffDialog,
   StaffCalendarMenu,
-} from "../components";
+} from "@/components/staff/calendar";
 
 export default function CalenderIndex() {
   const [selectedDateStr, setSelectedDateStr] = useState("2026-07-18");
