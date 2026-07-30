@@ -75,7 +75,11 @@ export default function HomeScreen() {
           </Text>
           <View className="gap-4">
             {shopList.map((shop) => (
-              <Link asChild href={`/salon/${shop.id}` as Href} key={shop.id}>
+              <Link
+                asChild
+                href={`/(role)/user/salon/${shop.id}` as Href}
+                key={shop.id}
+              >
                 <Pressable className="w-full overflow-hidden rounded-3xl border border-gray-100 bg-white p-3.5 shadow-xs active:opacity-95">
                   {/* Image cover with rating overlay */}
                   <View className="relative h-44 w-full overflow-hidden rounded-2xl bg-default-100">
