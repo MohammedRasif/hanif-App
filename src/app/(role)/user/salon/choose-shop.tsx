@@ -1,4 +1,4 @@
-import { Stack, useRouter } from "expo-router";
+import { Stack, useRouter, type Href } from "expo-router";
 import { Button } from "heroui-native";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -72,7 +72,7 @@ export default function ChooseShopScreen() {
         {/* Action Button */}
         <Button
           className="mt-8 h-14 w-full items-center justify-center rounded-2xl bg-[#F0B100]"
-          onPress={() => router.push("/salon/confirm")}
+          onPress={() => router.push("/salon/confirm" as Href)}
           variant="primary"
         >
           <Button.Label className="font-semibold text-base text-primary-foreground">

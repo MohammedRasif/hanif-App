@@ -1,5 +1,5 @@
 import { StyledIcons } from "@/lib";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useRouter, type Href } from "expo-router";
 import { Button } from "heroui-native";
 import { Pressable, Text, View } from "react-native";
 
@@ -76,7 +76,7 @@ export default function BookScreen() {
         {/* Action Button */}
         <Button
           className="mt-8 h-14 w-full items-center justify-center rounded-2xl bg-[#F0B100]"
-          onPress={() => router.push("/salon/choose-shop")}
+          onPress={() => router.push("/salon/choose-shop" as Href)}
           variant="primary"
         >
           <Button.Label className="font-semibold text-base text-primary-foreground">

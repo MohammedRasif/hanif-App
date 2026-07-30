@@ -1,6 +1,6 @@
-import { type Href, Link, useRouter } from "expo-router";
-import { InputGroup, TextField } from "heroui-native";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { Link, useRouter, type Href } from "expo-router";
+import React from "react";
+import { Image, Pressable, Text, View } from "react-native";
 
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
@@ -8,45 +8,30 @@ import { StyledIcons } from "@/lib";
 export default function HomeScreen() {
   const router = useRouter();
 
-  const categories = [
-    {
-      name: "Barber",
-      img: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=150&q=80",
-    },
-    {
-      name: "Nails",
-      img: "https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=150&q=80",
-    },
-    {
-      name: "Skin care",
-      img: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=150&q=80",
-    },
-    {
-      name: "Massage",
-      img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=150&q=80",
-    },
-    {
-      name: "Makeup",
-      img: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=150&q=80",
-    },
-  ];
-
-  const spatialOffers = [
+  const shopList = [
     {
       id: "1",
-      title: "Welcome, Maïa",
-      subtitle: "Let's find your next treatment",
+      location: "Los Angeles, CA  •  0.8 mi",
       rating: "4.9",
       reviews: "364 reviews",
-      img: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=400&q=80",
+      title: "Barbers Bay",
+      img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=600&q=80",
     },
     {
       id: "2",
-      title: "Chic Boutique",
-      subtitle: "Top rated haircut styling services",
-      rating: "4.8",
-      reviews: "182 reviews",
-      img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=400&q=80",
+      location: "Los Angeles, CA  •  0.8 mi",
+      rating: "4.9",
+      reviews: "364 reviews",
+      title: "Barbers Bay",
+      img: "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=600&q=80",
+    },
+    {
+      id: "3",
+      location: "Los Angeles, CA  •  0.8 mi",
+      rating: "4.9",
+      reviews: "364 reviews",
+      title: "Barbers Bay",
+      img: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=600&q=80",
     },
   ];
 
@@ -83,122 +68,50 @@ export default function HomeScreen() {
           </Pressable>
         </View>
 
-        {/* Search Bar */}
-        <View className="mb-6">
-          <TextField>
-            <InputGroup className="h-12 flex-row items-center rounded-full border-transparent bg-[#F8F9FA] px-4">
-              <InputGroup.Prefix className="mr-2">
-                <StyledIcons
-                  className="text-default-400"
-                  name="search"
-                  size={20}
-                />
-              </InputGroup.Prefix>
-              <InputGroup.Input
-                className="h-full flex-1 bg-transparent text-foreground text-sm placeholder-default-400"
-                placeholder="Search salons or services..."
-              />
-            </InputGroup>
-          </TextField>
-        </View>
-
-        {/* Promo Banner Card */}
-        <View className="relative mb-6 h-44 overflow-hidden rounded-3xl bg-default-800">
-          <Image
-            className="absolute inset-0 h-full w-full opacity-60"
-            source={{
-              uri: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=600&q=80",
-            }}
-          />
-          {/* Text and Button content */}
-          <View className="flex-1 justify-between p-5">
-            <View>
-              <Text className="font-semibold text-white/80 text-xs uppercase tracking-wider">
-                Get Special Discount
-              </Text>
-              <Text className="mt-1 font-bold text-2xl text-white">
-                Up to 30%
-              </Text>
-            </View>
-            <Pressable
-              className="self-start rounded-full bg-[#F0B100] px-6 py-2.5 active:opacity-90"
-              onPress={() => router.push("/salon/1" as Href)}
-            >
-              <Text className="font-bold text-white text-xs">Book Now</Text>
-            </Pressable>
-          </View>
-        </View>
-
-        {/* Categories Section */}
-        <View className="mb-6">
-          <Text className="mb-4 font-bold text-foreground text-lg">
-            Categories
-          </Text>
-          <ScrollView
-            contentContainerStyle={{ gap: 16 }}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          >
-            {categories.map((cat) => (
-              <View className="items-center" key={cat.name}>
-                <View className="mb-2 h-16 w-16 overflow-hidden rounded-full border-2 border-[#F0B100] bg-white p-0.5">
-                  <Image
-                    className="h-full w-full rounded-full"
-                    source={{ uri: cat.img }}
-                  />
-                </View>
-                <Text className="font-semibold text-foreground text-xs">
-                  {cat.name}
-                </Text>
-              </View>
-            ))}
-          </ScrollView>
-        </View>
-
-        {/* Spatial Offers Section */}
+        {/* Choose Shop Vertical List */}
         <View>
-          <Text className="mb-4 font-bold text-foreground text-lg">
-            Spatial offers
+          <Text className="mb-4 font-bold text-foreground text-xl tracking-tight">
+            Choose shop
           </Text>
-          <ScrollView
-            contentContainerStyle={{ gap: 16 }}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          >
-            {spatialOffers.map((offer) => (
-              <Link asChild href={`/salon/${offer.id}` as Href} key={offer.id}>
-                <Pressable className="w-64 overflow-hidden rounded-3xl border border-default-100 bg-white pb-4 active:opacity-95">
+          <View className="gap-4">
+            {shopList.map((shop) => (
+              <Link asChild href={`/salon/${shop.id}` as Href} key={shop.id}>
+                <Pressable className="w-full overflow-hidden rounded-3xl border border-gray-100 bg-white p-3.5 shadow-xs active:opacity-95">
                   {/* Image cover with rating overlay */}
-                  <View className="relative h-40 bg-default-100">
+                  <View className="relative h-44 w-full overflow-hidden rounded-2xl bg-default-100">
                     <Image
                       className="h-full w-full"
-                      source={{ uri: offer.img }}
+                      source={{ uri: shop.img }}
                     />
-                    <View className="absolute top-3 right-3 flex-row items-center gap-1.5 rounded-xl bg-black/60 px-2 py-1">
+                    <View className="absolute top-3 right-3 flex-row items-center gap-1.5 rounded-xl bg-black/60 px-2.5 py-1">
                       <Text className="font-bold text-[#F0B100] text-xs">
-                        {offer.rating}
+                        {shop.rating}
                       </Text>
                       <Text className="font-medium text-[10px] text-white/90">
-                        {offer.reviews}
+                        {shop.reviews}
                       </Text>
                     </View>
                   </View>
                   {/* Info */}
-                  <View className="px-4 pt-3">
+                  <View className="pt-3 px-1">
                     <Text className="font-bold text-base text-foreground">
-                      {offer.title}
+                      {shop.title}
                     </Text>
-                    <Text
-                      className="mt-1 text-default-400 text-xs"
-                      numberOfLines={2}
-                    >
-                      {offer.subtitle}
-                    </Text>
+                    <View className="mt-1 flex-row items-center gap-1">
+                      <StyledIcons
+                        className="text-gray-400"
+                        name="location-outline"
+                        size={14}
+                      />
+                      <Text className="text-gray-500 text-xs font-normal">
+                        {shop.location}
+                      </Text>
+                    </View>
                   </View>
                 </Pressable>
               </Link>
             ))}
-          </ScrollView>
+          </View>
         </View>
       </View>
     </Container>

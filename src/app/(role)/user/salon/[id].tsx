@@ -1,5 +1,5 @@
 import { StyledIcons } from "@/lib";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter, type Href } from "expo-router";
 import { Button } from "heroui-native";
 import { Pressable, Text, View } from "react-native";
 
@@ -100,7 +100,7 @@ export default function SalonDetailScreen() {
         <View className="mt-8 px-6">
           <Button
             className="h-14 w-full items-center justify-center rounded-2xl bg-[#F0B100]"
-            onPress={() => router.push("/salon/book")}
+            onPress={() => router.push("/salon/book" as Href)}
             variant="primary"
           >
             <Button.Label className="font-semibold text-base text-primary-foreground">
