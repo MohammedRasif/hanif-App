@@ -1,6 +1,7 @@
 import { Container } from "@/components/container";
 import {
   BarberSandServices,
+  SalonDetailsTab,
   SalonGalleryTab,
   SalonReviewsTab,
   SalonTabs,
@@ -111,13 +112,7 @@ export default function SalonDetailScreen() {
 
             {activeTab === "gallery" && <SalonGalleryTab />}
 
-            {activeTab === "details" && (
-              <View className="py-12 items-center justify-center">
-                <Text className="font-poppins-medium text-sm text-gray-400">
-                  Details Content Coming Soon
-                </Text>
-              </View>
-            )}
+            {activeTab === "details" && <SalonDetailsTab />}
           </View>
         </View>
       </View>
