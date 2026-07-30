@@ -13,27 +13,27 @@ interface MenuItem {
 const personalItems: MenuItem[] = [
   {
     title: "Personal Information",
-    href: "/profile/personal-info" as Href,
+    href: "/(role)/user/profile/personal-info" as Href,
     icon: "person-outline",
   },
   {
     title: "Notification",
-    href: "/(tabs)/notification" as Href,
+    href: "/notification" as Href,
     icon: "notifications-outline",
   },
   {
     title: "Location Services",
-    href: "/profile/location-services" as Href,
+    href: "/(role)/user/profile/location-services" as Href,
     icon: "location-outline",
   },
   {
     title: "Change Password",
-    href: "/profile/change-password" as Href,
+    href: "/(role)/user/profile/change-password" as Href,
     icon: "lock-closed-outline",
   },
   {
     title: "Refund",
-    href: "/profile/refund" as Href,
+    href: "/(role)/user/profile/refund" as Href,
     icon: "receipt-outline",
   },
 ];
@@ -41,22 +41,22 @@ const personalItems: MenuItem[] = [
 const supportItems: MenuItem[] = [
   {
     title: "Help center",
-    href: "/profile/help-center" as Href,
+    href: "/(role)/user/profile/help-center" as Href,
     icon: "help-circle-outline",
   },
   {
     title: "Contact us",
-    href: "/profile/contact-us" as Href,
+    href: "/(role)/user/profile/contact-us" as Href,
     icon: "call-outline",
   },
   {
     title: "Terms & Condition",
-    href: "/profile/terms" as Href,
+    href: "/(role)/user/profile/terms" as Href,
     icon: "document-text-outline",
   },
   {
     title: "Privacy policy",
-    href: "/profile/privacy" as Href,
+    href: "/(role)/user/profile/privacy" as Href,
     icon: "shield-outline",
   },
 ];
