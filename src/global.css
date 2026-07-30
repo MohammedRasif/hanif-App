@@ -21,6 +21,7 @@
 
   /* custom */
   --color-main-primary: #fe9a00;
+  --color-main-bg-overlay: #f9fafb;
 }
 
 @utility font-poppins {

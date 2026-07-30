@@ -1,5 +1,10 @@
 import { Container } from "@/components/container";
-import { BarberSandServices, SalonTabs } from "@/components/user/salon";
+import {
+  BarberSandServices,
+  SalonGalleryTab,
+  SalonReviewsTab,
+  SalonTabs,
+} from "@/components/user/salon";
 import { StyledIcons } from "@/lib";
 import { Image } from "expo-image";
 import { Stack, useRouter } from "expo-router";
@@ -10,7 +15,7 @@ const SALON_COVER_IMAGE =
   "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=800&q=80";
 
 const TABS = [
-  { id: "barbers-services", label: "Barbers & Services" },
+  { id: "barbers-services", label: "Services & Prices" },
   { id: "reviews", label: "Reviews" },
   { id: "gallery", label: "Gallery" },
   { id: "details", label: "Details" },
@@ -102,21 +107,9 @@ export default function SalonDetailScreen() {
           <View className="pt-4">
             {activeTab === "barbers-services" && <BarberSandServices />}
 
-            {activeTab === "reviews" && (
-              <View className="py-12 items-center justify-center">
-                <Text className="font-poppins-medium text-sm text-gray-400">
-                  Reviews Content Coming Soon
-                </Text>
-              </View>
-            )}
+            {activeTab === "reviews" && <SalonReviewsTab />}
 
-            {activeTab === "gallery" && (
-              <View className="py-12 items-center justify-center">
-                <Text className="font-poppins-medium text-sm text-gray-400">
-                  Gallery Content Coming Soon
-                </Text>
-              </View>
-            )}
+            {activeTab === "gallery" && <SalonGalleryTab />}
 
             {activeTab === "details" && (
               <View className="py-12 items-center justify-center">
