@@ -91,15 +91,11 @@ export default function UserLayout() {
         options={{ href: null, tabBarItemStyle: { display: "none" } }}
       />
       <Tabs.Screen
-        name="salon/book"
+        name="salon/choose-a-proffetinal"
         options={{ href: null, tabBarItemStyle: { display: "none" } }}
       />
       <Tabs.Screen
-        name="salon/choose-shop"
-        options={{ href: null, tabBarItemStyle: { display: "none" } }}
-      />
-      <Tabs.Screen
-        name="salon/confirm"
+        name="salon/choose-a-service"
         options={{ href: null, tabBarItemStyle: { display: "none" } }}
       />
     </Tabs>

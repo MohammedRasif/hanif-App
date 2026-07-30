@@ -40,7 +40,7 @@ export const SalonTabs = ({ tabs, activeTab, onTabChange }: SalonTabsProps) => {
 
               {/* Active Underline Indicator */}
               {isActive ? (
-                <View className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-gray-900" />
+                <View className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-gray-900" />
               ) : null}
             </Pressable>
           );

@@ -10,7 +10,7 @@ import { StyledIcons } from "@/lib";
 import { Image } from "expo-image";
 import { Stack, useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Share, Text, View } from "react-native";
 
 const SALON_COVER_IMAGE =
   "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=800&q=80";
@@ -25,6 +25,17 @@ const TABS = [
 export default function SalonDetailScreen() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("barbers-services");
+
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: "Check out Barbers Bay - Glam Beauty Salon!",
+        title: "Barbers Bay",
+      });
+    } catch (error) {
+      console.error("Error sharing salon details:", error);
+    }
+  };
 
   return (
     <Container isScrollable={true}>
@@ -54,7 +65,10 @@ export default function SalonDetailScreen() {
             </Pressable>
 
             {/* Share Button */}
-            <Pressable className="h-10 w-10 items-center justify-center rounded-full bg-white shadow-xs active:bg-gray-100">
+            <Pressable
+              className="h-10 w-10 items-center justify-center rounded-full bg-white shadow-xs active:bg-gray-100"
+              onPress={handleShare}
+            >
               <StyledIcons
                 className="text-gray-900"
                 name="arrow-redo-outline"

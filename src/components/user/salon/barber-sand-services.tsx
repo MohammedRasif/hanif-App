@@ -1,5 +1,6 @@
 import { StyledIcons } from "@/lib";
 import { Image } from "expo-image";
+import { router } from "expo-router";
 import React from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
@@ -138,7 +139,10 @@ export const BarberSandServices = () => {
       {/* Service List */}
       <View className="gap-3">
         {SERVICES.map((service) => (
-          <View
+          <Pressable
+            onPress={() =>
+              router.push("/(role)/user/salon/choose-a-proffetinal")
+            }
             className="flex-row items-center justify-between rounded-2xl bg-gray-50/80 p-4"
             key={service.id}
           >
@@ -157,7 +161,7 @@ export const BarberSandServices = () => {
             <Text className="font-poppins-bold text-base text-gray-900">
               {service.price}
             </Text>
-          </View>
+          </Pressable>
         ))}
       </View>
     </View>
