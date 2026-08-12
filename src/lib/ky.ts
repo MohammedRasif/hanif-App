@@ -1,32 +1,37 @@
-import ky, { HTTPError, isHTTPError } from "ky";
 import { env } from "@/lib/env";
+import { useAuthStore } from "@/store/auth.store";
+import ky, { HTTPError, isHTTPError } from "ky";
 
 export type ApiErrorData = {
   message?: string;
   detail?: string;
+  details?: string;
   error?: string;
   errors?: Record<string, string[]>;
   [key: string]: unknown;
 };
 
+const baseUrl = env.EXPO_PUBLIC_SERVER_URL.replace(/\/+$/, "");
+const apiPrefix = baseUrl.endsWith("/api") ? baseUrl : `${baseUrl}/api`;
+
 export const kyClient = ky.create({
-  prefix: env.EXPO_PUBLIC_SERVER_URL,
-  timeout: 10000,
+  prefix: apiPrefix,
+  timeout: 15000,
   retry: {
-    limit: 2,
+    limit: 1,
     statusCodes: [408, 413, 429, 500, 502, 503, 504],
   },
   hooks: {
     beforeRequest: [
       ({ request }) => {
-        // Inject auth token here when auth flow is added
-        // e.g. request.headers.set("Authorization", `Bearer ${token}`);
-        void request;
+        const token = useAuthStore.getState().accessToken;
+        if (token) {
+          request.headers.set("Authorization", `Bearer ${token}`);
+        }
       },
     ],
     beforeError: [
       ({ error }) => {
-        // Custom error formatting or logging can be performed here
         return error;
       },
     ],
@@ -39,11 +44,14 @@ export const getApiErrorMessage = (
 ): string => {
   if (isHTTPError(error)) {
     const data = error.data as ApiErrorData | undefined;
-    if (typeof data?.message === "string") {
-      return data.message;
+    if (typeof data?.details === "string") {
+      return data.details;
     }
     if (typeof data?.detail === "string") {
       return data.detail;
+    }
+    if (typeof data?.message === "string") {
+      return data.message;
     }
     if (typeof data?.error === "string") {
       return data.error;

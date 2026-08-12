@@ -1,16 +1,24 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Href } from "expo-router";
-import { Link, Stack } from "expo-router";
-import { Button, FieldError, InputGroup, TextField } from "heroui-native";
+import { Link, Stack, useRouter } from "expo-router";
+import {
+  Button,
+  FieldError,
+  InputGroup,
+  TextField,
+  useToast,
+} from "heroui-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { z } from "zod";
 
+import { useRegister } from "@/api";
 import { Container } from "@/components/container";
 import { AuthHeader } from "@/feature/auth-header";
 import { SocialAuth } from "@/feature/social-auth";
 import { StyledIcons } from "@/lib";
+import { getApiErrorMessage } from "@/lib/ky";
 
 const registerSchema = z
   .object({
@@ -36,9 +44,13 @@ const registerSchema = z
 type RegisterSchemaType = z.infer<typeof registerSchema>;
 
 export default function RegisterScreen() {
+  const router = useRouter();
+  const { toast } = useToast();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
+
+  const registerMutation = useRegister();
 
   const {
     control,
@@ -57,8 +69,39 @@ export default function RegisterScreen() {
     mode: "onChange",
   });
 
-  const onSubmit = (data: RegisterSchemaType) => {
-    console.log("Registration successful:", data);
+  const onSubmit = async (data: RegisterSchemaType) => {
+    try {
+      await registerMutation.mutateAsync({
+        full_name: data.fullName,
+        email: data.email,
+        phone: data.phoneNumber,
+        password: data.password,
+        confirm_password: data.confirmPassword,
+      });
+
+      toast.show({
+        label: "Account Created!",
+        description: "Please enter the verification code sent to your email.",
+        variant: "success",
+        placement: "top",
+      });
+
+      router.push({
+        pathname: "/auth/otp-code",
+        params: { email: data.email, type: "register" },
+      } as Href);
+    } catch (err) {
+      const message = getApiErrorMessage(
+        err,
+        "Registration failed. Please try again.",
+      );
+      toast.show({
+        label: "Registration Failed",
+        description: message,
+        variant: "danger",
+        placement: "top",
+      });
+    }
   };
 
   return (
@@ -280,11 +323,14 @@ export default function RegisterScreen() {
         {/* Create Account Button */}
         <Button
           className="mb-6 h-14 w-full items-center justify-center rounded-2xl bg-[#F0B100]"
+          isDisabled={registerMutation.isPending}
           onPress={handleSubmit(onSubmit)}
           variant="primary"
         >
           <Button.Label className="font-semibold text-base text-primary-foreground">
-            Create Account
+            {registerMutation.isPending
+              ? "Creating Account..."
+              : "Create Account"}
           </Button.Label>
         </Button>
 
@@ -300,9 +346,9 @@ export default function RegisterScreen() {
         {/* Sign In Link */}
         <View className="flex-row items-center justify-center gap-1">
           <Text className="text-default-500 text-sm">
-            Alerdy have an account?
+            Already have an account?
           </Text>
-          <Link asChild href={"/(auth)/login" as Href}>
+          <Link asChild href={"/auth/login" as Href}>
             <Pressable>
               <Text className="font-semibold text-primary text-sm">
                 Sign In

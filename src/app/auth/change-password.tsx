@@ -1,14 +1,22 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Href } from "expo-router";
-import { Stack, useRouter } from "expo-router";
-import { Button, FieldError, InputGroup, TextField } from "heroui-native";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import {
+  Button,
+  FieldError,
+  InputGroup,
+  TextField,
+  useToast,
+} from "heroui-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { z } from "zod";
 
+import { useResetPassword } from "@/api";
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
+import { getApiErrorMessage } from "@/lib/ky";
 
 const changePasswordSchema = z
   .object({
@@ -24,9 +32,17 @@ type ChangePasswordSchemaType = z.infer<typeof changePasswordSchema>;
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
+  const { toast } = useToast();
+  const { email, otp } = useLocalSearchParams<{
+    email?: string;
+    otp?: string;
+  }>();
+
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
+
+  const resetPasswordMutation = useResetPassword();
 
   const {
     control,
@@ -41,10 +57,35 @@ export default function ChangePasswordScreen() {
     mode: "onChange",
   });
 
-  const onSubmit = (data: ChangePasswordSchemaType) => {
-    console.log("Password change successful:", data);
-    // Navigate to login after reset
-    router.replace("/(auth)/login" as Href);
+  const onSubmit = async (data: ChangePasswordSchemaType) => {
+    try {
+      await resetPasswordMutation.mutateAsync({
+        email: email || "",
+        otp: otp || "",
+        new_password: data.password,
+        confirm_password: data.confirmPassword,
+      });
+
+      toast.show({
+        label: "Password Reset Successful",
+        description: "Your password has been reset. Please log in.",
+        variant: "success",
+        placement: "top",
+      });
+
+      router.replace("/auth/login" as Href);
+    } catch (err) {
+      const message = getApiErrorMessage(
+        err,
+        "Password reset failed. Please try again or request a new OTP.",
+      );
+      toast.show({
+        label: "Reset Failed",
+        description: message,
+        variant: "danger",
+        placement: "top",
+      });
+    }
   };
 
   return (
@@ -69,10 +110,10 @@ export default function ChangePasswordScreen() {
             </Text>
           </View>
 
-          {/* New PIN / Password Field */}
+          {/* New Password Field */}
           <View className="mb-4">
             <Text className="mb-2 font-semibold text-foreground text-sm">
-              Enter new PIN
+              Enter new Password
             </Text>
             <TextField isInvalid={!!errors.password}>
               <Controller
@@ -84,7 +125,7 @@ export default function ChangePasswordScreen() {
                       className="h-full w-full border-transparent bg-transparent pr-12 pl-4 text-foreground"
                       onBlur={onBlur}
                       onChangeText={onChange}
-                      placeholder="Plant@gmail.com"
+                      placeholder="••••••••"
                       secureTextEntry={!isPasswordVisible}
                       value={value}
                     />
@@ -111,10 +152,10 @@ export default function ChangePasswordScreen() {
             </TextField>
           </View>
 
-          {/* Confirm PIN / Password Field */}
+          {/* Confirm Password Field */}
           <View className="mb-4">
             <Text className="mb-2 font-semibold text-foreground text-sm">
-              Confirm PIN
+              Confirm Password
             </Text>
             <TextField isInvalid={!!errors.confirmPassword}>
               <Controller
@@ -126,7 +167,7 @@ export default function ChangePasswordScreen() {
                       className="h-full w-full border-transparent bg-transparent pr-12 pl-4 text-foreground"
                       onBlur={onBlur}
                       onChangeText={onChange}
-                      placeholder="Plant@gmail.com"
+                      placeholder="••••••••"
                       secureTextEntry={!isConfirmPasswordVisible}
                       value={value}
                     />
@@ -159,11 +200,14 @@ export default function ChangePasswordScreen() {
         {/* Change Password Button */}
         <Button
           className="h-14 w-full items-center justify-center rounded-2xl bg-[#F0B100]"
+          isDisabled={resetPasswordMutation.isPending}
           onPress={handleSubmit(onSubmit)}
           variant="primary"
         >
           <Button.Label className="font-semibold text-base text-primary-foreground">
-            Change Password
+            {resetPasswordMutation.isPending
+              ? "Changing Password..."
+              : "Change Password"}
           </Button.Label>
         </Button>
       </View>

@@ -1,16 +1,25 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Href } from "expo-router";
-import { Link, Stack } from "expo-router";
-import { Button, FieldError, InputGroup, TextField } from "heroui-native";
+import { Link, Stack, useRouter } from "expo-router";
+import {
+  Button,
+  FieldError,
+  InputGroup,
+  TextField,
+  useToast,
+} from "heroui-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { z } from "zod";
 
+import { useLogin } from "@/api";
 import { Container } from "@/components/container";
 import { AuthHeader } from "@/feature/auth-header";
 import { SocialAuth } from "@/feature/social-auth";
 import { StyledIcons } from "@/lib";
+import { getApiErrorMessage } from "@/lib/ky";
+import { useAuthStore } from "@/store/auth.store";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -21,7 +30,12 @@ const loginSchema = z.object({
 type LoginSchemaType = z.infer<typeof loginSchema>;
 
 export default function LoginScreen() {
+  const router = useRouter();
+  const { toast } = useToast();
+  const setAuth = useAuthStore((state) => state.setAuth);
+
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const loginMutation = useLogin();
 
   const {
     control,
@@ -37,8 +51,35 @@ export default function LoginScreen() {
     mode: "onChange",
   });
 
-  const onSubmit = (data: LoginSchemaType) => {
-    console.log("Login successful:", data);
+  const onSubmit = async (data: LoginSchemaType) => {
+    try {
+      const res = await loginMutation.mutateAsync({
+        email: data.email,
+        password: data.password,
+      });
+
+      setAuth({ access: res.access, refresh: res.refresh }, res.user);
+
+      toast.show({
+        label: "Welcome back!",
+        description: "Logged in successfully.",
+        variant: "success",
+        placement: "top",
+      });
+
+      router.replace("/(role)/customer/home" as Href);
+    } catch (err) {
+      const message = getApiErrorMessage(
+        err,
+        "Login failed. Please check your credentials.",
+      );
+      toast.show({
+        label: "Login Failed",
+        description: message,
+        variant: "danger",
+        placement: "top",
+      });
+    }
   };
 
   return (
@@ -168,21 +209,24 @@ export default function LoginScreen() {
             )}
           />
 
-          <Pressable>
-            <Text className="font-semibold text-foreground text-sm underline">
-              Forgot Password?
-            </Text>
-          </Pressable>
+          <Link asChild href={"/auth/forgot-password" as Href}>
+            <Pressable>
+              <Text className="font-semibold text-foreground text-sm underline">
+                Forgot Password?
+              </Text>
+            </Pressable>
+          </Link>
         </View>
 
         {/* Login Button */}
         <Button
           className="mb-6 h-14 w-full items-center justify-center rounded-2xl bg-[#F0B100]"
+          isDisabled={loginMutation.isPending}
           onPress={handleSubmit(onSubmit)}
           variant="primary"
         >
           <Button.Label className="font-semibold text-base text-primary-foreground">
-            Log in
+            {loginMutation.isPending ? "Logging in..." : "Log in"}
           </Button.Label>
         </Button>
 
@@ -200,7 +244,7 @@ export default function LoginScreen() {
           <Text className="text-default-500 text-sm">
             Don't have an account?
           </Text>
-          <Link asChild href={"/(auth)/register" as Href}>
+          <Link asChild href={"/auth/register" as Href}>
             <Pressable>
               <Text className="font-semibold text-primary text-sm">
                 Sign Up
