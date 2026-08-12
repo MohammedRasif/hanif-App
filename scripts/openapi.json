@@ -1211,10 +1211,900 @@
       ]
     },
     {
+      "name": "shops",
+      "item": [
+        {
+          "name": "shops list",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/shops/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "shops", ""]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/shops/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "shops", ""]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "shops gallery read",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/shops/gallery/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "shops", "gallery", ":id", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/shops/gallery/:id/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "shops", "gallery", ":id", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "shops read",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/shops/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "shops", ":id", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/shops/:id/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "shops", ":id", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "shops google-reviews list",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/shops/:id/google-reviews/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "shops", ":id", "google-reviews", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/shops/:id/google-reviews/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "shops", ":id", "google-reviews", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "shops payment-settings list",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{barbershop}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/shops/:id/payment-settings/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "shops", ":id", "payment-settings", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/shops/:id/payment-settings/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "shops", ":id", "payment-settings", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "shops create",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{barbershop}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Barber Castle\",\n    \"location\": \"Banani, Dhaka\"\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/shops/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "shops", ""]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/shops/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "shops", ""]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "shops gallery create",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{barbershop}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": [
+                    "/home/backend/Downloads/sebastian-svenson-d2w-_1LJioQ-unsplash.jpg",
+                    "/home/backend/Downloads/pawel-czerwinski-T5VUBvCYqKk-unsplash.jpg"
+                  ]
+                },
+                {
+                  "key": "shop",
+                  "value": "1",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/shops/gallery/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "shops", "gallery", ""]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/shops/gallery/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "shops", "gallery", ""]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "shops gallery update",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/shops/gallery/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "shops", "gallery", ":id", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/shops/gallery/:id/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "shops", "gallery", ":id", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "shops update",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{barbershop}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Updated Barber Castle",
+                  "type": "text"
+                },
+                {
+                  "key": "location",
+                  "value": "Banani, Dhaka (Updated Location)",
+                  "type": "text"
+                },
+                {
+                  "key": "about_us",
+                  "value": "Updated info...",
+                  "type": "text"
+                },
+                {
+                  "key": "logo",
+                  "type": "file",
+                  "src": "/home/backend/Downloads/diploma eng.jpeg"
+                },
+                {
+                  "key": "cover_image",
+                  "type": "file",
+                  "src": "/home/backend/Downloads/WhatsApp Image 2026-05-03 at 5.11.42 PM.jpeg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/shops/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "shops", ":id", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/shops/:id/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "shops", ":id", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "shops payment-settings partial update",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{barbershop}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"payment_gateway_enabled\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/shops/:id/payment-settings/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "shops", ":id", "payment-settings", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/shops/:id/payment-settings/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "shops", ":id", "payment-settings", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "shops gallery delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/shops/gallery/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "shops", "gallery", ":id", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/shops/gallery/:id/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "shops", "gallery", ":id", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "shops delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/shops/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "shops", ":id", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/shops/:id/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "shops", ":id", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reviews",
+      "item": [
+        {
+          "name": "reviews list",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{barbershop}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/bookings/reviews/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "bookings", "reviews", ""]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/reviews/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "reviews", ""]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "reviews read",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/bookings/reviews/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "bookings", "reviews", ":id", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/reviews/:id/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "reviews", ":id", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "google reviews create",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{barbershop}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"rating\": 4,\n    \"comment\": \"Updated comment: Still good but could be cleaner.\"\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/bookings/reviews/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "bookings", "reviews", ":id", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/reviews/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "reviews", ""]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "reviews delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/bookings/reviews/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "bookings", "reviews", ":id", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/reviews/:id/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "reviews", ":id", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "barbers",
       "item": [
         {
-          "name": "v1 barbers list",
+          "name": "barbers list",
           "request": {
             "method": "GET",
             "header": [],
@@ -1252,45 +2142,7 @@
           ]
         },
         {
-          "name": "v1 barbers create",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/barbers/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "barbers", ""]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/barbers/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "barbers", ""]
-                }
-              },
-              "status": "Created",
-              "code": 201,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 barbers read",
+          "name": "barbers read",
           "request": {
             "method": "GET",
             "header": [],
@@ -1339,7 +2191,110 @@
           ]
         },
         {
-          "name": "v1 barbers update",
+          "name": "barbers create",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{barbershop}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "shop",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "name",
+                  "value": "siam",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": " jane@example.com  ",
+                  "type": "text"
+                },
+                {
+                  "key": "phone",
+                  "value": " +123456789              ",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "/home/backend/Downloads/1770102017722.jpeg"
+                },
+                {
+                  "key": "specialty",
+                  "value": " Senior Barber    ",
+                  "type": "text"
+                },
+                {
+                  "key": "role",
+                  "value": "staff",
+                  "type": "text"
+                },
+                {
+                  "key": "calendar_access",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "client_details_access",
+                  "value": "false",
+                  "type": "text"
+                },
+                {
+                  "key": "services",
+                  "value": "[1]",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/barbers/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "barbers", ""]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/barbers/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "barbers", ""]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "barbers update",
           "request": {
             "method": "PUT",
             "header": [],
@@ -1388,7 +2343,7 @@
           ]
         },
         {
-          "name": "v1 barbers delete",
+          "name": "barbers delete",
           "request": {
             "method": "DELETE",
             "header": [],
@@ -1480,6 +2435,55 @@
           ]
         },
         {
+          "name": "v1 bookings calendar-link list",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/bookings/:id/calendar-link/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "bookings", ":id", "calendar-link", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/bookings/:id/calendar-link/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "bookings", ":id", "calendar-link", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
           "name": "v1 bookings create create",
           "request": {
             "method": "POST",
@@ -1506,6 +2510,55 @@
                   "raw": "{{baseUrl}}/v1/bookings/create/",
                   "host": ["{{baseUrl}}"],
                   "path": ["v1", "bookings", "create", ""]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "v1 bookings cancel create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/bookings/:id/cancel/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "bookings", ":id", "cancel", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/bookings/:id/cancel/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "bookings", ":id", "cancel", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
                 }
               },
               "status": "Created",
@@ -1566,191 +2619,12 @@
               "body": ""
             }
           ]
-        },
-        {
-          "name": "v1 bookings calendar-link list",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/bookings/:id/calendar-link/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "bookings", ":id", "calendar-link", ""],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "string"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/bookings/:id/calendar-link/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "bookings", ":id", "calendar-link", ""],
-                  "variable": [
-                    {
-                      "key": "id"
-                    }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 bookings cancel create",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/bookings/:id/cancel/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "bookings", ":id", "cancel", ""],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "string"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/bookings/:id/cancel/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "bookings", ":id", "cancel", ""],
-                  "variable": [
-                    {
-                      "key": "id"
-                    }
-                  ]
-                }
-              },
-              "status": "Created",
-              "code": 201,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
         }
       ]
     },
     {
       "name": "contact",
       "item": [
-        {
-          "name": "v1 contact create",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"full_name\": \"string\",\n  \"email\": \"iKh@HTuLBlyOxPCTDMlsGBTYXkEldTVbPv.ynp\",\n  \"message\": \"string\",\n  \"phone\": \"string\"\n}",
-              "options": {
-                "raw": {
-                  "headerFamily": "json",
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/v1/contact/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "contact", ""]
-            },
-            "description": "Submit a contact form (public endpoint)."
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  },
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  },
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"full_name\": \"string\",\n  \"email\": \"iKh@HTuLBlyOxPCTDMlsGBTYXkEldTVbPv.ynp\",\n  \"message\": \"string\",\n  \"phone\": \"string\"\n}",
-                  "options": {
-                    "raw": {
-                      "headerFamily": "json",
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/v1/contact/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "contact", ""]
-                }
-              },
-              "status": "Created",
-              "code": 201,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n  \"full_name\": \"string\",\n  \"email\": \"vwBmOp@rJkvYNOROyPOfFDzLl.hmu\",\n  \"message\": \"string\",\n  \"id\": 515,\n  \"phone\": \"string\",\n  \"is_replied\": false,\n  \"created_at\": \"1983-08-27T18:01:46.406Z\"\n}"
-            }
-          ]
-        },
         {
           "name": "v1 contact list list",
           "request": {
@@ -1845,6 +2719,87 @@
               ],
               "cookie": [],
               "body": "{\n  \"count\": 2235,\n  \"results\": [\n    {\n      \"full_name\": \"string\",\n      \"email\": \"PKWyGTFEMS@vQihdeMtnglAbBA.uau\",\n      \"message\": \"string\",\n      \"id\": 6338,\n      \"phone\": \"string\",\n      \"is_replied\": true,\n      \"created_at\": \"1953-06-05T21:14:23.295Z\"\n    },\n    {\n      \"full_name\": \"string\",\n      \"email\": \"Whvma@aVruR.rr\",\n      \"message\": \"string\",\n      \"id\": 5541,\n      \"phone\": \"string\",\n      \"is_replied\": false,\n      \"created_at\": \"1956-02-10T02:42:11.043Z\"\n    }\n  ],\n  \"next\": \"https://usXTMHhiqnV.ifwgzsjIylHGB4oNwH3NqE9ppV4.SUEYsbnF177quYXPQNMscfFXyQCzjo8uo+1v3Kyorq\",\n  \"previous\": \"http://HylpDphpGnnAdpBoEQnqRqkzhq.fzzkPLwkYCOGJlQl3fpp99Ii,RAPKuETqb2Nr\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "v1 contact create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"string\",\n  \"email\": \"iKh@HTuLBlyOxPCTDMlsGBTYXkEldTVbPv.ynp\",\n  \"message\": \"string\",\n  \"phone\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/contact/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "contact", ""]
+            },
+            "description": "Submit a contact form (public endpoint)."
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"full_name\": \"string\",\n  \"email\": \"iKh@HTuLBlyOxPCTDMlsGBTYXkEldTVbPv.ynp\",\n  \"message\": \"string\",\n  \"phone\": \"string\"\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/contact/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "contact", ""]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"full_name\": \"string\",\n  \"email\": \"vwBmOp@rJkvYNOROyPOfFDzLl.hmu\",\n  \"message\": \"string\",\n  \"id\": 515,\n  \"phone\": \"string\",\n  \"is_replied\": false,\n  \"created_at\": \"1983-08-27T18:01:46.406Z\"\n}"
             }
           ]
         }
@@ -1948,70 +2903,6 @@
               },
               "status": "OK",
               "code": 200,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 dashboard shops client-groups create",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/client-groups/",
-              "host": ["{{baseUrl}}"],
-              "path": [
-                "v1",
-                "dashboard",
-                "shops",
-                ":shop_id",
-                "client-groups",
-                ""
-              ],
-              "variable": [
-                {
-                  "key": "shop_id",
-                  "value": "string"
-                }
-              ]
-            },
-            "description": "Manage client groups."
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/client-groups/",
-                  "host": ["{{baseUrl}}"],
-                  "path": [
-                    "v1",
-                    "dashboard",
-                    "shops",
-                    ":shop_id",
-                    "client-groups",
-                    ""
-                  ],
-                  "variable": [
-                    {
-                      "key": "shop_id"
-                    }
-                  ]
-                }
-              },
-              "status": "Created",
-              "code": 201,
               "_postman_previewlanguage": "text",
               "header": [],
               "cookie": [],
@@ -2133,127 +3024,6 @@
               },
               "status": "OK",
               "code": 200,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 dashboard shops clients import create",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/clients/import/",
-              "host": ["{{baseUrl}}"],
-              "path": [
-                "v1",
-                "dashboard",
-                "shops",
-                ":shop_id",
-                "clients",
-                "import",
-                ""
-              ],
-              "variable": [
-                {
-                  "key": "shop_id",
-                  "value": "string"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/clients/import/",
-                  "host": ["{{baseUrl}}"],
-                  "path": [
-                    "v1",
-                    "dashboard",
-                    "shops",
-                    ":shop_id",
-                    "clients",
-                    "import",
-                    ""
-                  ],
-                  "variable": [
-                    {
-                      "key": "shop_id"
-                    }
-                  ]
-                }
-              },
-              "status": "Created",
-              "code": 201,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 dashboard shops clients create",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/clients/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "dashboard", "shops", ":shop_id", "clients", ""],
-              "variable": [
-                {
-                  "key": "shop_id",
-                  "value": "string"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/clients/",
-                  "host": ["{{baseUrl}}"],
-                  "path": [
-                    "v1",
-                    "dashboard",
-                    "shops",
-                    ":shop_id",
-                    "clients",
-                    ""
-                  ],
-                  "variable": [
-                    {
-                      "key": "shop_id"
-                    }
-                  ]
-                }
-              },
-              "status": "Created",
-              "code": 201,
               "_postman_previewlanguage": "text",
               "header": [],
               "cookie": [],
@@ -2390,6 +3160,240 @@
           ]
         },
         {
+          "name": "v1 dashboard shops staff list",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/staff/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "dashboard", "shops", ":shop_id", "staff", ""],
+              "variable": [
+                {
+                  "key": "shop_id",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/staff/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "dashboard", "shops", ":shop_id", "staff", ""],
+                  "variable": [
+                    {
+                      "key": "shop_id"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "v1 dashboard shops client-groups create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/client-groups/",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "v1",
+                "dashboard",
+                "shops",
+                ":shop_id",
+                "client-groups",
+                ""
+              ],
+              "variable": [
+                {
+                  "key": "shop_id",
+                  "value": "string"
+                }
+              ]
+            },
+            "description": "Manage client groups."
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/client-groups/",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "v1",
+                    "dashboard",
+                    "shops",
+                    ":shop_id",
+                    "client-groups",
+                    ""
+                  ],
+                  "variable": [
+                    {
+                      "key": "shop_id"
+                    }
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "v1 dashboard shops clients import create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/clients/import/",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "v1",
+                "dashboard",
+                "shops",
+                ":shop_id",
+                "clients",
+                "import",
+                ""
+              ],
+              "variable": [
+                {
+                  "key": "shop_id",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/clients/import/",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "v1",
+                    "dashboard",
+                    "shops",
+                    ":shop_id",
+                    "clients",
+                    "import",
+                    ""
+                  ],
+                  "variable": [
+                    {
+                      "key": "shop_id"
+                    }
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "v1 dashboard shops clients create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/clients/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "dashboard", "shops", ":shop_id", "clients", ""],
+              "variable": [
+                {
+                  "key": "shop_id",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/clients/",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "v1",
+                    "dashboard",
+                    "shops",
+                    ":shop_id",
+                    "clients",
+                    ""
+                  ],
+                  "variable": [
+                    {
+                      "key": "shop_id"
+                    }
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
           "name": "v1 dashboard shops send-messages create",
           "request": {
             "method": "POST",
@@ -2436,6 +3440,55 @@
                     "send-messages",
                     ""
                   ],
+                  "variable": [
+                    {
+                      "key": "shop_id"
+                    }
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "v1 dashboard shops staff create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/staff/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "dashboard", "shops", ":shop_id", "staff", ""],
+              "variable": [
+                {
+                  "key": "shop_id",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/staff/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "dashboard", "shops", ":shop_id", "staff", ""],
                   "variable": [
                     {
                       "key": "shop_id"
@@ -2595,324 +3648,12 @@
               "body": ""
             }
           ]
-        },
-        {
-          "name": "v1 dashboard shops staff list",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/staff/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "dashboard", "shops", ":shop_id", "staff", ""],
-              "variable": [
-                {
-                  "key": "shop_id",
-                  "value": "string"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/staff/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "dashboard", "shops", ":shop_id", "staff", ""],
-                  "variable": [
-                    {
-                      "key": "shop_id"
-                    }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 dashboard shops staff create",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/staff/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "dashboard", "shops", ":shop_id", "staff", ""],
-              "variable": [
-                {
-                  "key": "shop_id",
-                  "value": "string"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/dashboard/shops/:shop_id/staff/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "dashboard", "shops", ":shop_id", "staff", ""],
-                  "variable": [
-                    {
-                      "key": "shop_id"
-                    }
-                  ]
-                }
-              },
-              "status": "Created",
-              "code": 201,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
         }
       ]
     },
     {
       "name": "faqs",
       "item": [
-        {
-          "name": "{id}",
-          "item": [
-            {
-              "name": "v1 faqs read",
-              "request": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/faqs/:id/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "faqs", ":id", ""],
-                  "variable": [
-                    {
-                      "key": "id",
-                      "value": "674",
-                      "description": "A unique integer value identifying this FAQ."
-                    }
-                  ]
-                },
-                "description": "Retrieve, update, or delete a FAQ."
-              },
-              "response": [
-                {
-                  "name": "Untitled Response",
-                  "originalRequest": {
-                    "method": "GET",
-                    "header": [
-                      {
-                        "key": "Accept",
-                        "value": "application/json"
-                      },
-                      {
-                        "key": "Authorization",
-                        "value": "<API Key>",
-                        "description": "Added as a part of security scheme: apikey"
-                      }
-                    ],
-                    "url": {
-                      "raw": "{{baseUrl}}/v1/faqs/:id/",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["v1", "faqs", ":id", ""],
-                      "variable": [
-                        {
-                          "key": "id"
-                        }
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "json",
-                  "header": [
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "{\n  \"question\": \"string\",\n  \"answer\": \"string\",\n  \"id\": 9413,\n  \"order\": 8808734614552216000,\n  \"status\": 0,\n  \"created_at\": \"1982-04-15T04:46:39.311Z\",\n  \"updated_at\": \"2018-07-20T04:07:00.224Z\"\n}"
-                }
-              ]
-            },
-            {
-              "name": "v1 faqs partial update",
-              "request": {
-                "method": "PATCH",
-                "header": [
-                  {
-                    "key": "Content-Type",
-                    "value": "application/json"
-                  },
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  }
-                ],
-                "body": {
-                  "mode": "raw",
-                  "raw": "{\n  \"question\": \"string\",\n  \"answer\": \"string\",\n  \"order\": -5392266993145709000,\n  \"status\": 2\n}",
-                  "options": {
-                    "raw": {
-                      "headerFamily": "json",
-                      "language": "json"
-                    }
-                  }
-                },
-                "url": {
-                  "raw": "{{baseUrl}}/v1/faqs/:id/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "faqs", ":id", ""],
-                  "variable": [
-                    {
-                      "key": "id",
-                      "value": "674",
-                      "description": "A unique integer value identifying this FAQ."
-                    }
-                  ]
-                },
-                "description": "Retrieve, update, or delete a FAQ."
-              },
-              "response": [
-                {
-                  "name": "Untitled Response",
-                  "originalRequest": {
-                    "method": "PATCH",
-                    "header": [
-                      {
-                        "key": "Content-Type",
-                        "value": "application/json"
-                      },
-                      {
-                        "key": "Accept",
-                        "value": "application/json"
-                      },
-                      {
-                        "key": "Authorization",
-                        "value": "<API Key>",
-                        "description": "Added as a part of security scheme: apikey"
-                      }
-                    ],
-                    "body": {
-                      "mode": "raw",
-                      "raw": "{\n  \"question\": \"string\",\n  \"answer\": \"string\",\n  \"order\": -5392266993145709000,\n  \"status\": 2\n}",
-                      "options": {
-                        "raw": {
-                          "headerFamily": "json",
-                          "language": "json"
-                        }
-                      }
-                    },
-                    "url": {
-                      "raw": "{{baseUrl}}/v1/faqs/:id/",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["v1", "faqs", ":id", ""],
-                      "variable": [
-                        {
-                          "key": "id"
-                        }
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "json",
-                  "header": [
-                    {
-                      "key": "Content-Type",
-                      "value": "application/json"
-                    }
-                  ],
-                  "cookie": [],
-                  "body": "{\n  \"question\": \"string\",\n  \"answer\": \"string\",\n  \"id\": 9413,\n  \"order\": 8808734614552216000,\n  \"status\": 0,\n  \"created_at\": \"1982-04-15T04:46:39.311Z\",\n  \"updated_at\": \"2018-07-20T04:07:00.224Z\"\n}"
-                }
-              ]
-            },
-            {
-              "name": "v1 faqs delete",
-              "request": {
-                "method": "DELETE",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/faqs/:id/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "faqs", ":id", ""],
-                  "variable": [
-                    {
-                      "key": "id",
-                      "value": "674",
-                      "description": "A unique integer value identifying this FAQ."
-                    }
-                  ]
-                },
-                "description": "Retrieve, update, or delete a FAQ."
-              },
-              "response": [
-                {
-                  "name": "Untitled Response",
-                  "originalRequest": {
-                    "method": "DELETE",
-                    "header": [
-                      {
-                        "key": "Authorization",
-                        "value": "<API Key>",
-                        "description": "Added as a part of security scheme: apikey"
-                      }
-                    ],
-                    "url": {
-                      "raw": "{{baseUrl}}/v1/faqs/:id/",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["v1", "faqs", ":id", ""],
-                      "variable": [
-                        {
-                          "key": "id"
-                        }
-                      ]
-                    }
-                  },
-                  "status": "No Content",
-                  "code": 204,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                }
-              ]
-            }
-          ]
-        },
         {
           "name": "v1 faqs list",
           "request": {
@@ -3011,6 +3752,71 @@
           ]
         },
         {
+          "name": "v1 faqs read",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/faqs/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "faqs", ":id", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "674",
+                  "description": "A unique integer value identifying this FAQ."
+                }
+              ]
+            },
+            "description": "Retrieve, update, or delete a FAQ."
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/faqs/:id/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "faqs", ":id", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"question\": \"string\",\n  \"answer\": \"string\",\n  \"id\": 9413,\n  \"order\": 8808734614552216000,\n  \"status\": 0,\n  \"created_at\": \"1982-04-15T04:46:39.311Z\",\n  \"updated_at\": \"2018-07-20T04:07:00.224Z\"\n}"
+            }
+          ]
+        },
+        {
           "name": "v1 faqs create",
           "request": {
             "method": "POST",
@@ -3090,55 +3896,156 @@
               "body": "{\n  \"question\": \"string\",\n  \"answer\": \"string\",\n  \"id\": 9413,\n  \"order\": 8808734614552216000,\n  \"status\": 0,\n  \"created_at\": \"1982-04-15T04:46:39.311Z\",\n  \"updated_at\": \"2018-07-20T04:07:00.224Z\"\n}"
             }
           ]
+        },
+        {
+          "name": "v1 faqs partial update",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"string\",\n  \"answer\": \"string\",\n  \"order\": -5392266993145709000,\n  \"status\": 2\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/faqs/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "faqs", ":id", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "674",
+                  "description": "A unique integer value identifying this FAQ."
+                }
+              ]
+            },
+            "description": "Retrieve, update, or delete a FAQ."
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"question\": \"string\",\n  \"answer\": \"string\",\n  \"order\": -5392266993145709000,\n  \"status\": 2\n}",
+                  "options": {
+                    "raw": {
+                      "headerFamily": "json",
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/faqs/:id/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "faqs", ":id", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"question\": \"string\",\n  \"answer\": \"string\",\n  \"id\": 9413,\n  \"order\": 8808734614552216000,\n  \"status\": 0,\n  \"created_at\": \"1982-04-15T04:46:39.311Z\",\n  \"updated_at\": \"2018-07-20T04:07:00.224Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "v1 faqs delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/faqs/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "faqs", ":id", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "674",
+                  "description": "A unique integer value identifying this FAQ."
+                }
+              ]
+            },
+            "description": "Retrieve, update, or delete a FAQ."
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/faqs/:id/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "faqs", ":id", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
         }
       ]
     },
     {
       "name": "notifications",
       "item": [
-        {
-          "name": "send",
-          "item": [
-            {
-              "name": "v1 notifications send create",
-              "request": {
-                "method": "POST",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/notifications/send/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "notifications", "send", ""]
-                }
-              },
-              "response": [
-                {
-                  "name": "Untitled Response",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [
-                      {
-                        "key": "Authorization",
-                        "value": "<API Key>",
-                        "description": "Added as a part of security scheme: apikey"
-                      }
-                    ],
-                    "url": {
-                      "raw": "{{baseUrl}}/v1/notifications/send/",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["v1", "notifications", "send", ""]
-                    }
-                  },
-                  "status": "Created",
-                  "code": 201,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                }
-              ]
-            }
-          ]
-        },
         {
           "name": "v1 notifications list",
           "request": {
@@ -3170,6 +4077,44 @@
               },
               "status": "OK",
               "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "v1 notifications send create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/notifications/send/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "notifications", "send", ""]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/notifications/send/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "notifications", "send", ""]
+                }
+              },
+              "status": "Created",
+              "code": 201,
               "_postman_previewlanguage": "text",
               "header": [],
               "cookie": [],
@@ -3222,332 +4167,301 @@
       "name": "payments",
       "item": [
         {
-          "name": "export",
-          "item": [
+          "name": "v1 payments export list",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/payments/export/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "payments", "export", ""]
+            }
+          },
+          "response": [
             {
-              "name": "v1 payments export list",
-              "request": {
+              "name": "Untitled Response",
+              "originalRequest": {
                 "method": "GET",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
                 "url": {
                   "raw": "{{baseUrl}}/v1/payments/export/",
                   "host": ["{{baseUrl}}"],
                   "path": ["v1", "payments", "export", ""]
                 }
               },
-              "response": [
-                {
-                  "name": "Untitled Response",
-                  "originalRequest": {
-                    "method": "GET",
-                    "header": [
-                      {
-                        "key": "Authorization",
-                        "value": "<API Key>",
-                        "description": "Added as a part of security scheme: apikey"
-                      }
-                    ],
-                    "url": {
-                      "raw": "{{baseUrl}}/v1/payments/export/",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["v1", "payments", "export", ""]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                }
-              ]
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
             }
           ]
         },
         {
-          "name": "manual",
-          "item": [
+          "name": "v1 payments manual list",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/payments/manual/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "payments", "manual", ""]
+            }
+          },
+          "response": [
             {
-              "name": "{id}",
-              "item": [
-                {
-                  "name": "v1 payments manual read",
-                  "request": {
-                    "method": "GET",
-                    "header": [],
-                    "url": {
-                      "raw": "{{baseUrl}}/v1/payments/manual/:id/",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["v1", "payments", "manual", ":id", ""],
-                      "variable": [
-                        {
-                          "key": "id",
-                          "value": "string"
-                        }
-                      ]
-                    }
-                  },
-                  "response": [
-                    {
-                      "name": "Untitled Response",
-                      "originalRequest": {
-                        "method": "GET",
-                        "header": [
-                          {
-                            "key": "Authorization",
-                            "value": "<API Key>",
-                            "description": "Added as a part of security scheme: apikey"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/v1/payments/manual/:id/",
-                          "host": ["{{baseUrl}}"],
-                          "path": ["v1", "payments", "manual", ":id", ""],
-                          "variable": [
-                            {
-                              "key": "id"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "OK",
-                      "code": 200,
-                      "_postman_previewlanguage": "text",
-                      "header": [],
-                      "cookie": [],
-                      "body": ""
-                    }
-                  ]
-                },
-                {
-                  "name": "v1 payments manual partial update",
-                  "request": {
-                    "method": "PATCH",
-                    "header": [],
-                    "url": {
-                      "raw": "{{baseUrl}}/v1/payments/manual/:id/",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["v1", "payments", "manual", ":id", ""],
-                      "variable": [
-                        {
-                          "key": "id",
-                          "value": "string"
-                        }
-                      ]
-                    }
-                  },
-                  "response": [
-                    {
-                      "name": "Untitled Response",
-                      "originalRequest": {
-                        "method": "PATCH",
-                        "header": [
-                          {
-                            "key": "Authorization",
-                            "value": "<API Key>",
-                            "description": "Added as a part of security scheme: apikey"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/v1/payments/manual/:id/",
-                          "host": ["{{baseUrl}}"],
-                          "path": ["v1", "payments", "manual", ":id", ""],
-                          "variable": [
-                            {
-                              "key": "id"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "OK",
-                      "code": 200,
-                      "_postman_previewlanguage": "text",
-                      "header": [],
-                      "cookie": [],
-                      "body": ""
-                    }
-                  ]
-                },
-                {
-                  "name": "v1 payments manual delete",
-                  "request": {
-                    "method": "DELETE",
-                    "header": [],
-                    "url": {
-                      "raw": "{{baseUrl}}/v1/payments/manual/:id/",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["v1", "payments", "manual", ":id", ""],
-                      "variable": [
-                        {
-                          "key": "id",
-                          "value": "string"
-                        }
-                      ]
-                    }
-                  },
-                  "response": [
-                    {
-                      "name": "Untitled Response",
-                      "originalRequest": {
-                        "method": "DELETE",
-                        "header": [
-                          {
-                            "key": "Authorization",
-                            "value": "<API Key>",
-                            "description": "Added as a part of security scheme: apikey"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/v1/payments/manual/:id/",
-                          "host": ["{{baseUrl}}"],
-                          "path": ["v1", "payments", "manual", ":id", ""],
-                          "variable": [
-                            {
-                              "key": "id"
-                            }
-                          ]
-                        }
-                      },
-                      "status": "No Content",
-                      "code": 204,
-                      "_postman_previewlanguage": "text",
-                      "header": [],
-                      "cookie": [],
-                      "body": ""
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "v1 payments manual list",
-              "request": {
+              "name": "Untitled Response",
+              "originalRequest": {
                 "method": "GET",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
                 "url": {
                   "raw": "{{baseUrl}}/v1/payments/manual/",
                   "host": ["{{baseUrl}}"],
                   "path": ["v1", "payments", "manual", ""]
                 }
               },
-              "response": [
-                {
-                  "name": "Untitled Response",
-                  "originalRequest": {
-                    "method": "GET",
-                    "header": [
-                      {
-                        "key": "Authorization",
-                        "value": "<API Key>",
-                        "description": "Added as a part of security scheme: apikey"
-                      }
-                    ],
-                    "url": {
-                      "raw": "{{baseUrl}}/v1/payments/manual/",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["v1", "payments", "manual", ""]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                }
-              ]
-            },
-            {
-              "name": "v1 payments manual create",
-              "request": {
-                "method": "POST",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/payments/manual/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "payments", "manual", ""]
-                }
-              },
-              "response": [
-                {
-                  "name": "Untitled Response",
-                  "originalRequest": {
-                    "method": "POST",
-                    "header": [
-                      {
-                        "key": "Authorization",
-                        "value": "<API Key>",
-                        "description": "Added as a part of security scheme: apikey"
-                      }
-                    ],
-                    "url": {
-                      "raw": "{{baseUrl}}/v1/payments/manual/",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["v1", "payments", "manual", ""]
-                    }
-                  },
-                  "status": "Created",
-                  "code": 201,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                }
-              ]
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
             }
           ]
         },
         {
-          "name": "webhook",
-          "item": [
-            {
-              "name": "revenuecat",
-              "item": [
+          "name": "v1 payments manual read",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/payments/manual/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "payments", "manual", ":id", ""],
+              "variable": [
                 {
-                  "name": "v1 payments webhook revenuecat create",
-                  "request": {
-                    "method": "POST",
-                    "header": [],
-                    "url": {
-                      "raw": "{{baseUrl}}/v1/payments/webhook/revenuecat/",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["v1", "payments", "webhook", "revenuecat", ""]
-                    }
-                  },
-                  "response": [
+                  "key": "id",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/payments/manual/:id/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "payments", "manual", ":id", ""],
+                  "variable": [
                     {
-                      "name": "Untitled Response",
-                      "originalRequest": {
-                        "method": "POST",
-                        "header": [
-                          {
-                            "key": "Authorization",
-                            "value": "<API Key>",
-                            "description": "Added as a part of security scheme: apikey"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/v1/payments/webhook/revenuecat/",
-                          "host": ["{{baseUrl}}"],
-                          "path": [
-                            "v1",
-                            "payments",
-                            "webhook",
-                            "revenuecat",
-                            ""
-                          ]
-                        }
-                      },
-                      "status": "Created",
-                      "code": 201,
-                      "_postman_previewlanguage": "text",
-                      "header": [],
-                      "cookie": [],
-                      "body": ""
+                      "key": "id"
                     }
                   ]
                 }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "v1 payments manual partial update",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/payments/manual/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "payments", "manual", ":id", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "string"
+                }
               ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/payments/manual/:id/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "payments", "manual", ":id", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "v1 payments manual delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/payments/manual/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "payments", "manual", ":id", ""],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/payments/manual/:id/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "payments", "manual", ":id", ""],
+                  "variable": [
+                    {
+                      "key": "id"
+                    }
+                  ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "v1 payments manual create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/payments/manual/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "payments", "manual", ""]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/payments/manual/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "payments", "manual", ""]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "v1 payments webhook revenuecat create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/payments/webhook/revenuecat/",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "payments", "webhook", "revenuecat", ""]
+            }
+          },
+          "response": [
+            {
+              "name": "Untitled Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "<API Key>",
+                    "description": "Added as a part of security scheme: apikey"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/payments/webhook/revenuecat/",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["v1", "payments", "webhook", "revenuecat", ""]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
             }
           ]
         }
@@ -3687,239 +4601,6 @@
               ],
               "cookie": [],
               "body": "{\n  \"id\": 6718,\n  \"title\": \"string\",\n  \"content\": \"string\",\n  \"created_at\": \"2014-01-16T15:42:32.886Z\",\n  \"updated_at\": \"2026-03-31T13:10:00.716Z\"\n}"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "reviews",
-      "item": [
-        {
-          "name": "{id}",
-          "item": [
-            {
-              "name": "v1 reviews read",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/reviews/:id/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "reviews", ":id", ""],
-                  "variable": [
-                    {
-                      "key": "id",
-                      "value": "string"
-                    }
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "Untitled Response",
-                  "originalRequest": {
-                    "method": "GET",
-                    "header": [
-                      {
-                        "key": "Authorization",
-                        "value": "<API Key>",
-                        "description": "Added as a part of security scheme: apikey"
-                      }
-                    ],
-                    "url": {
-                      "raw": "{{baseUrl}}/v1/reviews/:id/",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["v1", "reviews", ":id", ""],
-                      "variable": [
-                        {
-                          "key": "id"
-                        }
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                }
-              ]
-            },
-            {
-              "name": "v1 reviews update",
-              "request": {
-                "method": "PUT",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/reviews/:id/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "reviews", ":id", ""],
-                  "variable": [
-                    {
-                      "key": "id",
-                      "value": "string"
-                    }
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "Untitled Response",
-                  "originalRequest": {
-                    "method": "PUT",
-                    "header": [
-                      {
-                        "key": "Authorization",
-                        "value": "<API Key>",
-                        "description": "Added as a part of security scheme: apikey"
-                      }
-                    ],
-                    "url": {
-                      "raw": "{{baseUrl}}/v1/reviews/:id/",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["v1", "reviews", ":id", ""],
-                      "variable": [
-                        {
-                          "key": "id"
-                        }
-                      ]
-                    }
-                  },
-                  "status": "OK",
-                  "code": 200,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                }
-              ]
-            },
-            {
-              "name": "v1 reviews delete",
-              "request": {
-                "method": "DELETE",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/reviews/:id/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "reviews", ":id", ""],
-                  "variable": [
-                    {
-                      "key": "id",
-                      "value": "string"
-                    }
-                  ]
-                }
-              },
-              "response": [
-                {
-                  "name": "Untitled Response",
-                  "originalRequest": {
-                    "method": "DELETE",
-                    "header": [
-                      {
-                        "key": "Authorization",
-                        "value": "<API Key>",
-                        "description": "Added as a part of security scheme: apikey"
-                      }
-                    ],
-                    "url": {
-                      "raw": "{{baseUrl}}/v1/reviews/:id/",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["v1", "reviews", ":id", ""],
-                      "variable": [
-                        {
-                          "key": "id"
-                        }
-                      ]
-                    }
-                  },
-                  "status": "No Content",
-                  "code": 204,
-                  "_postman_previewlanguage": "text",
-                  "header": [],
-                  "cookie": [],
-                  "body": ""
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "v1 reviews list",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/reviews/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "reviews", ""]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/reviews/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "reviews", ""]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 reviews create",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/reviews/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "reviews", ""]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/reviews/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "reviews", ""]
-                }
-              },
-              "status": "Created",
-              "code": 201,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
             }
           ]
         }
@@ -4541,604 +5222,6 @@
               },
               "status": "Created",
               "code": 201,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "shops",
-      "item": [
-        {
-          "name": "v1 shops list",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/shops/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "shops", ""]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/shops/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "shops", ""]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 shops create",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/shops/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "shops", ""]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/shops/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "shops", ""]
-                }
-              },
-              "status": "Created",
-              "code": 201,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 shops gallery list",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/shops/gallery/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "shops", "gallery", ""]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/shops/gallery/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "shops", "gallery", ""]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 shops gallery read",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/shops/gallery/:id/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "shops", "gallery", ":id", ""],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "string"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/shops/gallery/:id/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "shops", "gallery", ":id", ""],
-                  "variable": [
-                    {
-                      "key": "id"
-                    }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 shops gallery update",
-          "request": {
-            "method": "PUT",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/shops/gallery/:id/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "shops", "gallery", ":id", ""],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "string"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "PUT",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/shops/gallery/:id/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "shops", "gallery", ":id", ""],
-                  "variable": [
-                    {
-                      "key": "id"
-                    }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 shops gallery delete",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/shops/gallery/:id/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "shops", "gallery", ":id", ""],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "string"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "DELETE",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/shops/gallery/:id/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "shops", "gallery", ":id", ""],
-                  "variable": [
-                    {
-                      "key": "id"
-                    }
-                  ]
-                }
-              },
-              "status": "No Content",
-              "code": 204,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 shops gallery create",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/shops/gallery/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "shops", "gallery", ""]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "POST",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/shops/gallery/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "shops", "gallery", ""]
-                }
-              },
-              "status": "Created",
-              "code": 201,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 shops read",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/shops/:id/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "shops", ":id", ""],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "string"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/shops/:id/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "shops", ":id", ""],
-                  "variable": [
-                    {
-                      "key": "id"
-                    }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 shops google-reviews list",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/shops/:id/google-reviews/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "shops", ":id", "google-reviews", ""],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "string"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/shops/:id/google-reviews/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "shops", ":id", "google-reviews", ""],
-                  "variable": [
-                    {
-                      "key": "id"
-                    }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 shops update",
-          "request": {
-            "method": "PUT",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/shops/:id/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "shops", ":id", ""],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "string"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "PUT",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/shops/:id/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "shops", ":id", ""],
-                  "variable": [
-                    {
-                      "key": "id"
-                    }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 shops payment-settings list",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/shops/:id/payment-settings/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "shops", ":id", "payment-settings", ""],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "string"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/shops/:id/payment-settings/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "shops", ":id", "payment-settings", ""],
-                  "variable": [
-                    {
-                      "key": "id"
-                    }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 shops payment-settings partial update",
-          "request": {
-            "method": "PATCH",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/shops/:id/payment-settings/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "shops", ":id", "payment-settings", ""],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "string"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "PATCH",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/shops/:id/payment-settings/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "shops", ":id", "payment-settings", ""],
-                  "variable": [
-                    {
-                      "key": "id"
-                    }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "text",
-              "header": [],
-              "cookie": [],
-              "body": ""
-            }
-          ]
-        },
-        {
-          "name": "v1 shops delete",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/v1/shops/:id/",
-              "host": ["{{baseUrl}}"],
-              "path": ["v1", "shops", ":id", ""],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "string"
-                }
-              ]
-            }
-          },
-          "response": [
-            {
-              "name": "Untitled Response",
-              "originalRequest": {
-                "method": "DELETE",
-                "header": [
-                  {
-                    "key": "Authorization",
-                    "value": "<API Key>",
-                    "description": "Added as a part of security scheme: apikey"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/v1/shops/:id/",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["v1", "shops", ":id", ""],
-                  "variable": [
-                    {
-                      "key": "id"
-                    }
-                  ]
-                }
-              },
-              "status": "No Content",
-              "code": 204,
               "_postman_previewlanguage": "text",
               "header": [],
               "cookie": [],

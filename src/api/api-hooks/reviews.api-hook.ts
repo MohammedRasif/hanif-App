@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  type CreateReviewData,
   type ReviewFilters,
   type UpdateReviewData,
   reviewsApi,
@@ -24,17 +23,6 @@ export const useReviewDetail = (id?: string | number) => {
     queryKey: REVIEW_KEYS.detail(id ?? "unknown"),
     queryFn: () => reviewsApi.getById(id!),
     enabled: !!id,
-  });
-};
-
-export const useCreateReview = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (data: CreateReviewData) => reviewsApi.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: REVIEW_KEYS.all() });
-    },
   });
 };
 

@@ -42,20 +42,17 @@ export interface UpdateReviewData {
 export const reviewsApi = {
   getAll: (filters?: ReviewFilters) =>
     kyClient
-      .get("v1/reviews/", {
+      .get("v1/bookings/reviews/", {
         searchParams: filters as Record<string, string | number | boolean>,
       })
       .json<ReviewListResponse>(),
 
   getById: (id: string | number) =>
-    kyClient.get(`v1/reviews/${id}/`).json<Review>(),
-
-  create: (data: CreateReviewData) =>
-    kyClient.post("v1/reviews/", { json: data }).json<Review>(),
+    kyClient.get(`v1/bookings/reviews/${id}/`).json<Review>(),
 
   update: ({ id, ...data }: UpdateReviewData) =>
-    kyClient.put(`v1/reviews/${id}/`, { json: data }).json<Review>(),
+    kyClient.put(`v1/bookings/reviews/${id}/`, { json: data }).json<Review>(),
 
   remove: (id: string | number) =>
-    kyClient.delete(`v1/reviews/${id}/`).json<void>(),
+    kyClient.delete(`v1/bookings/reviews/${id}/`).json<void>(),
 };
