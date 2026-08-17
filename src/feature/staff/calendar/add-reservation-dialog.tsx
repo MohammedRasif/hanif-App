@@ -261,7 +261,6 @@ export function AddReservationDialog({
             )}
           </View>
 
-          {/* Pinned Bottom Action Button */}
           <View className="pt-3 border-t border-gray-100">
             <Button
               className="h-14 w-full rounded-2xl bg-[#FF9500] active:bg-[#e08300]"
