@@ -8,14 +8,13 @@ import {
   TextField,
   useToast,
 } from "heroui-native";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { z } from "zod";
 
-import { useForgotPassword } from "@/api";
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
-import { getApiErrorMessage } from "@/lib/ky";
 
 const forgotPasswordSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -26,7 +25,7 @@ type ForgotPasswordSchemaType = z.infer<typeof forgotPasswordSchema>;
 export default function ForgotPasswordScreen() {
   const router = useRouter();
   const { toast } = useToast();
-  const forgotPasswordMutation = useForgotPassword();
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     control,
@@ -41,10 +40,14 @@ export default function ForgotPasswordScreen() {
   });
 
   const onSubmit = async (data: ForgotPasswordSchemaType) => {
+    setIsLoading(true);
+
     try {
-      await forgotPasswordMutation.mutateAsync({
-        email: data.email,
-      });
+      // TODO: API integration
+      // Example:
+      // await forgotPasswordMutation.mutateAsync({
+      //   email: data.email,
+      // });
 
       toast.show({
         label: "OTP Code Sent",
@@ -57,17 +60,16 @@ export default function ForgotPasswordScreen() {
         pathname: "/auth/otp-code",
         params: { email: data.email, type: "forgot-password" },
       } as Href);
-    } catch (err) {
-      const message = getApiErrorMessage(
-        err,
-        "Failed to send reset code. Please check your email address.",
-      );
+    } catch {
       toast.show({
         label: "Error Sending Code",
-        description: message,
+        description:
+          "Failed to send reset code. Please check your email address.",
         variant: "danger",
         placement: "top",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -128,12 +130,12 @@ export default function ForgotPasswordScreen() {
         {/* Next Button */}
         <Button
           className="h-14 w-full items-center justify-center rounded-2xl bg-[#F0B100]"
-          isDisabled={forgotPasswordMutation.isPending}
+          isDisabled={isLoading}
           onPress={handleSubmit(onSubmit)}
           variant="primary"
         >
           <Button.Label className="font-semibold text-base text-primary-foreground">
-            {forgotPasswordMutation.isPending ? "Sending Code..." : "Next"}
+            {isLoading ? "Sending Code..." : "Next"}
           </Button.Label>
         </Button>
       </View>

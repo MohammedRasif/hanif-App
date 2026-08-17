@@ -4,10 +4,8 @@ import { InputOTP, useToast } from "heroui-native";
 import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
-import { useResendOtp, useVerifyEmail, useVerifyPasswordOtp } from "@/api";
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
-import { getApiErrorMessage } from "@/lib/ky";
 
 export default function OtpCodeScreen() {
   const router = useRouter();
@@ -19,10 +17,7 @@ export default function OtpCodeScreen() {
 
   const [timer, setTimer] = useState(45);
   const [isVerifying, setIsVerifying] = useState(false);
-
-  const verifyEmailMutation = useVerifyEmail();
-  const verifyPasswordOtpMutation = useVerifyPasswordOtp();
-  const resendOtpMutation = useResendOtp();
+  const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
     if (timer <= 0) {
@@ -39,12 +34,15 @@ export default function OtpCodeScreen() {
     const targetEmail = email || "";
 
     try {
-      if (type === "register") {
-        await verifyEmailMutation.mutateAsync({
-          email: targetEmail,
-          otp: code,
-        });
+      // TODO: API integration
+      // Example:
+      // if (type === "register") {
+      //   await verifyEmailMutation.mutateAsync({ email: targetEmail, otp: code });
+      // } else {
+      //   await verifyPasswordOtpMutation.mutateAsync({ email: targetEmail, otp: code });
+      // }
 
+      if (type === "register") {
         toast.show({
           label: "Email Verified!",
           description: "Your account is verified. Please log in.",
@@ -54,11 +52,6 @@ export default function OtpCodeScreen() {
 
         router.replace("/auth/login" as Href);
       } else {
-        await verifyPasswordOtpMutation.mutateAsync({
-          email: targetEmail,
-          otp: code,
-        });
-
         toast.show({
           label: "Code Verified!",
           description: "Please enter your new password.",
@@ -71,14 +64,10 @@ export default function OtpCodeScreen() {
           params: { email: targetEmail, otp: code },
         } as Href);
       }
-    } catch (err) {
-      const message = getApiErrorMessage(
-        err,
-        "Invalid verification code. Please try again.",
-      );
+    } catch {
       toast.show({
         label: "Verification Failed",
-        description: message,
+        description: "Invalid verification code. Please try again.",
         variant: "danger",
         placement: "top",
       });
@@ -89,12 +78,15 @@ export default function OtpCodeScreen() {
 
   const handleResend = async () => {
     if (timer > 0 || !email) return;
+    setIsResending(true);
 
     try {
-      await resendOtpMutation.mutateAsync({
-        email,
-        type: type === "register" ? "register" : "password_reset",
-      });
+      // TODO: API integration
+      // Example:
+      // await resendOtpMutation.mutateAsync({
+      //   email,
+      //   type: type === "register" ? "register" : "password_reset",
+      // });
 
       toast.show({
         label: "OTP Resent",
@@ -104,14 +96,15 @@ export default function OtpCodeScreen() {
       });
 
       setTimer(45);
-    } catch (err) {
-      const message = getApiErrorMessage(err, "Failed to resend code.");
+    } catch {
       toast.show({
         label: "Resend Failed",
-        description: message,
+        description: "Failed to resend code.",
         variant: "danger",
         placement: "top",
       });
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -186,7 +179,7 @@ export default function OtpCodeScreen() {
           ) : (
             <Pressable onPress={handleResend}>
               <Text className="font-bold text-[#F0B100] text-base underline">
-                {resendOtpMutation.isPending ? "Sending..." : "Resend Code"}
+                {isResending ? "Sending..." : "Resend Code"}
               </Text>
             </Pressable>
           )}

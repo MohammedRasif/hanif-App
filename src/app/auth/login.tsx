@@ -13,13 +13,10 @@ import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { z } from "zod";
 
-import { useLogin } from "@/api";
 import { Container } from "@/components/container";
 import { AuthHeader } from "@/feature/auth-header";
 import { SocialAuth } from "@/feature/social-auth";
 import { StyledIcons } from "@/lib";
-import { getApiErrorMessage } from "@/lib/ky";
-import { useAuthStore } from "@/store/auth.store";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -32,10 +29,9 @@ type LoginSchemaType = z.infer<typeof loginSchema>;
 export default function LoginScreen() {
   const router = useRouter();
   const { toast } = useToast();
-  const setAuth = useAuthStore((state) => state.setAuth);
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const loginMutation = useLogin();
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     control,
@@ -51,14 +47,17 @@ export default function LoginScreen() {
     mode: "onChange",
   });
 
-  const onSubmit = async (data: LoginSchemaType) => {
-    try {
-      const res = await loginMutation.mutateAsync({
-        email: data.email,
-        password: data.password,
-      });
+  const onSubmit = async (_data: LoginSchemaType) => {
+    setIsLoading(true);
 
-      setAuth({ access: res.access, refresh: res.refresh }, res.user);
+    try {
+      // TODO: API integration
+      // Example:
+      // const res = await loginMutation.mutateAsync({
+      //   email: _data.email,
+      //   password: _data.password,
+      // });
+      // setAuth({ access: res.access, refresh: res.refresh }, res.user);
 
       toast.show({
         label: "Welcome back!",
@@ -67,18 +66,16 @@ export default function LoginScreen() {
         placement: "top",
       });
 
-      router.replace("/(role)/customer/home" as Href);
-    } catch (err) {
-      const message = getApiErrorMessage(
-        err,
-        "Login failed. Please check your credentials.",
-      );
+      router.replace("/(role)/user" as Href);
+    } catch {
       toast.show({
         label: "Login Failed",
-        description: message,
+        description: "Login failed. Please check your credentials.",
         variant: "danger",
         placement: "top",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -221,12 +218,12 @@ export default function LoginScreen() {
         {/* Login Button */}
         <Button
           className="mb-6 h-14 w-full items-center justify-center rounded-2xl bg-[#F0B100]"
-          isDisabled={loginMutation.isPending}
+          isDisabled={isLoading}
           onPress={handleSubmit(onSubmit)}
           variant="primary"
         >
           <Button.Label className="font-semibold text-base text-primary-foreground">
-            {loginMutation.isPending ? "Logging in..." : "Log in"}
+            {isLoading ? "Logging in..." : "Log in"}
           </Button.Label>
         </Button>
 

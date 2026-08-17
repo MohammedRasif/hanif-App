@@ -2,7 +2,18 @@ import { createMMKV, type MMKV } from "react-native-mmkv";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import type { UserProfile } from "@/api/query-list/auth.query";
+export interface UserProfile {
+  id: string;
+  email: string;
+  username?: string;
+  role?: string;
+  full_name?: string;
+  image?: string;
+  phone?: string;
+  address?: string;
+  last_active_at?: string;
+  date_joined?: string;
+}
 
 export const storage: MMKV = createMMKV({
   id: "barbers-bay-auth-storage",

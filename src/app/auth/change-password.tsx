@@ -13,10 +13,8 @@ import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { z } from "zod";
 
-import { useResetPassword } from "@/api";
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
-import { getApiErrorMessage } from "@/lib/ky";
 
 const changePasswordSchema = z
   .object({
@@ -33,7 +31,7 @@ type ChangePasswordSchemaType = z.infer<typeof changePasswordSchema>;
 export default function ChangePasswordScreen() {
   const router = useRouter();
   const { toast } = useToast();
-  const { email, otp } = useLocalSearchParams<{
+  const { email: _email, otp: _otp } = useLocalSearchParams<{
     email?: string;
     otp?: string;
   }>();
@@ -41,8 +39,7 @@ export default function ChangePasswordScreen() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
-
-  const resetPasswordMutation = useResetPassword();
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     control,
@@ -57,14 +54,18 @@ export default function ChangePasswordScreen() {
     mode: "onChange",
   });
 
-  const onSubmit = async (data: ChangePasswordSchemaType) => {
+  const onSubmit = async (_data: ChangePasswordSchemaType) => {
+    setIsLoading(true);
+
     try {
-      await resetPasswordMutation.mutateAsync({
-        email: email || "",
-        otp: otp || "",
-        new_password: data.password,
-        confirm_password: data.confirmPassword,
-      });
+      // TODO: API integration
+      // Example:
+      // await resetPasswordMutation.mutateAsync({
+      //   email: email || "",
+      //   otp: otp || "",
+      //   new_password: _data.password,
+      //   confirm_password: _data.confirmPassword,
+      // });
 
       toast.show({
         label: "Password Reset Successful",
@@ -74,17 +75,15 @@ export default function ChangePasswordScreen() {
       });
 
       router.replace("/auth/login" as Href);
-    } catch (err) {
-      const message = getApiErrorMessage(
-        err,
-        "Password reset failed. Please try again or request a new OTP.",
-      );
+    } catch {
       toast.show({
         label: "Reset Failed",
-        description: message,
+        description: "Password reset failed. Please try again.",
         variant: "danger",
         placement: "top",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -200,14 +199,12 @@ export default function ChangePasswordScreen() {
         {/* Change Password Button */}
         <Button
           className="h-14 w-full items-center justify-center rounded-2xl bg-[#F0B100]"
-          isDisabled={resetPasswordMutation.isPending}
+          isDisabled={isLoading}
           onPress={handleSubmit(onSubmit)}
           variant="primary"
         >
           <Button.Label className="font-semibold text-base text-primary-foreground">
-            {resetPasswordMutation.isPending
-              ? "Changing Password..."
-              : "Change Password"}
+            {isLoading ? "Changing Password..." : "Change Password"}
           </Button.Label>
         </Button>
       </View>

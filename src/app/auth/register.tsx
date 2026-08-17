@@ -13,12 +13,10 @@ import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { z } from "zod";
 
-import { useRegister } from "@/api";
 import { Container } from "@/components/container";
 import { AuthHeader } from "@/feature/auth-header";
 import { SocialAuth } from "@/feature/social-auth";
 import { StyledIcons } from "@/lib";
-import { getApiErrorMessage } from "@/lib/ky";
 
 const registerSchema = z
   .object({
@@ -49,8 +47,7 @@ export default function RegisterScreen() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
-
-  const registerMutation = useRegister();
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     control,
@@ -70,14 +67,18 @@ export default function RegisterScreen() {
   });
 
   const onSubmit = async (data: RegisterSchemaType) => {
+    setIsLoading(true);
+
     try {
-      await registerMutation.mutateAsync({
-        full_name: data.fullName,
-        email: data.email,
-        phone: data.phoneNumber,
-        password: data.password,
-        confirm_password: data.confirmPassword,
-      });
+      // TODO: API integration
+      // Example:
+      // await registerMutation.mutateAsync({
+      //   full_name: data.fullName,
+      //   email: data.email,
+      //   phone: data.phoneNumber,
+      //   password: data.password,
+      //   confirm_password: data.confirmPassword,
+      // });
 
       toast.show({
         label: "Account Created!",
@@ -90,17 +91,15 @@ export default function RegisterScreen() {
         pathname: "/auth/otp-code",
         params: { email: data.email, type: "register" },
       } as Href);
-    } catch (err) {
-      const message = getApiErrorMessage(
-        err,
-        "Registration failed. Please try again.",
-      );
+    } catch {
       toast.show({
         label: "Registration Failed",
-        description: message,
+        description: "Registration failed. Please try again.",
         variant: "danger",
         placement: "top",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -323,14 +322,12 @@ export default function RegisterScreen() {
         {/* Create Account Button */}
         <Button
           className="mb-6 h-14 w-full items-center justify-center rounded-2xl bg-[#F0B100]"
-          isDisabled={registerMutation.isPending}
+          isDisabled={isLoading}
           onPress={handleSubmit(onSubmit)}
           variant="primary"
         >
           <Button.Label className="font-semibold text-base text-primary-foreground">
-            {registerMutation.isPending
-              ? "Creating Account..."
-              : "Create Account"}
+            {isLoading ? "Creating Account..." : "Create Account"}
           </Button.Label>
         </Button>
 
