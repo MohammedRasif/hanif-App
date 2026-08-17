@@ -70,6 +70,29 @@ export function AdminLayout() {
           ),
         }}
       />
+
+      {/* Hidden Sub-Routes (Accessible via navigation, NOT visible on bottom tab bar) */}
+      <Tabs.Screen
+        name="client/group-client-select"
+        options={{
+          href: null,
+          tabBarItemStyle: { display: "none" },
+        }}
+      />
+      <Tabs.Screen
+        name="client/group-client-message"
+        options={{
+          href: null,
+          tabBarItemStyle: { display: "none" },
+        }}
+      />
+      <Tabs.Screen
+        name="client/group-client-message-send"
+        options={{
+          href: null,
+          tabBarItemStyle: { display: "none" },
+        }}
+      />
     </Tabs>
   );
 }

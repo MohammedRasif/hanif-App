@@ -3,7 +3,7 @@ import { Container } from "@/components/container";
 import { useRouter } from "expo-router";
 import React from "react";
 
-export default function GroupClientMessage() {
+export default function AdminGroupClientMessage() {
   const router = useRouter();
 
   return (
@@ -12,8 +12,8 @@ export default function GroupClientMessage() {
         buttonText="Send message to 233 clint"
         onBack={() => router.back()}
         onSubmit={() => {
-          console.log("Send message clicked");
-          router.push("/(role)/staff/client");
+          console.log("Admin send message clicked");
+          router.push("/(role)/admin/client");
         }}
       />
     </Container>
