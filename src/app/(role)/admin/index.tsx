@@ -2,7 +2,7 @@ import {
   AdminHeader,
   AdminNextAppointments,
   AdminTodayMetrics,
-} from "@/components/admin";
+} from "@/components/admin/index-page";
 import { Container } from "@/components/container";
 import { Stack, useRouter } from "expo-router";
 import React from "react";
