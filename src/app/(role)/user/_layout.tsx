@@ -100,6 +100,10 @@ export default function UserLayout() {
         name="salon/choose-a-service"
         options={{ href: null, tabBarItemStyle: { display: "none" } }}
       />
+      <Tabs.Screen
+        name="bookings/[id]"
+        options={{ href: null, tabBarItemStyle: { display: "none" } }}
+      />
     </Tabs>
   );
 }

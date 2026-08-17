@@ -108,7 +108,10 @@ export function AppointmentCard({
           {showBookAgain && (
             <Pressable
               className="mt-3 self-start rounded-xl bg-[#f0b100] px-4 py-2 active:opacity-85"
-              onPress={() => onBookAgain?.(appointment)}
+              onPress={(e) => {
+                e.stopPropagation?.();
+                onBookAgain?.(appointment);
+              }}
             >
               <Text className="font-poppins-semibold text-sm text-white">
                 Book Again

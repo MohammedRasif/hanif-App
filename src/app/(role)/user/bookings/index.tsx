@@ -137,6 +137,12 @@ export default function BookingsScreen() {
                 appointment={appointment}
                 key={appointment.id}
                 onBookAgain={handleBookAgain}
+                onPress={(appt) =>
+                  router.push({
+                    pathname: "/(role)/user/bookings/[id]",
+                    params: { id: appt.id },
+                  })
+                }
                 showBookAgain={activeTab === "finessed"}
               />
             ))}
