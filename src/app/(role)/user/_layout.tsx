@@ -25,7 +25,7 @@ export default function UserLayout() {
 
       {/* 2. Booking Tab Screen */}
       <Tabs.Screen
-        name="bookings"
+        name="bookings/index"
         options={{
           title: "Booking",
           tabBarIcon: ({ color, focused }) => (
