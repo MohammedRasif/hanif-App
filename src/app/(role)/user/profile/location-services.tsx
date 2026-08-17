@@ -8,6 +8,14 @@ import { StyledIcons } from "@/lib";
 export default function LocationServicesScreen() {
   const router = useRouter();
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/(role)/user/profile");
+    }
+  };
+
   return (
     <Container>
       <Stack.Screen options={{ headerShown: false }} />
@@ -16,7 +24,7 @@ export default function LocationServicesScreen() {
         <View>
           {/* Header row */}
           <View className="relative mb-8 flex-row items-center justify-between">
-            <Pressable className="py-2 pr-4" onPress={() => router.back()}>
+            <Pressable className="py-2 pr-4" onPress={handleBack}>
               <StyledIcons
                 className="text-foreground"
                 name="arrow-back"
@@ -68,7 +76,7 @@ export default function LocationServicesScreen() {
         <View className="mt-8 gap-3">
           <Button
             className="h-14 w-full items-center justify-center rounded-2xl bg-[#F0B100]"
-            onPress={() => router.back()}
+            onPress={handleBack}
             variant="primary"
           >
             <Button.Label className="font-semibold text-base text-primary-foreground">
@@ -78,7 +86,7 @@ export default function LocationServicesScreen() {
 
           <Button
             className="h-14 w-full items-center justify-center rounded-2xl bg-default-100"
-            onPress={() => router.back()}
+            onPress={handleBack}
             variant="secondary"
           >
             <Button.Label className="font-semibold text-base text-foreground">

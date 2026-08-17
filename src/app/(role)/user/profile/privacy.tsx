@@ -8,6 +8,14 @@ import { Container } from "@/components/container";
 export default function PrivacyScreen() {
   const router = useRouter();
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/(role)/user/profile");
+    }
+  };
+
   return (
     <Container>
       <Stack.Screen options={{ headerShown: false }} />
@@ -16,7 +24,7 @@ export default function PrivacyScreen() {
         <View>
           {/* Header row */}
           <View className="relative mb-8 flex-row items-center justify-between">
-            <Pressable className="py-2 pr-4" onPress={() => router.back()}>
+            <Pressable className="py-2 pr-4" onPress={handleBack}>
               <StyledIcons
                 className="text-foreground"
                 name="arrow-back"
@@ -45,7 +53,7 @@ export default function PrivacyScreen() {
         {/* Back Button */}
         <Button
           className="mt-8 h-14 w-full items-center justify-center rounded-2xl bg-[#F0B100]"
-          onPress={() => router.back()}
+          onPress={handleBack}
           variant="primary"
         >
           <Button.Label className="font-semibold text-base text-primary-foreground">

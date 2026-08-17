@@ -6,7 +6,7 @@ const StaffLayout = () => {
   const screenOptions = useDefaultTabScreenOptions();
 
   return (
-    <Tabs screenOptions={screenOptions}>
+    <Tabs backBehavior="history" screenOptions={screenOptions}>
       {/* 1. Staff Home Dashboard Tab */}
       <Tabs.Screen
         name="index"

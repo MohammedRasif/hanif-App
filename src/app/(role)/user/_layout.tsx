@@ -25,7 +25,7 @@ export default function UserLayout() {
 
       {/* 2. Booking Tab Screen */}
       <Tabs.Screen
-        name="bookings/index"
+        name="bookings"
         options={{
           title: "Booking",
           tabBarIcon: ({ color, focused }) => (
@@ -55,39 +55,7 @@ export default function UserLayout() {
         }}
       />
 
-      {/* Hidden Sub-Routes (Hidden from bottom tab bar) */}
-      <Tabs.Screen
-        name="profile/change-password"
-        options={{ href: null, tabBarItemStyle: { display: "none" } }}
-      />
-      <Tabs.Screen
-        name="profile/contact-us"
-        options={{ href: null, tabBarItemStyle: { display: "none" } }}
-      />
-      <Tabs.Screen
-        name="profile/help-center"
-        options={{ href: null, tabBarItemStyle: { display: "none" } }}
-      />
-      <Tabs.Screen
-        name="profile/location-services"
-        options={{ href: null, tabBarItemStyle: { display: "none" } }}
-      />
-      <Tabs.Screen
-        name="profile/personal-info"
-        options={{ href: null, tabBarItemStyle: { display: "none" } }}
-      />
-      <Tabs.Screen
-        name="profile/privacy"
-        options={{ href: null, tabBarItemStyle: { display: "none" } }}
-      />
-      <Tabs.Screen
-        name="profile/refund"
-        options={{ href: null, tabBarItemStyle: { display: "none" } }}
-      />
-      <Tabs.Screen
-        name="profile/terms"
-        options={{ href: null, tabBarItemStyle: { display: "none" } }}
-      />
+      {/* Salon Sub-Routes (Hidden from bottom tab bar) */}
       <Tabs.Screen
         name="salon/[id]"
         options={{ href: null, tabBarItemStyle: { display: "none" } }}
@@ -98,10 +66,6 @@ export default function UserLayout() {
       />
       <Tabs.Screen
         name="salon/choose-a-service"
-        options={{ href: null, tabBarItemStyle: { display: "none" } }}
-      />
-      <Tabs.Screen
-        name="bookings/[id]"
         options={{ href: null, tabBarItemStyle: { display: "none" } }}
       />
     </Tabs>

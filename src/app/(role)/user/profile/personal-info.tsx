@@ -60,9 +60,17 @@ export default function PersonalInfoScreen() {
     }
   };
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/(role)/user/profile");
+    }
+  };
+
   const onSubmit = (data: PersonalInfoSchemaType) => {
     console.log("Personal info updated successfully:", data, image);
-    router.back();
+    handleBack();
   };
 
   return (
@@ -73,7 +81,7 @@ export default function PersonalInfoScreen() {
         <View>
           {/* Header row */}
           <View className="relative mb-8 flex-row items-center justify-between">
-            <Pressable className="py-2 pr-4" onPress={() => router.back()}>
+            <Pressable className="py-2 pr-4" onPress={handleBack}>
               <StyledIcons
                 className="text-foreground"
                 name="arrow-back"
