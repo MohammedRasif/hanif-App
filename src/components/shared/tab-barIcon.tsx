@@ -48,8 +48,8 @@ export function useDefaultTabScreenOptions() {
 
   // Dynamic bottom padding to ensure no overlap with Android 3-button navigation, gesture bars, or hardware buttons
   const bottomPadding =
-    insets.bottom > 0 ? insets.bottom : Platform.OS === "android" ? 10 : 8;
-  const tabHeight = 56 + bottomPadding;
+    insets.bottom > 0 ? insets.bottom : Platform.OS === "android" ? 6 : 4;
+  const tabHeight = 52 + bottomPadding;
 
   return {
     headerShown: false,
@@ -58,7 +58,7 @@ export function useDefaultTabScreenOptions() {
     tabBarHideOnKeyboard: true,
     animation: "fade" as const,
     tabBarLabelStyle: {
-      fontSize: 12,
+      fontSize: 11,
       fontWeight: "600" as const,
       marginTop: 2,
     },
@@ -68,12 +68,12 @@ export function useDefaultTabScreenOptions() {
       borderTopColor: "#F0F0F0",
       height: tabHeight,
       paddingBottom: bottomPadding,
-      paddingTop: 8,
-      elevation: 10,
+      paddingTop: 6,
+      elevation: 8,
       shadowColor: "#000000",
-      shadowOffset: { width: 0, height: -3 },
-      shadowOpacity: 0.08,
-      shadowRadius: 8,
+      shadowOffset: { width: 0, height: -2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 6,
     },
   };
 }

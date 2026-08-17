@@ -19,6 +19,7 @@ type Props = AnimatedProps<ViewProps> & {
   className?: string;
   isScrollable?: boolean;
   keyboardAvoiding?: boolean;
+  safeAreaBottom?: boolean;
   scrollViewProps?: Omit<ScrollViewProps, "contentContainerStyle">;
 };
 
@@ -27,6 +28,7 @@ export function Container({
   className,
   isScrollable = true,
   keyboardAvoiding = false,
+  safeAreaBottom = false,
   scrollViewProps,
   ...props
 }: PropsWithChildren<Props>) {
@@ -72,7 +74,7 @@ export function Container({
     <AnimatedView
       className={cn("flex-1 bg-background", className)}
       style={{
-        paddingBottom: insets.bottom,
+        paddingBottom: safeAreaBottom ? insets.bottom : 0,
       }}
       {...props}
     >
