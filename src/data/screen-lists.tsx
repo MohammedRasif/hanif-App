@@ -58,16 +58,22 @@ export const otherScreens: Screen[] = [
 
 export const mainScreens: Screen[] = [
   {
+    title: "User Screen",
+    desc: "All User related  page",
+    href: "/(role)/user" as Href,
+    icon: "man-outline" as const,
+  },
+  {
     title: "Staff Screen",
     desc: "All staff related  page",
     href: "/(role)/staff" as Href,
     icon: "home-outline" as const,
   },
   {
-    title: "User Screen",
-    desc: "All User related  page",
-    href: "/(role)/user" as Href,
-    icon: "man-outline" as const,
+    title: "Admin Screen",
+    desc: "All Admin related page",
+    href: "/(role)/admin" as Href,
+    icon: "shield-checkmark-outline" as const,
   },
 ];
 
