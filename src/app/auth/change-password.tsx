@@ -1,18 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Href } from "expo-router";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import {
-  Button,
-  FieldError,
-  InputGroup,
-  TextField,
-  useToast,
-} from "heroui-native";
+import { Button, useToast } from "heroui-native";
 import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { z } from "zod";
 
+import { AuthInput } from "@/components/shared";
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
 
@@ -36,9 +31,6 @@ export default function ChangePasswordScreen() {
     otp?: string;
   }>();
 
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
-    useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -110,90 +102,24 @@ export default function ChangePasswordScreen() {
           </View>
 
           {/* New Password Field */}
-          <View className="mb-4">
-            <Text className="mb-2 font-semibold text-foreground text-sm">
-              Enter new Password
-            </Text>
-            <TextField isInvalid={!!errors.password}>
-              <Controller
-                control={control}
-                name="password"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white">
-                    <InputGroup.Input
-                      className="h-full w-full border-transparent bg-transparent pr-12 pl-4 text-foreground"
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      placeholder="••••••••"
-                      secureTextEntry={!isPasswordVisible}
-                      value={value}
-                    />
-                    <InputGroup.Suffix className="absolute top-0 right-0 bottom-0 items-center justify-center pr-4 pl-2">
-                      <Pressable
-                        hitSlop={12}
-                        onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-                      >
-                        <StyledIcons
-                          className="text-muted"
-                          name={
-                            isPasswordVisible
-                              ? "eye-off-outline"
-                              : "eye-outline"
-                          }
-                          size={20}
-                        />
-                      </Pressable>
-                    </InputGroup.Suffix>
-                  </InputGroup>
-                )}
-              />
-              <FieldError>{errors.password?.message}</FieldError>
-            </TextField>
-          </View>
+          <AuthInput
+            control={control}
+            errorMessage={errors.password?.message}
+            isPassword
+            label="Enter new Password"
+            name="password"
+            placeholder="••••••••"
+          />
 
           {/* Confirm Password Field */}
-          <View className="mb-4">
-            <Text className="mb-2 font-semibold text-foreground text-sm">
-              Confirm Password
-            </Text>
-            <TextField isInvalid={!!errors.confirmPassword}>
-              <Controller
-                control={control}
-                name="confirmPassword"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white">
-                    <InputGroup.Input
-                      className="h-full w-full border-transparent bg-transparent pr-12 pl-4 text-foreground"
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      placeholder="••••••••"
-                      secureTextEntry={!isConfirmPasswordVisible}
-                      value={value}
-                    />
-                    <InputGroup.Suffix className="absolute top-0 right-0 bottom-0 items-center justify-center pr-4 pl-2">
-                      <Pressable
-                        hitSlop={12}
-                        onPress={() =>
-                          setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
-                        }
-                      >
-                        <StyledIcons
-                          className="text-muted"
-                          name={
-                            isConfirmPasswordVisible
-                              ? "eye-off-outline"
-                              : "eye-outline"
-                          }
-                          size={20}
-                        />
-                      </Pressable>
-                    </InputGroup.Suffix>
-                  </InputGroup>
-                )}
-              />
-              <FieldError>{errors.confirmPassword?.message}</FieldError>
-            </TextField>
-          </View>
+          <AuthInput
+            control={control}
+            errorMessage={errors.confirmPassword?.message}
+            isPassword
+            label="Confirm Password"
+            name="confirmPassword"
+            placeholder="••••••••"
+          />
         </View>
 
         {/* Change Password Button */}

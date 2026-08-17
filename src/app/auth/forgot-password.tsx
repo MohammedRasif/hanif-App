@@ -1,18 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Href } from "expo-router";
 import { Stack, useRouter } from "expo-router";
-import {
-  Button,
-  FieldError,
-  InputGroup,
-  TextField,
-  useToast,
-} from "heroui-native";
+import { Button, useToast } from "heroui-native";
 import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { z } from "zod";
 
+import { AuthInput } from "@/components/shared";
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
 
@@ -100,31 +95,16 @@ export default function ForgotPasswordScreen() {
           </View>
 
           {/* Email input field */}
-          <View className="mb-6">
-            <Text className="mb-2 font-semibold text-foreground text-sm">
-              Enter Email
-            </Text>
-            <TextField isInvalid={!!errors.email}>
-              <Controller
-                control={control}
-                name="email"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white">
-                    <InputGroup.Input
-                      autoCapitalize="none"
-                      className="h-full w-full border-transparent bg-transparent px-4 text-foreground"
-                      keyboardType="email-address"
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      placeholder="Plant@gmail.com"
-                      value={value}
-                    />
-                  </InputGroup>
-                )}
-              />
-              <FieldError>{errors.email?.message}</FieldError>
-            </TextField>
-          </View>
+          <AuthInput
+            autoCapitalize="none"
+            containerClassName="mb-6"
+            control={control}
+            errorMessage={errors.email?.message}
+            keyboardType="email-address"
+            label="Enter Email"
+            name="email"
+            placeholder="Plant@gmail.com"
+          />
         </View>
 
         {/* Next Button */}

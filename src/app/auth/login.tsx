@@ -1,18 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Href } from "expo-router";
 import { Link, Stack, useRouter } from "expo-router";
-import {
-  Button,
-  FieldError,
-  InputGroup,
-  TextField,
-  useToast,
-} from "heroui-native";
+import { Button, useToast } from "heroui-native";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { z } from "zod";
 
+import { AuthInput } from "@/components/shared";
 import { Container } from "@/components/container";
 import { AuthHeader } from "@/feature/auth-header";
 import { SocialAuth } from "@/feature/social-auth";
@@ -30,7 +25,6 @@ export default function LoginScreen() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -90,91 +84,27 @@ export default function LoginScreen() {
         />
 
         {/* Email Field */}
-        <View className="mb-4">
-          <Text className="mb-2 font-semibold text-foreground text-sm">
-            Enter Email
-          </Text>
-          <TextField isInvalid={!!errors.email}>
-            <Controller
-              control={control}
-              name="email"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white">
-                  <InputGroup.Prefix
-                    className="absolute top-0 bottom-0 left-0 items-center justify-center pr-2 pl-4"
-                    isDecorative
-                  >
-                    <StyledIcons
-                      className="text-muted"
-                      name="mail-outline"
-                      size={20}
-                    />
-                  </InputGroup.Prefix>
-                  <InputGroup.Input
-                    autoCapitalize="none"
-                    className="h-full w-full border-transparent bg-transparent text-foreground"
-                    keyboardType="email-address"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    placeholder="Plant@gmail.com"
-                    value={value}
-                  />
-                </InputGroup>
-              )}
-            />
-            <FieldError>{errors.email?.message}</FieldError>
-          </TextField>
-        </View>
+        <AuthInput
+          autoCapitalize="none"
+          control={control}
+          errorMessage={errors.email?.message}
+          icon="mail-outline"
+          keyboardType="email-address"
+          label="Enter Email"
+          name="email"
+          placeholder="Plant@gmail.com"
+        />
 
         {/* Password Field */}
-        <View className="mb-4">
-          <Text className="mb-2 font-semibold text-foreground text-sm">
-            Password
-          </Text>
-          <TextField isInvalid={!!errors.password}>
-            <Controller
-              control={control}
-              name="password"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-[#E5E5E5] bg-white">
-                  <InputGroup.Prefix
-                    className="absolute top-0 bottom-0 left-0 items-center justify-center pr-2 pl-4"
-                    isDecorative
-                  >
-                    <StyledIcons
-                      className="text-muted"
-                      name="lock-closed-outline"
-                      size={20}
-                    />
-                  </InputGroup.Prefix>
-                  <InputGroup.Input
-                    className="h-full w-full border-transparent bg-transparent text-foreground"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    placeholder="••••••••"
-                    secureTextEntry={!isPasswordVisible}
-                    value={value}
-                  />
-                  <InputGroup.Suffix className="absolute top-0 right-0 bottom-0 items-center justify-center pr-4 pl-2">
-                    <Pressable
-                      hitSlop={12}
-                      onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-                    >
-                      <StyledIcons
-                        className="text-muted"
-                        name={
-                          isPasswordVisible ? "eye-off-outline" : "eye-outline"
-                        }
-                        size={20}
-                      />
-                    </Pressable>
-                  </InputGroup.Suffix>
-                </InputGroup>
-              )}
-            />
-            <FieldError>{errors.password?.message}</FieldError>
-          </TextField>
-        </View>
+        <AuthInput
+          control={control}
+          errorMessage={errors.password?.message}
+          icon="lock-closed-outline"
+          isPassword
+          label="Password"
+          name="password"
+          placeholder="••••••••"
+        />
 
         {/* Remember Me + Forgot Password */}
         <View className="mb-8 flex-row items-center justify-between">
