@@ -1,11 +1,13 @@
 import { StyledIcons } from "@/lib";
 import type { Ionicons } from "@expo/vector-icons";
-import { useEffect, type ComponentProps } from "react";
+import React, { useEffect, type ComponentProps } from "react";
+import { Platform } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export interface TabBarIconProps {
   color: string;
@@ -20,17 +22,14 @@ export function TabBarIcon({
   iconName,
   focusedIconName,
 }: TabBarIconProps) {
-  const scale = useSharedValue(focused ? 1.15 : 1);
-  const opacity = useSharedValue(focused ? 1 : 0.7);
+  const scale = useSharedValue(focused ? 1.12 : 1);
 
   useEffect(() => {
-    scale.value = withTiming(focused ? 1.15 : 1, { duration: 180 });
-    opacity.value = withTiming(focused ? 1 : 0.7, { duration: 180 });
-  }, [focused, scale, opacity]);
+    scale.value = withTiming(focused ? 1.12 : 1, { duration: 180 });
+  }, [focused, scale]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
-    opacity: opacity.value,
   }));
 
   return (
@@ -44,17 +43,63 @@ export function TabBarIcon({
   );
 }
 
+export function useDefaultTabScreenOptions() {
+  const insets = useSafeAreaInsets();
+
+  // Dynamic bottom padding to ensure no overlap with Android 3-button navigation, gesture bars, or hardware buttons
+  const bottomPadding =
+    insets.bottom > 0 ? insets.bottom : Platform.OS === "android" ? 10 : 8;
+  const tabHeight = 56 + bottomPadding;
+
+  return {
+    headerShown: false,
+    tabBarActiveTintColor: "#F0B100",
+    tabBarInactiveTintColor: "#525252",
+    tabBarHideOnKeyboard: true,
+    animation: "fade" as const,
+    tabBarLabelStyle: {
+      fontSize: 12,
+      fontWeight: "600" as const,
+      marginTop: 2,
+    },
+    tabBarStyle: {
+      backgroundColor: "#FFFFFF",
+      borderTopWidth: 1,
+      borderTopColor: "#F0F0F0",
+      height: tabHeight,
+      paddingBottom: bottomPadding,
+      paddingTop: 8,
+      elevation: 10,
+      shadowColor: "#000000",
+      shadowOffset: { width: 0, height: -3 },
+      shadowOpacity: 0.08,
+      shadowRadius: 8,
+    },
+  };
+}
+
 export const defaultTabScreenOptions = {
   headerShown: false,
   tabBarActiveTintColor: "#F0B100",
-  tabBarInactiveTintColor: "#A3A3A3",
+  tabBarInactiveTintColor: "#525252",
+  tabBarHideOnKeyboard: true,
   animation: "fade" as const,
+  tabBarLabelStyle: {
+    fontSize: 12,
+    fontWeight: "600" as const,
+    marginTop: 2,
+  },
   tabBarStyle: {
     backgroundColor: "#FFFFFF",
     borderTopWidth: 1,
-    borderTopColor: "#F5F5F5",
-    height: 64,
-    paddingBottom: 10,
+    borderTopColor: "#F0F0F0",
+    height: 70,
+    paddingBottom: 12,
     paddingTop: 8,
+    elevation: 10,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
   },
 };

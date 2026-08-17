@@ -5,7 +5,7 @@ import { Image, Pressable, Text, View } from "react-native";
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
 
-export default function HomeScreen() {
+export default function UserHomeScreen() {
   const router = useRouter();
 
   const shopList = [

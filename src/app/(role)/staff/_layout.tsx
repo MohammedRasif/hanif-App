@@ -1,10 +1,12 @@
-import { TabBarIcon, defaultTabScreenOptions } from "@/components/shared";
+import { TabBarIcon, useDefaultTabScreenOptions } from "@/components/shared";
 import { Tabs } from "expo-router";
 import React from "react";
 
 const StaffLayout = () => {
+  const screenOptions = useDefaultTabScreenOptions();
+
   return (
-    <Tabs screenOptions={defaultTabScreenOptions}>
+    <Tabs screenOptions={screenOptions}>
       {/* 1. Staff Home Dashboard Tab */}
       <Tabs.Screen
         name="index"
