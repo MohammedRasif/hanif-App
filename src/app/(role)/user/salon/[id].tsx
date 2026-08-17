@@ -5,7 +5,7 @@ import {
   SalonGalleryTab,
   SalonReviewsTab,
   SalonTabs,
-} from "@/components/user/salon";
+} from "@/feature/user/salon";
 import { StyledIcons } from "@/lib";
 import { Image } from "expo-image";
 import { Stack, useRouter } from "expo-router";

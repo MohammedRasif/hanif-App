@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { z } from "zod";
 
-import { AuthInput } from "@/components/shared";
+import { AuthInput } from "@/components/auth";
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
 

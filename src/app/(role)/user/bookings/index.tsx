@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { Container } from "@/components/container";
-import { AppointmentCard, type Appointment } from "@/components/user";
+import { AppointmentCard, type Appointment } from "@/feature/user";
 
 const MOCK_UPCOMING_APPOINTMENTS: Appointment[] = [
   {
@@ -137,7 +137,7 @@ export default function BookingsScreen() {
                 appointment={appointment}
                 key={appointment.id}
                 onBookAgain={handleBookAgain}
-                onPress={(appt) =>
+                onPress={(appt: Appointment) =>
                   router.push({
                     pathname: "/(role)/user/bookings/[id]",
                     params: { id: appt.id },

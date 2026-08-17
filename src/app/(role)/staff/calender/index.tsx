@@ -5,7 +5,7 @@ import {
   ConfirmAddReservationDialog,
   FinalAddReservationDialog,
   StaffCalendarMenu,
-} from "@/components/staff/calendar";
+} from "@/feature/staff/calendar";
 import CustomCalendar from "@/lib/calender";
 import React, { useState } from "react";
 

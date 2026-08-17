@@ -1,9 +1,9 @@
+import { Container } from "@/components/container";
 import {
   AdminHeader,
   AdminNextAppointments,
   AdminTodayMetrics,
-} from "@/components/admin/index-page";
-import { Container } from "@/components/container";
+} from "@/feature/admin/index-page";
 import { Stack, useRouter } from "expo-router";
 import React from "react";
 import { View } from "react-native";

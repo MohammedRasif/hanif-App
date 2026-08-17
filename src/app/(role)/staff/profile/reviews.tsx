@@ -1,6 +1,8 @@
 import { Container } from "@/components/container";
-import { StaffReviewCard } from "@/components/staff/profile/staff-review-card";
-import { StaffProfileTopHeader } from "@/components/staff/profile/staff-profile-top-header";
+import {
+  StaffProfileTopHeader,
+  StaffReviewCard,
+} from "@/feature/staff/profile";
 import { StyledIcons } from "@/lib";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";

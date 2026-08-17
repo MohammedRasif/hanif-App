@@ -1,5 +1,5 @@
 import { Container } from "@/components/container";
-import { StaffProfileTopHeader } from "@/components/staff/profile/staff-profile-top-header";
+import { StaffProfileTopHeader } from "@/feature/staff/profile";
 import React from "react";
 import { FlatList, Text, View } from "react-native";
 

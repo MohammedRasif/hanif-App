@@ -1,8 +1,8 @@
-import AdminDashboardComponent from "@/components/staff";
+import StaffDashboardComponent from "@/feature/staff";
 import React from "react";
 
 const StaffScreen = () => {
-  return <AdminDashboardComponent />;
+  return <StaffDashboardComponent />;
 };
 
 export default StaffScreen;

@@ -7,10 +7,8 @@ import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { z } from "zod";
 
-import { AuthInput } from "@/components/shared";
+import { AuthHeader, AuthInput, SocialAuth } from "@/components/auth";
 import { Container } from "@/components/container";
-import { AuthHeader } from "@/feature/auth-header";
-import { SocialAuth } from "@/feature/social-auth";
 import { StyledIcons } from "@/lib";
 
 const registerSchema = z
