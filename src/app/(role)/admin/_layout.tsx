@@ -57,7 +57,7 @@ export function AdminLayout() {
 
       {/* 4. Admin Profile Tab */}
       <Tabs.Screen
-        name="profile/index"
+        name="profile"
         options={{
           title: "Profile",
           tabBarIcon: ({ color, focused }) => (

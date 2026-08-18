@@ -11,7 +11,7 @@ export default function AdminProfileScreen() {
       label: "Personal setting",
       iconName: "settings-outline",
       onPress: () => {
-        console.log("Personal setting clicked");
+        router.push("/(role)/admin/profile/personal-setting");
       },
     },
     {
