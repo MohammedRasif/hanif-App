@@ -6,6 +6,10 @@ import { Pressable, Text, View } from "react-native";
 
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
+import {
+  useResendOtpMutation,
+  useVerifyOtpMutation,
+} from "@/Redux/feature/auth";
 
 export default function OtpCodeScreen() {
   const router = useRouter();
@@ -16,8 +20,8 @@ export default function OtpCodeScreen() {
   }>();
 
   const [timer, setTimer] = useState(45);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [isResending, setIsResending] = useState(false);
+  const [verifyOtpApi, { isLoading: isVerifying }] = useVerifyOtpMutation();
+  const [resendOtpApi, { isLoading: isResending }] = useResendOtpMutation();
 
   useEffect(() => {
     if (timer <= 0) {
@@ -30,27 +34,33 @@ export default function OtpCodeScreen() {
   }, [timer]);
 
   const onComplete = async (code: string) => {
-    setIsVerifying(true);
     const targetEmail = email || "";
+    const payload = {
+      email: targetEmail,
+      otp: code,
+    };
 
     try {
-      // TODO: API integration
-      // Example:
-      // if (type === "register") {
-      //   await verifyEmailMutation.mutateAsync({ email: targetEmail, otp: code });
-      // } else {
-      //   await verifyPasswordOtpMutation.mutateAsync({ email: targetEmail, otp: code });
-      // }
+      console.log("[Submitting Verify OTP Form]:", payload);
+      const res = await verifyOtpApi(payload).unwrap();
+      console.log("[Verify OTP API Success Response]:", res);
 
       if (type === "register") {
         toast.show({
           label: "Email Verified!",
-          description: "Your account is verified. Please log in.",
+          description: res?.details || "Email verified successfully.",
           variant: "success",
           placement: "top",
         });
 
-        router.replace("/auth/login" as Href);
+        const role = res?.data?.user?.role || "USER";
+        if (role === "ADMIN") {
+          router.replace("/(role)/admin" as Href);
+        } else if (role === "STAFF") {
+          router.replace("/(role)/staff" as Href);
+        } else {
+          router.replace("/(role)/user" as Href);
+        }
       } else {
         toast.show({
           label: "Code Verified!",
@@ -64,47 +74,66 @@ export default function OtpCodeScreen() {
           params: { email: targetEmail, otp: code },
         } as Href);
       }
-    } catch {
+    } catch (error: any) {
+      console.error("[Verify OTP API Error Response]:", error);
+      const errorMessage =
+        error?.data?.details ||
+        error?.data?.message ||
+        error?.message ||
+        "Invalid verification code. Please try again.";
+
       toast.show({
         label: "Verification Failed",
-        description: "Invalid verification code. Please try again.",
+        description:
+          typeof errorMessage === "string"
+            ? errorMessage
+            : JSON.stringify(errorMessage),
         variant: "danger",
         placement: "top",
       });
-    } finally {
-      setIsVerifying(false);
     }
   };
 
   const handleResend = async () => {
     if (timer > 0 || !email) return;
-    setIsResending(true);
+
+    const payload = {
+      email,
+      type: type === "register" ? "register" : "forgot-password",
+    };
 
     try {
-      // TODO: API integration
-      // Example:
-      // await resendOtpMutation.mutateAsync({
-      //   email,
-      //   type: type === "register" ? "register" : "password_reset",
-      // });
+      console.log("[Submitting Resend OTP Form]:", payload);
+      const res = await resendOtpApi(payload).unwrap();
+      console.log("[Resend OTP API Success Response]:", res);
 
       toast.show({
         label: "OTP Resent",
-        description: "A new verification code has been sent to your email.",
+        description:
+          res?.details ||
+          "A new verification code has been sent to your email.",
         variant: "success",
         placement: "top",
       });
 
       setTimer(45);
-    } catch {
+    } catch (error: any) {
+      console.error("[Resend OTP API Error Response]:", error);
+      const errorMessage =
+        error?.data?.details ||
+        error?.data?.message ||
+        error?.message ||
+        "Failed to resend code.";
+
       toast.show({
         label: "Resend Failed",
-        description: "Failed to resend code.",
+        description:
+          typeof errorMessage === "string"
+            ? errorMessage
+            : JSON.stringify(errorMessage),
         variant: "danger",
         placement: "top",
       });
-    } finally {
-      setIsResending(false);
     }
   };
 

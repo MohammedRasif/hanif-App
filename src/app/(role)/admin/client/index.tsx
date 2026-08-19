@@ -1,18 +1,19 @@
+import { ClientListView } from "@/components/client-management";
 import { Container } from "@/components/container";
+import { useRouter } from "expo-router";
 import React from "react";
-import { Text, View } from "react-native";
 
 export default function AdminClientScreen() {
+  const router = useRouter();
+
   return (
-    <Container className="bg-white" isScrollable={false}>
-      <View className="flex-1 items-center justify-center p-6">
-        <Text className="font-poppins-bold text-2xl text-foreground">
-          Admin Clients
-        </Text>
-        <Text className="mt-2 text-center font-poppins text-default-400 text-sm">
-          Client directory and details will appear here.
-        </Text>
-      </View>
+    <Container className="bg-white flex-1" isScrollable={false}>
+      <ClientListView
+        onPressAdd={() => console.log("Admin add new client clicked")}
+        onSelectGroup={() =>
+          router.push("/(role)/admin/client/group-client-select")
+        }
+      />
     </Container>
   );
 }

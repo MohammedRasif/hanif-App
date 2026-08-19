@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { Href } from "expo-router";
 import { Link, Stack, useRouter } from "expo-router";
 import { Button, useToast } from "heroui-native";
-import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { z } from "zod";
@@ -10,6 +9,7 @@ import { z } from "zod";
 import { AuthHeader, AuthInput, SocialAuth } from "@/components/auth";
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
+import { useRegisterMutation } from "@/Redux/feature/auth";
 
 const registerSchema = z
   .object({
@@ -37,7 +37,7 @@ type RegisterSchemaType = z.infer<typeof registerSchema>;
 export default function RegisterScreen() {
   const router = useRouter();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const [registerApi, { isLoading }] = useRegisterMutation();
 
   const {
     control,
@@ -57,22 +57,24 @@ export default function RegisterScreen() {
   });
 
   const onSubmit = async (data: RegisterSchemaType) => {
-    setIsLoading(true);
-
     try {
-      // TODO: API integration
-      // Example:
-      // await registerMutation.mutateAsync({
-      //   full_name: data.fullName,
-      //   email: data.email,
-      //   phone: data.phoneNumber,
-      //   password: data.password,
-      //   confirm_password: data.confirmPassword,
-      // });
+      const payload = {
+        email: data.email,
+        password: data.password,
+        confirm_password: data.confirmPassword,
+        full_name: data.fullName,
+        phone: data.phoneNumber,
+      };
+
+      console.log("[Submitting Register Form]:", payload);
+      const res = await registerApi(payload).unwrap();
+      console.log("[Register API Success Response]:", res);
 
       toast.show({
         label: "Account Created!",
-        description: "Please enter the verification code sent to your email.",
+        description:
+          res?.details ||
+          "Please enter the verification code sent to your email.",
         variant: "success",
         placement: "top",
       });
@@ -81,15 +83,23 @@ export default function RegisterScreen() {
         pathname: "/auth/otp-code",
         params: { email: data.email, type: "register" },
       } as Href);
-    } catch {
+    } catch (error: any) {
+      console.error("[Register API Error Response]:", error);
+      const errorMessage =
+        error?.data?.details ||
+        error?.data?.message ||
+        error?.message ||
+        "Registration failed. Please try again.";
+
       toast.show({
         label: "Registration Failed",
-        description: "Registration failed. Please try again.",
+        description:
+          typeof errorMessage === "string"
+            ? errorMessage
+            : JSON.stringify(errorMessage),
         variant: "danger",
         placement: "top",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 

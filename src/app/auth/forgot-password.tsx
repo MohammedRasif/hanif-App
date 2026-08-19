@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { Href } from "expo-router";
 import { Stack, useRouter } from "expo-router";
 import { Button, useToast } from "heroui-native";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { z } from "zod";
@@ -10,6 +9,7 @@ import { z } from "zod";
 import { AuthInput } from "@/components/auth";
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
+import { useForgotPasswordMutation } from "@/Redux/feature/auth";
 
 const forgotPasswordSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -20,7 +20,7 @@ type ForgotPasswordSchemaType = z.infer<typeof forgotPasswordSchema>;
 export default function ForgotPasswordScreen() {
   const router = useRouter();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const [forgotPasswordApi, { isLoading }] = useForgotPasswordMutation();
 
   const {
     control,
@@ -35,18 +35,19 @@ export default function ForgotPasswordScreen() {
   });
 
   const onSubmit = async (data: ForgotPasswordSchemaType) => {
-    setIsLoading(true);
-
     try {
-      // TODO: API integration
-      // Example:
-      // await forgotPasswordMutation.mutateAsync({
-      //   email: data.email,
-      // });
+      const payload = {
+        email: data.email,
+      };
+
+      console.log("[Submitting Forgot Password Form]:", payload);
+      const res = await forgotPasswordApi(payload).unwrap();
+      console.log("[Forgot Password API Success Response]:", res);
 
       toast.show({
         label: "OTP Code Sent",
-        description: "Please check your email for the reset code.",
+        description:
+          res?.details || "Please check your email for the reset code.",
         variant: "success",
         placement: "top",
       });
@@ -55,16 +56,23 @@ export default function ForgotPasswordScreen() {
         pathname: "/auth/otp-code",
         params: { email: data.email, type: "forgot-password" },
       } as Href);
-    } catch {
+    } catch (error: any) {
+      console.error("[Forgot Password API Error Response]:", error);
+      const errorMessage =
+        error?.data?.details ||
+        error?.data?.message ||
+        error?.message ||
+        "Failed to send reset code. Please check your email address.";
+
       toast.show({
         label: "Error Sending Code",
         description:
-          "Failed to send reset code. Please check your email address.",
+          typeof errorMessage === "string"
+            ? errorMessage
+            : JSON.stringify(errorMessage),
         variant: "danger",
         placement: "top",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 

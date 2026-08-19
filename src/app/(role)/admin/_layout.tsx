@@ -57,7 +57,7 @@ export function AdminLayout() {
 
       {/* 4. Admin Profile Tab */}
       <Tabs.Screen
-        name="profile/index"
+        name="profile"
         options={{
           title: "Profile",
           tabBarIcon: ({ color, focused }) => (
@@ -68,6 +68,29 @@ export function AdminLayout() {
               iconName="person-outline"
             />
           ),
+        }}
+      />
+
+      {/* Hidden Sub-Routes (Accessible via navigation, NOT visible on bottom tab bar) */}
+      <Tabs.Screen
+        name="client/group-client-select"
+        options={{
+          href: null,
+          tabBarItemStyle: { display: "none" },
+        }}
+      />
+      <Tabs.Screen
+        name="client/group-client-message"
+        options={{
+          href: null,
+          tabBarItemStyle: { display: "none" },
+        }}
+      />
+      <Tabs.Screen
+        name="client/group-client-message-send"
+        options={{
+          href: null,
+          tabBarItemStyle: { display: "none" },
         }}
       />
     </Tabs>

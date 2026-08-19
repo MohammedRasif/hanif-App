@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { Href } from "expo-router";
 import { Link, Stack, useRouter } from "expo-router";
 import { Button, useToast } from "heroui-native";
-import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { z } from "zod";
@@ -10,6 +9,7 @@ import { z } from "zod";
 import { AuthHeader, AuthInput, SocialAuth } from "@/components/auth";
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
+import { useLoginMutation } from "@/Redux/feature/auth";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
@@ -22,8 +22,7 @@ type LoginSchemaType = z.infer<typeof loginSchema>;
 export default function LoginScreen() {
   const router = useRouter();
   const { toast } = useToast();
-
-  const [isLoading, setIsLoading] = useState(false);
+  const [loginApi, { isLoading }] = useLoginMutation();
 
   const {
     control,
@@ -39,35 +38,49 @@ export default function LoginScreen() {
     mode: "onChange",
   });
 
-  const onSubmit = async (_data: LoginSchemaType) => {
-    setIsLoading(true);
-
+  const onSubmit = async (data: LoginSchemaType) => {
     try {
-      // TODO: API integration
-      // Example:
-      // const res = await loginMutation.mutateAsync({
-      //   email: _data.email,
-      //   password: _data.password,
-      // });
-      // setAuth({ access: res.access, refresh: res.refresh }, res.user);
+      const payload = {
+        email: data.email,
+        password: data.password,
+      };
+
+      console.log("[Submitting Login Form]:", payload);
+      const res = await loginApi(payload).unwrap();
+      console.log("[Login API Success Response]:", res);
 
       toast.show({
         label: "Welcome back!",
-        description: "Logged in successfully.",
+        description: res?.details || "Logged in successfully.",
         variant: "success",
         placement: "top",
       });
 
-      router.replace("/(role)/user" as Href);
-    } catch {
+      const role = res?.data?.user?.role || "USER";
+      if (role === "ADMIN") {
+        router.replace("/(role)/admin" as Href);
+      } else if (role === "STAFF") {
+        router.replace("/(role)/staff" as Href);
+      } else {
+        router.replace("/(role)/user" as Href);
+      }
+    } catch (error: any) {
+      console.error("[Login API Error Response]:", error);
+      const errorMessage =
+        error?.data?.details ||
+        error?.data?.message ||
+        error?.message ||
+        "Login failed. Please check your credentials.";
+
       toast.show({
         label: "Login Failed",
-        description: "Login failed. Please check your credentials.",
+        description:
+          typeof errorMessage === "string"
+            ? errorMessage
+            : JSON.stringify(errorMessage),
         variant: "danger",
         placement: "top",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 

@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { Href } from "expo-router";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Button, useToast } from "heroui-native";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Pressable, Text, View } from "react-native";
 import { z } from "zod";
@@ -10,6 +9,7 @@ import { z } from "zod";
 import { AuthInput } from "@/components/auth";
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
+import { useResetPasswordMutation } from "@/Redux/feature/auth";
 
 const changePasswordSchema = z
   .object({
@@ -31,7 +31,7 @@ export default function ChangePasswordScreen() {
     otp?: string;
   }>();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [resetPasswordApi, { isLoading }] = useResetPasswordMutation();
 
   const {
     control,
@@ -47,35 +47,44 @@ export default function ChangePasswordScreen() {
   });
 
   const onSubmit = async (_data: ChangePasswordSchemaType) => {
-    setIsLoading(true);
-
     try {
-      // TODO: API integration
-      // Example:
-      // await resetPasswordMutation.mutateAsync({
-      //   email: email || "",
-      //   otp: otp || "",
-      //   new_password: _data.password,
-      //   confirm_password: _data.confirmPassword,
-      // });
+      const payload = {
+        email: _email || "",
+        otp: _otp || "",
+        new_password: _data.password,
+        confirm_password: _data.confirmPassword,
+      };
+
+      console.log("[Submitting Reset Password Form]:", payload);
+      const res = await resetPasswordApi(payload).unwrap();
+      console.log("[Reset Password API Success Response]:", res);
 
       toast.show({
         label: "Password Reset Successful",
-        description: "Your password has been reset. Please log in.",
+        description:
+          res?.details || "Your password has been reset. Please log in.",
         variant: "success",
         placement: "top",
       });
 
       router.replace("/auth/login" as Href);
-    } catch {
+    } catch (error: any) {
+      console.error("[Reset Password API Error Response]:", error);
+      const errorMessage =
+        error?.data?.details ||
+        error?.data?.message ||
+        error?.message ||
+        "Password reset failed. Please try again.";
+
       toast.show({
         label: "Reset Failed",
-        description: "Password reset failed. Please try again.",
+        description:
+          typeof errorMessage === "string"
+            ? errorMessage
+            : JSON.stringify(errorMessage),
         variant: "danger",
         placement: "top",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 

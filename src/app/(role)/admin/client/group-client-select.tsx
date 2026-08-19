@@ -3,7 +3,7 @@ import { Container } from "@/components/container";
 import { useRouter } from "expo-router";
 import React from "react";
 
-export default function GroupClientSelect() {
+export default function AdminGroupClientSelect() {
   const router = useRouter();
 
   return (
@@ -11,8 +11,8 @@ export default function GroupClientSelect() {
       <GroupClientSelectView
         onBack={() => router.back()}
         onProceed={(selectedIds) => {
-          console.log("Proceed with clients:", selectedIds);
-          router.push("/(role)/staff/client/group-client-message-send");
+          console.log("Admin proceed with clients:", selectedIds);
+          router.push("/(role)/admin/client/group-client-message-send");
         }}
       />
     </Container>

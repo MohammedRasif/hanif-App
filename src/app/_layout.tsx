@@ -20,6 +20,9 @@ export const unstable_settings = {
   initialRouteName: "index",
 };
 
+import { Provider } from "react-redux";
+import { store } from "@/Redux/store";
+
 export default function Layout() {
   const [queryClient] = useState(() => new QueryClient());
   const [fontsLoaded] = useFonts({
@@ -40,26 +43,28 @@ export default function Layout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <KeyboardProvider>
-        <AppThemeProvider>
-          <HeroUINativeProvider
-            config={{
-              devInfo: { stylingPrinciples: false },
-              toast: {
-                defaultProps: {
-                  placement: "top",
+    <Provider store={store}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <KeyboardProvider>
+          <AppThemeProvider>
+            <HeroUINativeProvider
+              config={{
+                devInfo: { stylingPrinciples: false },
+                toast: {
+                  defaultProps: {
+                    placement: "top",
+                  },
                 },
-              },
-            }}
-          >
-            <QueryClientProvider client={queryClient}>
-              <StackLayout />
-            </QueryClientProvider>
-          </HeroUINativeProvider>
-        </AppThemeProvider>
-      </KeyboardProvider>
-    </GestureHandlerRootView>
+              }}
+            >
+              <QueryClientProvider client={queryClient}>
+                <StackLayout />
+              </QueryClientProvider>
+            </HeroUINativeProvider>
+          </AppThemeProvider>
+        </KeyboardProvider>
+      </GestureHandlerRootView>
+    </Provider>
   );
 }
 
