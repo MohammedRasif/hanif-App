@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import { AuthInput } from "@/components/auth";
 import { Container } from "@/components/container";
-import { StyledIcons } from "@/lib";
+import { getErrorMessage, StyledIcons } from "@/lib";
 import { useResetPasswordMutation } from "@/Redux/feature/auth";
 
 const changePasswordSchema = z
@@ -70,18 +70,14 @@ export default function ChangePasswordScreen() {
       router.replace("/auth/login" as Href);
     } catch (error: any) {
       console.error("[Reset Password API Error Response]:", error);
-      const errorMessage =
-        error?.data?.details ||
-        error?.data?.message ||
-        error?.message ||
-        "Password reset failed. Please try again.";
+      const errorMessage = getErrorMessage(
+        error,
+        "Password reset failed. Please try again.",
+      );
 
       toast.show({
         label: "Reset Failed",
-        description:
-          typeof errorMessage === "string"
-            ? errorMessage
-            : JSON.stringify(errorMessage),
+        description: errorMessage,
         variant: "danger",
         placement: "top",
       });

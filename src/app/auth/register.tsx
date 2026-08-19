@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import { AuthHeader, AuthInput, SocialAuth } from "@/components/auth";
 import { Container } from "@/components/container";
-import { StyledIcons } from "@/lib";
+import { getErrorMessage, StyledIcons } from "@/lib";
 import { useRegisterMutation } from "@/Redux/feature/auth";
 
 const registerSchema = z
@@ -85,18 +85,14 @@ export default function RegisterScreen() {
       } as Href);
     } catch (error: any) {
       console.error("[Register API Error Response]:", error);
-      const errorMessage =
-        error?.data?.details ||
-        error?.data?.message ||
-        error?.message ||
-        "Registration failed. Please try again.";
+      const errorMessage = getErrorMessage(
+        error,
+        "Registration failed. Please try again.",
+      );
 
       toast.show({
         label: "Registration Failed",
-        description:
-          typeof errorMessage === "string"
-            ? errorMessage
-            : JSON.stringify(errorMessage),
+        description: errorMessage,
         variant: "danger",
         placement: "top",
       });

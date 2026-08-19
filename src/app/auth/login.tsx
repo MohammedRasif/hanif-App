@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import { AuthHeader, AuthInput, SocialAuth } from "@/components/auth";
 import { Container } from "@/components/container";
-import { StyledIcons } from "@/lib";
+import { getErrorMessage, StyledIcons } from "@/lib";
 import { useLoginMutation } from "@/Redux/feature/auth";
 
 const loginSchema = z.object({
@@ -66,18 +66,14 @@ export default function LoginScreen() {
       }
     } catch (error: any) {
       console.error("[Login API Error Response]:", error);
-      const errorMessage =
-        error?.data?.details ||
-        error?.data?.message ||
-        error?.message ||
-        "Login failed. Please check your credentials.";
+      const errorMessage = getErrorMessage(
+        error,
+        "Login failed. Please check your credentials.",
+      );
 
       toast.show({
         label: "Login Failed",
-        description:
-          typeof errorMessage === "string"
-            ? errorMessage
-            : JSON.stringify(errorMessage),
+        description: errorMessage,
         variant: "danger",
         placement: "top",
       });

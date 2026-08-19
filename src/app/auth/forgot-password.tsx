@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import { AuthInput } from "@/components/auth";
 import { Container } from "@/components/container";
-import { StyledIcons } from "@/lib";
+import { getErrorMessage, StyledIcons } from "@/lib";
 import { useForgotPasswordMutation } from "@/Redux/feature/auth";
 
 const forgotPasswordSchema = z.object({
@@ -58,18 +58,14 @@ export default function ForgotPasswordScreen() {
       } as Href);
     } catch (error: any) {
       console.error("[Forgot Password API Error Response]:", error);
-      const errorMessage =
-        error?.data?.details ||
-        error?.data?.message ||
-        error?.message ||
-        "Failed to send reset code. Please check your email address.";
+      const errorMessage = getErrorMessage(
+        error,
+        "Failed to send reset code. Please check your email address.",
+      );
 
       toast.show({
         label: "Error Sending Code",
-        description:
-          typeof errorMessage === "string"
-            ? errorMessage
-            : JSON.stringify(errorMessage),
+        description: errorMessage,
         variant: "danger",
         placement: "top",
       });

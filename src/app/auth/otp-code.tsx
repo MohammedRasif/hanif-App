@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { Container } from "@/components/container";
-import { StyledIcons } from "@/lib";
+import { getErrorMessage, StyledIcons } from "@/lib";
 import {
   useResendOtpMutation,
   useVerifyOtpMutation,
@@ -76,18 +76,14 @@ export default function OtpCodeScreen() {
       }
     } catch (error: any) {
       console.error("[Verify OTP API Error Response]:", error);
-      const errorMessage =
-        error?.data?.details ||
-        error?.data?.message ||
-        error?.message ||
-        "Invalid verification code. Please try again.";
+      const errorMessage = getErrorMessage(
+        error,
+        "Invalid verification code. Please try again.",
+      );
 
       toast.show({
         label: "Verification Failed",
-        description:
-          typeof errorMessage === "string"
-            ? errorMessage
-            : JSON.stringify(errorMessage),
+        description: errorMessage,
         variant: "danger",
         placement: "top",
       });
@@ -119,18 +115,11 @@ export default function OtpCodeScreen() {
       setTimer(45);
     } catch (error: any) {
       console.error("[Resend OTP API Error Response]:", error);
-      const errorMessage =
-        error?.data?.details ||
-        error?.data?.message ||
-        error?.message ||
-        "Failed to resend code.";
+      const errorMessage = getErrorMessage(error, "Failed to resend code.");
 
       toast.show({
         label: "Resend Failed",
-        description:
-          typeof errorMessage === "string"
-            ? errorMessage
-            : JSON.stringify(errorMessage),
+        description: errorMessage,
         variant: "danger",
         placement: "top",
       });
