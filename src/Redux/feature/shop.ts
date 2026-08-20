@@ -167,6 +167,7 @@ export const shopApi = baseApi.injectEndpoints({
       providesTags: ["Shop"],
     }),
   }),
+  overrideExisting: true,
 });
 
 export const {
