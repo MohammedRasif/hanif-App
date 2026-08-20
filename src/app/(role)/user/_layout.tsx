@@ -68,6 +68,14 @@ export default function UserLayout() {
         name="salon/choose-a-service"
         options={{ href: null, tabBarItemStyle: { display: "none" } }}
       />
+      <Tabs.Screen
+        name="salon/choose-time"
+        options={{ href: null, tabBarItemStyle: { display: "none" } }}
+      />
+      <Tabs.Screen
+        name="salon/confirm"
+        options={{ href: null, tabBarItemStyle: { display: "none" } }}
+      />
     </Tabs>
   );
 }

@@ -1,6 +1,7 @@
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
 import { Image } from "expo-image";
+import type { Href } from "expo-router";
 import { Stack, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, Text, View } from "react-native";
@@ -66,13 +67,27 @@ const PROFESSIONALS: Professional[] = [
 
 export default function ChooseAProphetical() {
   const router = useRouter();
-  const [selectedId, setSelectedId] = useState<string>("anyone");
+  const [selectedId, setSelectedId] = useState<string>("2");
+
+  const handleSelectProfessional = (pro: Professional) => {
+    setSelectedId(pro.id);
+    router.push({
+      pathname: "/(role)/user/salon/choose-a-service",
+      params: {
+        barberId: pro.id,
+        barberName: pro.isAnyone ? "Anyone" : pro.name,
+        barberImage: pro.image || "",
+        availability: pro.availability,
+        isAvailableToday: pro.isAvailableToday ? "true" : "false",
+      },
+    } as Href);
+  };
 
   return (
     <Container isScrollable={true}>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <View className="flex-1 bg-white relative pb-24">
+      <View className="flex-1 bg-white relative pb-12">
         {/* Top Header */}
         <View className="flex-row items-center px-6 pt-6 pb-4">
           <Pressable
@@ -102,7 +117,7 @@ export default function ChooseAProphetical() {
                     : "border-gray-100"
                 }`}
                 key={pro.id}
-                onPress={() => setSelectedId(pro.id)}
+                onPress={() => handleSelectProfessional(pro)}
               >
                 {pro.isAnyone ? (
                   <View className="h-32 w-full items-center justify-center rounded-xl bg-gray-50/50">
@@ -137,25 +152,6 @@ export default function ChooseAProphetical() {
             );
           })}
         </View>
-      </View>
-
-      {/* Bottom Sticky Action Bar */}
-      <View className="border-t border-gray-100 bg-white px-6 py-4 flex-row items-center justify-between shadow-lg">
-        <View>
-          <Text className="font-poppins text-xs text-gray-400">3hr</Text>
-          <Text className="font-poppins-bold text-xl text-gray-900">
-            $12000
-          </Text>
-        </View>
-
-        <Pressable
-          className="rounded-2xl bg-[#FE9A00] px-8 py-3.5 active:opacity-90"
-          onPress={() => router.push("/(role)/user/salon/confirm" as any)}
-        >
-          <Text className="font-poppins-semibold text-sm text-white">
-            Book Now
-          </Text>
-        </Pressable>
       </View>
     </Container>
   );
