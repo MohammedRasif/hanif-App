@@ -38,6 +38,28 @@ export const authentication = createApi({
       invalidatesTags: ["User"],
     }),
 
+    registerVerifyOtp: builder.mutation({
+      query: (data) => {
+        console.log(
+          "[Auth API Request - Register Verify OTP]:",
+          JSON.stringify(data, null, 2),
+        );
+        return {
+          url: "v1/auth/verify-email/",
+          method: "POST",
+          body: data, // { email, otp }
+        };
+      },
+      transformResponse: (response: any) => {
+        console.log(
+          "[Auth API Response - Register Verify OTP]:",
+          JSON.stringify(response, null, 2),
+        );
+        return response;
+      },
+      invalidatesTags: ["User"],
+    }),
+
     // Verify OTP API: {{baseUrl}}/v1/auth/password/verify-otp/
     verifyOtp: builder.mutation({
       query: (data) => {
@@ -192,6 +214,7 @@ export const authentication = createApi({
 
 export const {
   useRegisterMutation,
+  useRegisterVerifyOtpMutation,
   useVerifyOtpMutation,
   useResendOtpMutation,
   useLoginMutation,

@@ -7,6 +7,7 @@ import { Pressable, Text, View } from "react-native";
 import { Container } from "@/components/container";
 import { getErrorMessage, StyledIcons } from "@/lib";
 import {
+  useRegisterVerifyOtpMutation,
   useResendOtpMutation,
   useVerifyOtpMutation,
 } from "@/Redux/feature/auth";
@@ -20,8 +21,13 @@ export default function OtpCodeScreen() {
   }>();
 
   const [timer, setTimer] = useState(45);
-  const [verifyOtpApi, { isLoading: isVerifying }] = useVerifyOtpMutation();
+  const [registerVerifyOtpApi, { isLoading: isRegisterVerifying }] =
+    useRegisterVerifyOtpMutation();
+  const [verifyOtpApi, { isLoading: isForgetVerifying }] =
+    useVerifyOtpMutation();
   const [resendOtpApi, { isLoading: isResending }] = useResendOtpMutation();
+
+  const isVerifying = isRegisterVerifying || isForgetVerifying;
 
   useEffect(() => {
     if (timer <= 0) {
@@ -41,11 +47,12 @@ export default function OtpCodeScreen() {
     };
 
     try {
-      console.log("[Submitting Verify OTP Form]:", payload);
-      const res = await verifyOtpApi(payload).unwrap();
-      console.log("[Verify OTP API Success Response]:", res);
+      console.log("[Submitting Verify OTP Form]:", payload, "Type:", type);
 
       if (type === "register") {
+        const res = await registerVerifyOtpApi(payload).unwrap();
+        console.log("[Register Verify OTP API Success Response]:", res);
+
         toast.show({
           label: "Email Verified!",
           description: res?.details || "Email verified successfully.",
@@ -62,6 +69,9 @@ export default function OtpCodeScreen() {
           router.replace("/(role)/user" as Href);
         }
       } else {
+        const res = await verifyOtpApi(payload).unwrap();
+        console.log("[Verify OTP API Success Response]:", res);
+
         toast.show({
           label: "Code Verified!",
           description: "Please enter your new password.",
