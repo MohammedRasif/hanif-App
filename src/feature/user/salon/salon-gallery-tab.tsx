@@ -1,30 +1,66 @@
+import { useGetShopGalleryQuery } from "@/Redux/feature/shop";
 import { Image } from "expo-image";
 import React from "react";
-import { View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 
-const GALLERY_IMAGES = [
-  "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=400&q=80",
-  "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=400&q=80",
-];
+interface SalonGalleryTabProps {
+  shopId?: string | number;
+}
 
-export const SalonGalleryTab = () => {
+export const SalonGalleryTab: React.FC<SalonGalleryTabProps> = ({ shopId }) => {
+  const {
+    data: galleryResponse,
+    isLoading,
+    isError,
+  } = useGetShopGalleryQuery(shopId || "", { skip: !shopId });
+
+  const galleryList = Array.isArray(galleryResponse?.data)
+    ? galleryResponse.data
+    : Array.isArray(galleryResponse)
+      ? galleryResponse
+      : [];
+
+  if (isLoading) {
+    return (
+      <View className="py-8 items-center justify-center">
+        <ActivityIndicator color="#F0B100" size="small" />
+        <Text className="mt-2 font-poppins text-xs text-gray-500">
+          Loading gallery...
+        </Text>
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View className="py-6 items-center justify-center">
+        <Text className="font-poppins text-xs text-red-500">
+          Failed to load gallery images.
+        </Text>
+      </View>
+    );
+  }
+
+  if (!Array.isArray(galleryList) || galleryList.length === 0) {
+    return (
+      <View className="py-8 items-center justify-center">
+        <Text className="font-poppins-medium text-sm text-gray-500">
+          No gallery images available.
+        </Text>
+      </View>
+    );
+  }
+
   return (
-    <View className="flex-row flex-wrap justify-between gap-y-3.5 pt-2">
-      {GALLERY_IMAGES.map((imgUri, index) => (
+    <View className="flex-row flex-wrap gap-y-3.5 pt-2">
+      {galleryList.map((item, index) => (
         <View
-          className="aspect-square w-[31%] overflow-hidden rounded-2xl bg-gray-100"
-          key={index}
+          className="aspect-square w-[31%] mr-[2%] overflow-hidden rounded-2xl bg-gray-100"
+          key={item.id || index}
         >
           <Image
             contentFit="cover"
-            source={{ uri: imgUri }}
+            source={{ uri: item.image }}
             style={{ height: "100%", width: "100%" }}
           />
         </View>

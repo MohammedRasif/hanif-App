@@ -7,12 +7,13 @@ import {
   SalonTabs,
 } from "@/feature/user/salon";
 import { StyledIcons } from "@/lib";
+import { useGetShopDetailsQuery } from "@/Redux/feature/shop";
 import { Image } from "expo-image";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Pressable, Share, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, Share, Text, View } from "react-native";
 
-const SALON_COVER_IMAGE =
+const SALON_COVER_IMAGE_FALLBACK =
   "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=800&q=80";
 
 const TABS = [
@@ -24,18 +25,29 @@ const TABS = [
 
 export default function SalonDetailScreen() {
   const router = useRouter();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState("barbers-services");
+
+  const { data: detailsResponse, isLoading } = useGetShopDetailsQuery(
+    id || "",
+    { skip: !id },
+  );
+
+  const shopDetails = detailsResponse?.data;
 
   const handleShare = async () => {
     try {
       await Share.share({
-        message: "Check out Barbers Bay - Glam Beauty Salon!",
-        title: "Barbers Bay",
+        message: `Check out ${shopDetails?.name || "Salon"} on our app!`,
+        title: shopDetails?.name || "Salon",
       });
     } catch (error) {
       console.error("Error sharing salon details:", error);
     }
   };
+
+  const coverUri =
+    shopDetails?.cover_image || shopDetails?.logo || SALON_COVER_IMAGE_FALLBACK;
 
   return (
     <Container isScrollable={true}>
@@ -46,7 +58,7 @@ export default function SalonDetailScreen() {
         <View className="relative h-64 w-full bg-gray-100">
           <Image
             contentFit="cover"
-            source={{ uri: SALON_COVER_IMAGE }}
+            source={{ uri: coverUri }}
             style={{ width: "100%", height: "100%" }}
           />
 
@@ -80,34 +92,49 @@ export default function SalonDetailScreen() {
 
         {/* Salon Summary Info */}
         <View className="px-6 pt-5 pb-3">
-          <View className="flex-row items-center justify-between">
-            <Text className="font-poppins-bold text-2xl text-gray-900 tracking-tight">
-              Barbers Bay
-            </Text>
+          {isLoading && !shopDetails ? (
+            <ActivityIndicator color="#F0B100" size="small" />
+          ) : (
+            <>
+              <View className="flex-row items-center justify-between">
+                <Text className="font-poppins-bold text-2xl text-gray-900 tracking-tight flex-1 pr-2">
+                  {shopDetails?.name || "Salon Details"}
+                </Text>
 
-            {/* Rating */}
-            <View className="flex-row items-center gap-1">
-              <StyledIcons className="text-[#F0B100]" name="star" size={18} />
-              <Text className="font-poppins-bold text-base text-gray-900">
-                4.9
-              </Text>
-              <Text className="font-poppins text-sm text-gray-400">
-                (243 reviews)
-              </Text>
-            </View>
-          </View>
+                {/* Rating */}
+                <View className="flex-row items-center gap-1">
+                  <StyledIcons
+                    className="text-[#F0B100]"
+                    name="star"
+                    size={18}
+                  />
+                  <Text className="font-poppins-bold text-base text-gray-900">
+                    4.9
+                  </Text>
+                  <Text className="font-poppins text-sm text-gray-400">
+                    (reviews)
+                  </Text>
+                </View>
+              </View>
 
-          {/* Open Status Row */}
-          <View className="mt-2 flex-row items-center gap-2">
-            <View className="rounded-full bg-[#00B049] px-3 py-1">
-              <Text className="font-poppins-medium text-xs text-white">
-                Open Now
-              </Text>
-            </View>
-            <Text className="font-poppins text-xs text-gray-500">
-              • Closes at 8:00 PM
-            </Text>
-          </View>
+              {/* Location / Status Row */}
+              <View className="mt-2 flex-row items-center gap-2">
+                <View className="rounded-full bg-[#00B049] px-3 py-1">
+                  <Text className="font-poppins-medium text-xs text-white">
+                    Open Now
+                  </Text>
+                </View>
+                {shopDetails?.location ? (
+                  <Text
+                    className="font-poppins text-xs text-gray-500 flex-1"
+                    numberOfLines={1}
+                  >
+                    • {shopDetails.location}
+                  </Text>
+                ) : null}
+              </View>
+            </>
+          )}
         </View>
 
         {/* Custom Salon Tabs */}
@@ -120,13 +147,17 @@ export default function SalonDetailScreen() {
 
           {/* Active Tab Content */}
           <View className="pt-4">
-            {activeTab === "barbers-services" && <BarberSandServices />}
+            {activeTab === "barbers-services" && (
+              <BarberSandServices shopId={id} />
+            )}
 
-            {activeTab === "reviews" && <SalonReviewsTab />}
+            {activeTab === "reviews" && <SalonReviewsTab shopId={id} />}
 
-            {activeTab === "gallery" && <SalonGalleryTab />}
+            {activeTab === "gallery" && <SalonGalleryTab shopId={id} />}
 
-            {activeTab === "details" && <SalonDetailsTab />}
+            {activeTab === "details" && (
+              <SalonDetailsTab shopDetails={shopDetails} shopId={id} />
+            )}
           </View>
         </View>
       </View>
