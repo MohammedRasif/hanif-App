@@ -2,7 +2,7 @@ import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
 import { Image } from "expo-image";
 import type { Href } from "expo-router";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
@@ -67,18 +67,26 @@ const PROFESSIONALS: Professional[] = [
 
 export default function ChooseAProphetical() {
   const router = useRouter();
+  const params = useLocalSearchParams<{
+    shopId?: string;
+    serviceId?: string;
+    serviceName?: string;
+    selectedServices?: string;
+  }>();
+
   const [selectedId, setSelectedId] = useState<string>("2");
 
   const handleSelectProfessional = (pro: Professional) => {
     setSelectedId(pro.id);
     router.push({
-      pathname: "/(role)/user/salon/choose-a-service",
+      pathname: "/(role)/user/salon/choose-time",
       params: {
         barberId: pro.id,
         barberName: pro.isAnyone ? "Anyone" : pro.name,
         barberImage: pro.image || "",
         availability: pro.availability,
         isAvailableToday: pro.isAvailableToday ? "true" : "false",
+        selectedServices: params.selectedServices || "[]",
       },
     } as Href);
   };
@@ -101,7 +109,7 @@ export default function ChooseAProphetical() {
             />
           </Pressable>
           <Text className="flex-1 text-center pr-10 font-poppins-bold text-lg text-gray-900">
-            Choose a proffetinal
+            Choose a professional
           </Text>
         </View>
 

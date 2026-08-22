@@ -76,7 +76,23 @@ export const BarberSandServices: React.FC<BarberSandServicesProps> = ({
             const reviewsCount = barber.review?.count || 0;
 
             return (
-              <View className="items-center" key={barber.id}>
+              <Pressable
+                className="items-center active:opacity-80"
+                key={barber.id}
+                onPress={() =>
+                  router.push({
+                    pathname: "/(role)/user/salon/choose-a-service",
+                    params: {
+                      barberId: String(barber.id),
+                      barberName: name,
+                      barberImage: avatar,
+                      shopId: String(shopId || ""),
+                      rating,
+                      reviewsCount: String(reviewsCount),
+                    },
+                  })
+                }
+              >
                 <Image
                   contentFit="cover"
                   source={{ uri: avatar }}
@@ -99,7 +115,7 @@ export const BarberSandServices: React.FC<BarberSandServicesProps> = ({
                 <Text className="mt-1 font-poppins-medium text-xs text-gray-600 text-center">
                   {name}
                 </Text>
-              </View>
+              </Pressable>
             );
           })}
         </ScrollView>
@@ -134,9 +150,26 @@ export const BarberSandServices: React.FC<BarberSandServicesProps> = ({
           {services.map((service) => (
             <Pressable
               onPress={() =>
-                router.push("/(role)/user/salon/choose-a-proffetinal")
+                router.push({
+                  pathname: "/(role)/user/salon/choose-a-proffetinal",
+                  params: {
+                    shopId: String(shopId || ""),
+                    serviceId: String(service.id),
+                    serviceName: service.name,
+                    servicePrice: `$${service.price}`,
+                    serviceDuration: `${service.duration_minutes} min`,
+                    selectedServices: JSON.stringify([
+                      {
+                        id: String(service.id),
+                        title: service.name,
+                        price: `$${service.price}`,
+                        duration: `${service.duration_minutes} min`,
+                      },
+                    ]),
+                  },
+                })
               }
-              className="flex-row items-center justify-between rounded-2xl bg-gray-50/80 p-4"
+              className="flex-row items-center justify-between rounded-2xl bg-gray-50/80 p-4 active:bg-gray-100"
               key={service.id}
             >
               <View className="flex-1 pr-3">
