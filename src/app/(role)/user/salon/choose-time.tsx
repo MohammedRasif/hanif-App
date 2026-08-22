@@ -1,9 +1,16 @@
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
+import { useGetAvailableSlotsQuery } from "@/Redux/feature/shop";
 import type { Href } from "expo-router";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import React, { useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 
 const MONTH_NAMES = [
   "January",
@@ -22,31 +29,64 @@ const MONTH_NAMES = [
 
 const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-const TIME_SLOTS = [
-  "9:00 AM",
-  "10:00 AM",
-  "11:00 AM",
-  "12:00 PM",
-  "1:00 PM",
-  "2:00 PM",
-  "3:00 PM",
-  "4:00 PM",
-  "5:00 PM",
+const FALLBACK_TIME_SLOTS = [
+  "09:00:00",
+  "10:00:00",
+  "11:00:00",
+  "12:00:00",
+  "13:00:00",
+  "14:00:00",
+  "15:00:00",
+  "16:00:00",
+  "17:00:00",
 ];
 
 export default function ChooseTimeScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{
+    shopId?: string;
     barberId?: string;
+    barberUserId?: string;
     barberName?: string;
     barberImage?: string;
+    serviceId?: string;
     selectedServices?: string;
   }>();
 
-  const [currentYear, setCurrentYear] = useState(2026);
-  const [currentMonthIndex, setCurrentMonthIndex] = useState(6); // July (0-indexed 6)
-  const [selectedDay, setSelectedDay] = useState(18);
-  const [selectedTime, setSelectedTime] = useState("9:00 AM");
+  const today = new Date();
+  const [currentYear, setCurrentYear] = useState(today.getFullYear());
+  const [currentMonthIndex, setCurrentMonthIndex] = useState(today.getMonth());
+  const [selectedDay, setSelectedDay] = useState(today.getDate());
+  const [selectedTime, setSelectedTime] = useState("10:00:00");
+
+  const formattedDate = useMemo(() => {
+    const yearStr = currentYear.toString();
+    const monthStr = String(currentMonthIndex + 1).padStart(2, "0");
+    const dayStr = String(selectedDay).padStart(2, "0");
+    return `${yearStr}-${monthStr}-${dayStr}`;
+  }, [currentYear, currentMonthIndex, selectedDay]);
+
+  const { data: slotsResponse, isLoading } = useGetAvailableSlotsQuery(
+    {
+      barber_id: params.barberId || "2",
+      date: formattedDate,
+      services: params.serviceId || "1",
+    },
+    { skip: !params.barberId && !params.serviceId },
+  );
+
+  const availableSlots: string[] = useMemo(() => {
+    if (slotsResponse?.data) {
+      if (Array.isArray(slotsResponse.data)) {
+        return slotsResponse.data.map((item: any) =>
+          typeof item === "string"
+            ? item
+            : item?.start_time || item?.time || String(item),
+        );
+      }
+    }
+    return FALLBACK_TIME_SLOTS;
+  }, [slotsResponse]);
 
   const handlePrevMonth = () => {
     if (currentMonthIndex === 0) {
@@ -78,18 +118,38 @@ export default function ChooseTimeScreen() {
     daysGrid.push(d);
   }
 
-  const shortMonthName = MONTH_NAMES[currentMonthIndex].substring(0, 3);
+  const monthName = MONTH_NAMES[currentMonthIndex] || "July";
+  const shortMonthName = monthName.substring(0, 3);
   const selectedDateLabel = `${shortMonthName} ${selectedDay}`;
+
+  const formatDisplayTime = (timeStr: string) => {
+    if (!timeStr) return "";
+    if (timeStr.includes("AM") || timeStr.includes("PM")) return timeStr;
+    const parts = timeStr.split(":");
+    if (parts.length >= 2 && parts[0] !== undefined && parts[1] !== undefined) {
+      let hour = Number.parseInt(parts[0], 10);
+      const minutes = parts[1];
+      const ampm = hour >= 12 ? "PM" : "AM";
+      hour = hour % 12 || 12;
+      return `${hour}:${minutes} ${ampm}`;
+    }
+    return timeStr;
+  };
 
   const handleBookNow = () => {
     router.push({
       pathname: "/(role)/user/salon/confirm",
       params: {
+        shopId: params.shopId || "1",
+        barberId: params.barberId || "1",
+        serviceId: params.serviceId || "1",
         barberName: params.barberName || "Esther Howard",
         barberImage: params.barberImage || "",
         selectedServices: params.selectedServices || "[]",
-        selectedDate: `${selectedDay} ${MONTH_NAMES[currentMonthIndex]} ${currentYear}`,
-        selectedTime,
+        appointment_date: formattedDate,
+        start_time: selectedTime,
+        selectedDateLabel: `${selectedDay} ${monthName} ${currentYear}`,
+        selectedTimeLabel: formatDisplayTime(selectedTime),
       },
     } as Href);
   };
@@ -116,7 +176,7 @@ export default function ChooseTimeScreen() {
           </Text>
         </View>
 
-        {/* Calendar Card (Image 4) */}
+        {/* Calendar Card */}
         <View className="rounded-3xl bg-gray-50/70 p-5 border border-gray-100/60 mb-6">
           {/* Month Header Navigation */}
           <View className="flex-row items-center justify-between mb-5 px-2">
@@ -132,7 +192,7 @@ export default function ChooseTimeScreen() {
             </Pressable>
 
             <Text className="font-poppins-bold text-lg text-gray-900">
-              {MONTH_NAMES[currentMonthIndex]} {currentYear}
+              {monthName} {currentYear}
             </Text>
 
             <Pressable
@@ -194,35 +254,44 @@ export default function ChooseTimeScreen() {
           Available Times for ({selectedDateLabel})
         </Text>
 
-        {/* Time Slots Grid */}
-        <ScrollView
-          contentContainerStyle={{ gap: 13, paddingBottom: 150 }}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        >
-          {TIME_SLOTS.map((time) => {
-            const isSelected = selectedTime === time;
-            return (
-              <Pressable
-                className={`rounded-full px-5 py-3 border ${
-                  isSelected
-                    ? "bg-black border-black"
-                    : "bg-gray-50 border-gray-100 active:bg-gray-100"
-                }`}
-                key={time}
-                onPress={() => setSelectedTime(time)}
-              >
-                <Text
-                  className={`font-poppins-semibold text-xs ${
-                    isSelected ? "text-white" : "text-gray-800"
+        {/* Dynamic Time Slots Grid */}
+        {isLoading ? (
+          <View className="py-6 items-center justify-center">
+            <ActivityIndicator color="#F0B100" size="small" />
+            <Text className="mt-2 font-poppins text-xs text-gray-400">
+              Loading available slots...
+            </Text>
+          </View>
+        ) : (
+          <ScrollView
+            contentContainerStyle={{ gap: 13, paddingBottom: 60 }}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          >
+            {availableSlots.map((time) => {
+              const isSelected = selectedTime === time;
+              return (
+                <Pressable
+                  className={`rounded-full px-5 py-3 border ${
+                    isSelected
+                      ? "bg-black border-black"
+                      : "bg-gray-50 border-gray-100 active:bg-gray-100"
                   }`}
+                  key={time}
+                  onPress={() => setSelectedTime(time)}
                 >
-                  {time}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
+                  <Text
+                    className={`font-poppins-semibold text-xs ${
+                      isSelected ? "text-white" : "text-gray-800"
+                    }`}
+                  >
+                    {formatDisplayTime(time)}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        )}
       </View>
 
       {/* Bottom Sticky Action Bar */}

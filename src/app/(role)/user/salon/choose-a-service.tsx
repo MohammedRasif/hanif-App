@@ -57,6 +57,7 @@ export default function ChooseAServiceScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{
     barberId?: string;
+    barberUserId?: string;
     barberName?: string;
     barberImage?: string;
     availability?: string;
@@ -74,8 +75,11 @@ export default function ChooseAServiceScreen() {
   const reviewsCount = params.reviewsCount || "20";
 
   const { data: servicesResponse, isLoading } = useGetShopServicesQuery(
-    params.shopId || "",
-    { skip: !params.shopId },
+    {
+      shop: params.shopId,
+      barber: params.barberUserId || params.barberId,
+    },
+    { skip: !params.shopId && !params.barberUserId && !params.barberId },
   );
 
   const shopServices = Array.isArray(servicesResponse?.data)
@@ -99,9 +103,12 @@ export default function ChooseAServiceScreen() {
     router.push({
       pathname: "/(role)/user/salon/choose-time",
       params: {
+        shopId: params.shopId || "",
         barberId: params.barberId || "2",
+        barberUserId: params.barberUserId || "",
         barberName,
         barberImage,
+        serviceId: service.id,
         selectedServices: JSON.stringify([service]),
       },
     } as Href);
@@ -170,6 +177,9 @@ export default function ChooseAServiceScreen() {
         {isLoading ? (
           <View className="py-6 items-center justify-center">
             <ActivityIndicator color="#F0B100" size="small" />
+            <Text className="mt-2 font-poppins text-xs text-gray-400">
+              Loading services...
+            </Text>
           </View>
         ) : (
           <View className="gap-3.5">

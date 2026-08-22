@@ -125,12 +125,23 @@ export const shopApi = baseApi.injectEndpoints({
 
     getShopServices: builder.query<
       { success: boolean; data: ShopService[] },
-      string | number
+      { shop?: string | number; barber?: string | number } | string | number
     >({
-      query: (shopId) => ({
-        url: `v1/services/?shop=${shopId}`,
-        method: "GET",
-      }),
+      query: (params) => {
+        if (typeof params === "object" && params !== null) {
+          const queryParts: string[] = [];
+          if (params.shop) queryParts.push(`shop=${params.shop}`);
+          if (params.barber) queryParts.push(`barber=${params.barber}`);
+          return {
+            url: `v1/services/?${queryParts.join("&")}`,
+            method: "GET",
+          };
+        }
+        return {
+          url: `v1/services/?shop=${params}`,
+          method: "GET",
+        };
+      },
       providesTags: ["Shop"],
     }),
 
@@ -158,13 +169,60 @@ export const shopApi = baseApi.injectEndpoints({
 
     getBarbers: builder.query<
       { success: boolean; data: BarberItem[] },
-      string | number
+      { shop?: string | number; service?: string | number } | string | number
     >({
-      query: (shopId) => ({
-        url: `v1/barbers/?shop=${shopId}`,
+      query: (params) => {
+        if (typeof params === "object" && params !== null) {
+          const queryParts: string[] = [];
+          if (params.shop) queryParts.push(`shop=${params.shop}`);
+          if (params.service) queryParts.push(`service=${params.service}`);
+          return {
+            url: `v1/barbers/?${queryParts.join("&")}`,
+            method: "GET",
+          };
+        }
+        return {
+          url: `v1/barbers/?shop=${params}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["Shop"],
+    }),
+
+    getAvailableSlots: builder.query<
+      { success: boolean; data: any },
+      { barber_id: string | number; date: string; services: string | number }
+    >({
+      query: ({ barber_id, date, services }) => ({
+        url: `v1/bookings/available-slots/?barber_id=${barber_id}&date=${date}&services=${services}`,
         method: "GET",
       }),
-      providesTags: ["Shop"],
+    }),
+
+    createBooking: builder.mutation<
+      {
+        success: boolean;
+        status_code?: number;
+        data?: any;
+        details?: string;
+        message?: string;
+      },
+      {
+        shop: number;
+        barber: number | string;
+        services: number[];
+        appointment_date: string;
+        start_time: string;
+        payment_method: string;
+        tip_amount: number;
+      }
+    >({
+      query: (body) => ({
+        url: "v1/bookings/create/",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Shop"],
     }),
   }),
   overrideExisting: true,
@@ -177,4 +235,6 @@ export const {
   useGetShopReviewsQuery,
   useGetShopGalleryQuery,
   useGetBarbersQuery,
+  useGetAvailableSlotsQuery,
+  useCreateBookingMutation,
 } = shopApi;
