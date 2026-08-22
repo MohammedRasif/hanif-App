@@ -15,69 +15,33 @@ export const authentication = createApi({
   }),
   tagTypes: ["User", "Agency", "TourPlan"],
   endpoints: (builder) => ({
-    // Register API: {{baseUrl}}/v1/auth/register/
+    // Register API
     register: builder.mutation({
-      query: (data) => {
-        console.log(
-          "[Auth API Request - Register]:",
-          JSON.stringify(data, null, 2),
-        );
-        return {
-          url: "v1/auth/register/",
-          method: "POST",
-          body: data, // { email, password, confirm_password, full_name, phone }
-        };
-      },
-      transformResponse: (response: any) => {
-        console.log(
-          "[Auth API Response - Register]:",
-          JSON.stringify(response, null, 2),
-        );
-        return response;
-      },
+      query: (data) => ({
+        url: "v1/auth/register/",
+        method: "POST",
+        body: data,
+      }),
       invalidatesTags: ["User"],
     }),
 
     registerVerifyOtp: builder.mutation({
-      query: (data) => {
-        console.log(
-          "[Auth API Request - Register Verify OTP]:",
-          JSON.stringify(data, null, 2),
-        );
-        return {
-          url: "v1/auth/verify-email/",
-          method: "POST",
-          body: data, // { email, otp }
-        };
-      },
-      transformResponse: (response: any) => {
-        console.log(
-          "[Auth API Response - Register Verify OTP]:",
-          JSON.stringify(response, null, 2),
-        );
-        return response;
-      },
+      query: (data) => ({
+        url: "v1/auth/verify-email/",
+        method: "POST",
+        body: data,
+      }),
       invalidatesTags: ["User"],
     }),
 
-    // Verify OTP API: {{baseUrl}}/v1/auth/password/verify-otp/
+    // Verify OTP API
     verifyOtp: builder.mutation({
-      query: (data) => {
-        console.log(
-          "[Auth API Request - Verify OTP]:",
-          JSON.stringify(data, null, 2),
-        );
-        return {
-          url: "v1/auth/password/verify-otp/",
-          method: "POST",
-          body: data, // { email, otp }
-        };
-      },
+      query: (data) => ({
+        url: "v1/auth/password/verify-otp/",
+        method: "POST",
+        body: data,
+      }),
       transformResponse: (response: any) => {
-        console.log(
-          "[Auth API Response - Verify OTP]:",
-          JSON.stringify(response, null, 2),
-        );
         if (response?.data?.access) {
           setAccessToken(response.data.access);
         }
@@ -89,46 +53,23 @@ export const authentication = createApi({
       invalidatesTags: ["User"],
     }),
 
-    // Resend OTP API: {{baseUrl}}/v1/auth/resend-otp/
+    // Resend OTP API
     resendOtp: builder.mutation({
-      query: (data) => {
-        console.log(
-          "[Auth API Request - Resend OTP]:",
-          JSON.stringify(data, null, 2),
-        );
-        return {
-          url: "v1/auth/resend-otp/",
-          method: "POST",
-          body: data, // { email, type: "register" }
-        };
-      },
-      transformResponse: (response: any) => {
-        console.log(
-          "[Auth API Response - Resend OTP]:",
-          JSON.stringify(response, null, 2),
-        );
-        return response;
-      },
+      query: (data) => ({
+        url: "v1/auth/resend-otp/",
+        method: "POST",
+        body: data,
+      }),
     }),
 
-    // Login API: {{baseUrl}}/v1/auth/login/
+    // Login API
     login: builder.mutation({
-      query: (data) => {
-        console.log(
-          "[Auth API Request - Login]:",
-          JSON.stringify(data, null, 2),
-        );
-        return {
-          url: "v1/auth/login/",
-          method: "POST",
-          body: data, // { email, password }
-        };
-      },
+      query: (data) => ({
+        url: "v1/auth/login/",
+        method: "POST",
+        body: data,
+      }),
       transformResponse: (response: any) => {
-        console.log(
-          "[Auth API Response - Login]:",
-          JSON.stringify(response, null, 2),
-        );
         if (response?.data?.access) {
           setAccessToken(response.data.access);
         }
@@ -143,70 +84,31 @@ export const authentication = createApi({
       invalidatesTags: ["User"],
     }),
 
-    // Forgot Password API: {{baseUrl}}/v1/auth/password/forgot/
+    // Forgot Password API
     forgotPassword: builder.mutation({
-      query: (data) => {
-        console.log(
-          "[Auth API Request - Forgot Password]:",
-          JSON.stringify(data, null, 2),
-        );
-        return {
-          url: "v1/auth/password/forgot/",
-          method: "POST",
-          body: data, // { email }
-        };
-      },
-      transformResponse: (response: any) => {
-        console.log(
-          "[Auth API Response - Forgot Password]:",
-          JSON.stringify(response, null, 2),
-        );
-        return response;
-      },
+      query: (data) => ({
+        url: "v1/auth/password/forgot/",
+        method: "POST",
+        body: data,
+      }),
     }),
 
-    // Reset Password API: {{baseUrl}}/v1/auth/password/reset/
+    // Reset Password API
     resetPassword: builder.mutation({
-      query: (data) => {
-        console.log(
-          "[Auth API Request - Reset Password]:",
-          JSON.stringify(data, null, 2),
-        );
-        return {
-          url: "v1/auth/password/reset/",
-          method: "POST",
-          body: data, // { email, otp, new_password, confirm_password }
-        };
-      },
-      transformResponse: (response: any) => {
-        console.log(
-          "[Auth API Response - Reset Password]:",
-          JSON.stringify(response, null, 2),
-        );
-        return response;
-      },
+      query: (data) => ({
+        url: "v1/auth/password/reset/",
+        method: "POST",
+        body: data,
+      }),
     }),
 
-    // Send OTP (General OTP flow)
+    // Send OTP API
     sendOtp: builder.mutation({
-      query: (data) => {
-        console.log(
-          "[Auth API Request - Send OTP]:",
-          JSON.stringify(data, null, 2),
-        );
-        return {
-          url: "v1/auth/send-otp/",
-          method: "POST",
-          body: data, // { phone, email }
-        };
-      },
-      transformResponse: (response: any) => {
-        console.log(
-          "[Auth API Response - Send OTP]:",
-          JSON.stringify(response, null, 2),
-        );
-        return response;
-      },
+      query: (data) => ({
+        url: "v1/auth/send-otp/",
+        method: "POST",
+        body: data,
+      }),
       invalidatesTags: ["User"],
     }),
   }),

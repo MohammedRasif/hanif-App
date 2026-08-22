@@ -1,3 +1,4 @@
+import type { BookingItem } from "@/Redux/feature/shop.types";
 import { StyledIcons } from "@/lib";
 import React from "react";
 import { Image, Pressable, Text, View } from "react-native";
@@ -14,7 +15,8 @@ export interface Appointment {
     day: string;
     time: string;
   };
-  status?: "Confirmed" | "Completed" | "Cancelled";
+  status?: string;
+  rawBooking?: BookingItem;
 }
 
 export interface AppointmentCardProps {
@@ -33,34 +35,36 @@ export function AppointmentCard({
   const getStatusBadge = () => {
     if (!appointment.status) return null;
 
-    switch (appointment.status) {
-      case "Confirmed":
-        return (
-          <View className="rounded-full bg-emerald-50 px-3.5 py-1">
-            <Text className="font-poppins-semibold text-emerald-600 text-xs">
-              Confirmed
-            </Text>
-          </View>
-        );
-      case "Completed":
-        return (
-          <View className="rounded-full bg-emerald-50 px-3.5 py-1">
-            <Text className="font-poppins-semibold text-emerald-600 text-xs">
-              Completed
-            </Text>
-          </View>
-        );
-      case "Cancelled":
-        return (
-          <View className="rounded-full bg-rose-50 px-3.5 py-1">
-            <Text className="font-poppins-semibold text-rose-500 text-xs">
-              Cancelled
-            </Text>
-          </View>
-        );
-      default:
-        return null;
-    }
+    const lowerStatus = appointment.status.toLowerCase();
+    const isCancelled = lowerStatus.includes("cancel");
+    const isCompleted =
+      lowerStatus.includes("complet") ||
+      lowerStatus.includes("finish") ||
+      lowerStatus.includes("past");
+
+    return (
+      <View
+        className={`rounded-full px-3.5 py-1 ${
+          isCancelled
+            ? "bg-rose-50"
+            : isCompleted
+              ? "bg-gray-100"
+              : "bg-emerald-50"
+        }`}
+      >
+        <Text
+          className={`font-poppins-semibold text-xs capitalize ${
+            isCancelled
+              ? "text-rose-500"
+              : isCompleted
+                ? "text-gray-600"
+                : "text-emerald-600"
+          }`}
+        >
+          {appointment.status}
+        </Text>
+      </View>
+    );
   };
 
   return (

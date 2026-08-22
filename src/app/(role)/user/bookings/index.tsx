@@ -1,74 +1,28 @@
-import { Stack, useRouter } from "expo-router";
-import React, { useState } from "react";
-import { Pressable, Text, View } from "react-native";
-
 import { Container } from "@/components/container";
 import { AppointmentCard, type Appointment } from "@/feature/user";
+import { useGetBookingsQuery } from "@/Redux/feature/shop";
+import type { BookingItem } from "@/Redux/feature/shop.types";
+import { Stack, useRouter } from "expo-router";
+import React, { useState } from "react";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
-const MOCK_UPCOMING_APPOINTMENTS: Appointment[] = [
-  {
-    id: "1",
-    shopName: "Barbers Bay",
-    location: "Los Angeles, CA",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=300&q=80",
-    service: "Haircut",
-    barberName: "jhon",
-    date: {
-      month: "July",
-      day: "14",
-      time: "11:00 AM",
-    },
-  },
-  {
-    id: "2",
-    shopName: "Barbers Bay",
-    location: "Los Angeles, CA",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=300&q=80",
-    service: "Haircut",
-    barberName: "jhon",
-    date: {
-      month: "July",
-      day: "14",
-      time: "11:00 AM",
-    },
-    status: "Confirmed",
-  },
+const MONTH_NAMES = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
-const MOCK_FINESSED_APPOINTMENTS: Appointment[] = [
-  {
-    id: "3",
-    shopName: "Barbers Bay",
-    location: "Los Angeles, CA",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=300&q=80",
-    service: "Haircut",
-    barberName: "jhon",
-    date: {
-      month: "July",
-      day: "14",
-      time: "11:00 AM",
-    },
-    status: "Completed",
-  },
-  {
-    id: "4",
-    shopName: "Barbers Bay",
-    location: "Los Angeles, CA",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=300&q=80",
-    service: "Haircut",
-    barberName: "jhon",
-    date: {
-      month: "July",
-      day: "14",
-      time: "11:00 AM",
-    },
-    status: "Cancelled",
-  },
-];
+const DEFAULT_AVATAR =
+  "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=300&q=80";
 
 type BookingTab = "upcoming" | "finessed";
 
@@ -76,13 +30,65 @@ export default function BookingsScreen() {
   const [activeTab, setActiveTab] = useState<BookingTab>("upcoming");
   const router = useRouter();
 
-  const currentAppointments =
-    activeTab === "upcoming"
-      ? MOCK_UPCOMING_APPOINTMENTS
-      : MOCK_FINESSED_APPOINTMENTS;
+  const queryType = activeTab === "upcoming" ? "upcoming" : "past";
+  const { data: bookingsResponse, isLoading } = useGetBookingsQuery(queryType);
+
+  const bookingsData: BookingItem[] = Array.isArray(bookingsResponse?.data)
+    ? bookingsResponse.data
+    : [];
+
+  const formattedAppointments: Appointment[] = bookingsData.map((b) => {
+    const firstAppointment = b.appointments_details?.[0];
+    const shopName = b.shop_details?.name || "Barber Shop";
+    const location = b.shop_details?.location || "Location unavailable";
+    const serviceName = firstAppointment?.service_name || "Salon Service";
+    const barberName = firstAppointment?.barber_name || "Barber";
+
+    let month = "Jul";
+    let day = "14";
+    let time = "11:00 AM";
+
+    if (firstAppointment?.appointment_date) {
+      const d = new Date(firstAppointment.appointment_date);
+      if (!Number.isNaN(d.getTime())) {
+        month = MONTH_NAMES[d.getMonth()] || "Jul";
+        day = String(d.getDate());
+      }
+    }
+
+    if (firstAppointment?.start_time) {
+      const parts = firstAppointment.start_time.split(":");
+      if (
+        parts.length >= 2 &&
+        parts[0] !== undefined &&
+        parts[1] !== undefined
+      ) {
+        let hour = Number.parseInt(parts[0], 10);
+        const minutes = parts[1];
+        const ampm = hour >= 12 ? "PM" : "AM";
+        hour = hour % 12 || 12;
+        time = `${hour}:${minutes} ${ampm}`;
+      }
+    }
+
+    return {
+      id: String(b.id),
+      shopName,
+      location,
+      avatarUrl: DEFAULT_AVATAR,
+      service: serviceName,
+      barberName,
+      date: {
+        month,
+        day,
+        time,
+      },
+      status: b.status,
+      rawBooking: b,
+    };
+  });
 
   const handleBookAgain = (_appointment: Appointment) => {
-    // Navigate or trigger booking flow
     router.push("/(role)/user");
   };
 
@@ -130,9 +136,16 @@ export default function BookingsScreen() {
         </View>
 
         {/* Appointments List */}
-        {currentAppointments.length > 0 ? (
+        {isLoading ? (
+          <View className="items-center justify-center py-16">
+            <ActivityIndicator color="#F0B100" size="small" />
+            <Text className="mt-2 font-poppins text-xs text-gray-400">
+              Loading appointments...
+            </Text>
+          </View>
+        ) : formattedAppointments.length > 0 ? (
           <View>
-            {currentAppointments.map((appointment) => (
+            {formattedAppointments.map((appointment) => (
               <AppointmentCard
                 appointment={appointment}
                 key={appointment.id}
@@ -140,7 +153,12 @@ export default function BookingsScreen() {
                 onPress={(appt: Appointment) =>
                   router.push({
                     pathname: "/(role)/user/bookings/[id]",
-                    params: { id: appt.id },
+                    params: {
+                      id: appt.id,
+                      bookingData: appt.rawBooking
+                        ? JSON.stringify(appt.rawBooking)
+                        : "",
+                    },
                   })
                 }
                 showBookAgain={activeTab === "finessed"}

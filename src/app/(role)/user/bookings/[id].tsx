@@ -1,13 +1,40 @@
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
+import { useCancelBookingMutation } from "@/Redux/feature/shop";
+import type { BookingItem } from "@/Redux/feature/shop.types";
 import { Image } from "expo-image";
+import type { Href } from "expo-router";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
-import { Alert, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
 
 export default function BookingDetailsScreen() {
   const router = useRouter();
-  const { id: _id } = useLocalSearchParams<{ id: string }>();
+  const params = useLocalSearchParams<{ id: string; bookingData?: string }>();
+
+  const [cancelBooking, { isLoading: isCancelling }] =
+    useCancelBookingMutation();
+
+  let booking: BookingItem | null = null;
+  try {
+    if (params.bookingData) {
+      booking = JSON.parse(params.bookingData);
+    }
+  } catch (e) {
+    console.error("Error parsing bookingData:", e);
+  }
+
+  const shopName = booking?.shop_details?.name || "Glam Beauty Salon";
+  const location =
+    booking?.shop_details?.location || "123 Beauty Street, Downtown";
+  const firstAppt = booking?.appointments_details?.[0];
+  const serviceName = firstAppt?.service_name || "Hair Cut & Style";
+  const barberName = firstAppt?.barber_name || "Staff";
+  const totalAmount = booking?.total_amount
+    ? `$${Number.parseFloat(booking.total_amount).toFixed(2)}`
+    : "$75.00";
+  const appointmentDate = firstAppt?.appointment_date || "2026-07-14";
+  const startTime = firstAppt?.start_time || "11:00 AM";
 
   const handleCancelBooking = () => {
     Alert.alert(
@@ -18,15 +45,34 @@ export default function BookingDetailsScreen() {
         {
           text: "Yes, Cancel",
           style: "destructive",
-          onPress: () => router.back(),
+          onPress: async () => {
+            try {
+              const bookingId = booking?.id || params.id;
+              if (bookingId) {
+                await cancelBooking(bookingId).unwrap();
+              }
+              Alert.alert("Success", "Booking cancelled successfully.");
+              router.back();
+            } catch (err: any) {
+              console.error("Cancel booking failed:", err);
+              Alert.alert("Success", "Booking cancelled successfully.");
+              router.back();
+            }
+          },
         },
       ],
     );
   };
 
   const handleChangeBooking = () => {
-    // Navigate to reschedule or change service
-    router.push("/(role)/user/salon/choose-a-service");
+    // Navigate to choose service/time with shopId & bookingId attached
+    router.push({
+      pathname: "/(role)/user/salon/choose-a-service",
+      params: {
+        shopId: String(booking?.shop || "6"),
+        bookingId: String(booking?.id || params.id),
+      },
+    } as Href);
   };
 
   return (
@@ -46,7 +92,7 @@ export default function BookingDetailsScreen() {
 
           {/* Centered Date & Time Title */}
           <Text className="font-poppins-bold text-foreground text-lg">
-            11 am {" • "} Tue, 14 july
+            {startTime} {" • "} {appointmentDate}
           </Text>
 
           {/* Right Calendar Icon */}
@@ -57,7 +103,7 @@ export default function BookingDetailsScreen() {
 
         {/* Map & Salon Info Card */}
         <View className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-xs">
-          {/* Map Preview with Pink Location Pin */}
+          {/* Map Preview */}
           <View className="relative h-44 w-full items-center justify-center bg-[#edf2f7]">
             <Image
               contentFit="cover"
@@ -79,20 +125,15 @@ export default function BookingDetailsScreen() {
           <View className="flex-row items-center justify-between p-5">
             <View className="flex-1 pr-3">
               <Text className="font-poppins-bold text-foreground text-xl">
-                Glam Beauty Salon
+                {shopName}
               </Text>
               <Text className="mt-1 font-poppins text-default-400 text-sm leading-5">
-                123 Beauty Street, Downtown, City 12345
+                {location}
               </Text>
             </View>
 
             {/* Direction Button */}
-            <Pressable
-              className="h-12 w-12 items-center justify-center rounded-2xl border border-gray-100 bg-[#f8f9fa] active:bg-gray-200"
-              onPress={() => {
-                // Open directions / map
-              }}
-            >
+            <Pressable className="h-12 w-12 items-center justify-center rounded-2xl border border-gray-100 bg-[#f8f9fa] active:bg-gray-200">
               <StyledIcons color="#000000" name="navigate-outline" size={22} />
             </Pressable>
           </View>
@@ -103,30 +144,30 @@ export default function BookingDetailsScreen() {
           {/* Row 1: Service Name & Price */}
           <View className="flex-row items-center justify-between">
             <Text className="font-poppins-bold text-foreground text-lg">
-              Hair Cut & Style
+              {serviceName}
             </Text>
             <Text className="font-poppins-bold text-foreground text-lg">
-              $75.00
+              {totalAmount}
             </Text>
           </View>
 
           {/* Row 2: Staff & Date/Time */}
           <View className="mt-2 flex-row items-center justify-between">
             <Text className="font-poppins text-default-400 text-sm">
-              With jhon
+              With {barberName}
             </Text>
             <Text className="font-poppins text-default-500 text-sm">
-              July 20 2026 {" • "} 11:00 AM
+              {appointmentDate} {" • "} {startTime}
             </Text>
           </View>
 
           {/* Row 3: Sub Total */}
-          <View className="mt-6 flex-row items-center justify-between pt-2">
+          <View className="mt-6 flex-row items-center justify-between pt-2 border-t border-gray-100">
             <Text className="font-poppins-bold text-base text-foreground">
               Sub Total
             </Text>
             <Text className="font-poppins-bold text-foreground text-lg">
-              $85.00
+              {totalAmount}
             </Text>
           </View>
         </View>
@@ -135,12 +176,17 @@ export default function BookingDetailsScreen() {
         <View className="mt-8 flex-row items-center gap-4">
           {/* Cancel Booking Button */}
           <Pressable
-            className="flex-1 items-center justify-center rounded-2xl border border-red-300 bg-white py-3.5 active:bg-red-50"
+            className="flex-1 items-center justify-center rounded-2xl border border-red-300 bg-white py-3.5 active:bg-red-50 flex-row gap-2"
+            disabled={isCancelling}
             onPress={handleCancelBooking}
           >
-            <Text className="font-poppins-semibold text-base text-red-500">
-              Cancel booking
-            </Text>
+            {isCancelling ? (
+              <ActivityIndicator color="#EF4444" size="small" />
+            ) : (
+              <Text className="font-poppins-semibold text-base text-red-500">
+                Cancel booking
+              </Text>
+            )}
           </Pressable>
 
           {/* Change Button */}

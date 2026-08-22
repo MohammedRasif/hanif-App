@@ -1,106 +1,15 @@
 import { baseApi } from "./baseApi";
+import type {
+  BarberItem,
+  BookingItem,
+  GalleryItem,
+  ReviewItem,
+  Shop,
+  ShopDetails,
+  ShopService,
+} from "./shop.types";
 
-export interface ShopReview {
-  count: number;
-  average_rating: number;
-}
-
-export interface Shop {
-  id: number;
-  name: string;
-  logo: string | null;
-  cover_image: string | null;
-  location: string | null;
-  payment_gateway_enabled: boolean;
-  review?: ShopReview;
-}
-
-export interface ShopDetails {
-  id: number;
-  name: string;
-  slug: string;
-  logo: string | null;
-  cover_image: string | null;
-  location: string | null;
-  about_us: string | null;
-  phone: string | null;
-  email: string | null;
-  whatsapp: string | null;
-  facebook: string | null;
-  instagram: string | null;
-  tiktok: string | null;
-  twitter: string | null;
-  youtube: string | null;
-  google_review_link: string | null;
-  google_place_id: string | null;
-  payment_gateway_enabled: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ShopService {
-  id: number;
-  category: number;
-  shop: number;
-  barbers: string[];
-  name: string;
-  image: string | null;
-  description: string | null;
-  price: string;
-  duration_minutes: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ReviewItem {
-  id: number | string;
-  user_name?: string;
-  user_avatar?: string;
-  rating: number;
-  comment: string;
-  created_at?: string;
-}
-
-export interface GalleryItem {
-  id: number;
-  shop: number;
-  image: string;
-  display_order: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface BarberItem {
-  id: number;
-  user: string;
-  user_name: string;
-  shop: number;
-  shop_name: string;
-  specialty: string;
-  is_available: boolean;
-  experience_years: number;
-  role: string;
-  calendar_access: boolean;
-  client_details_access: boolean;
-  review?: {
-    count: number;
-    average_rating: number;
-  };
-  user_details?: {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    image: string | null;
-  };
-  assigned_services?: Array<{
-    id: number;
-    name: string;
-    price: number;
-    duration_minutes: number;
-  }>;
-}
+export * from "./shop.types";
 
 export const shopApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -224,6 +133,43 @@ export const shopApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Shop"],
     }),
+
+    // Get Bookings List (upcoming or past)
+    getBookings: builder.query<
+      { success: boolean; data: BookingItem[] },
+      "upcoming" | "past" | string
+    >({
+      query: (type = "upcoming") => ({
+        url: `v1/booking/?type=${type}`,
+        method: "GET",
+      }),
+      providesTags: ["Shop"],
+    }),
+
+    // Cancel Booking by ID
+    cancelBooking: builder.mutation<
+      { success: boolean; details?: string; message?: string },
+      string | number
+    >({
+      query: (id) => ({
+        url: `v1/bookings/${id}/cancel/`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Shop"],
+    }),
+
+    // Update / Reschedule Booking by ID
+    updateBooking: builder.mutation<
+      { success: boolean; data?: any; message?: string },
+      { id: string | number; data: Partial<BookingItem> | Record<string, any> }
+    >({
+      query: ({ id, data }) => ({
+        url: `v1/bookings/${id}/`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["Shop"],
+    }),
   }),
   overrideExisting: true,
 });
@@ -237,4 +183,7 @@ export const {
   useGetBarbersQuery,
   useGetAvailableSlotsQuery,
   useCreateBookingMutation,
+  useGetBookingsQuery,
+  useCancelBookingMutation,
+  useUpdateBookingMutation,
 } = shopApi;
