@@ -1,35 +1,49 @@
 import { Container } from "@/components/container";
-import { notificationData } from "@/data/notification.data";
 import { StyledIcons } from "@/lib";
+import {
+  useGetNotificationsQuery,
+  type NotificationItem,
+} from "@/Redux/feature/auth";
 import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
 
-const typeStyles = {
+const typeStyles: Record<string, { icon: any; bg: string; color: string }> = {
+  booking: {
+    icon: "calendar-outline",
+    bg: "bg-[#E8F3FF]",
+    color: "text-[#007AFF]",
+  },
   confirmed: {
-    icon: "calendar-outline" as const,
+    icon: "calendar-outline",
     bg: "bg-[#E8F3FF]",
     color: "text-[#007AFF]",
   },
   reminder: {
-    icon: "logo-usd" as const,
+    icon: "logo-usd",
     bg: "bg-[#FFF4E0]",
     color: "text-[#F0B100]",
   },
   cancelled: {
-    icon: "document-text-outline" as const,
+    icon: "document-text-outline",
     bg: "bg-[#F0E6FF]",
     color: "text-[#7F00FF]",
   },
   updated: {
-    icon: "star" as const,
+    icon: "star",
     bg: "bg-[#FFEBEB]",
     color: "text-[#FF2D55]",
   },
-  feedback: {
-    icon: "star" as const,
-    bg: "bg-[#FFEBEB]",
-    color: "text-[#FF2D55]",
+  default: {
+    icon: "notifications-outline",
+    bg: "bg-[#E8F3FF]",
+    color: "text-[#007AFF]",
   },
 };
 
@@ -37,12 +51,33 @@ export default function NotificationScreen() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"all" | "unread">("all");
 
-  const filteredNotifications = notificationData.filter((item) => {
+  const { data: notificationsResponse, isLoading } = useGetNotificationsQuery();
+
+  const notificationsList: NotificationItem[] =
+    notificationsResponse?.data?.notifications || [];
+
+  const filteredNotifications = notificationsList.filter((item) => {
     if (activeTab === "unread") {
-      return item.isUnread;
+      return !item.is_read;
     }
     return true;
   });
+
+  const formatNotificationTime = (createdAtStr: string) => {
+    if (!createdAtStr) return "Just now";
+    try {
+      const d = new Date(createdAtStr);
+      if (Number.isNaN(d.getTime())) return "Recently";
+      return d.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch (e) {
+      return "Recently";
+    }
+  };
 
   return (
     <Container isScrollable={false}>
@@ -97,51 +132,71 @@ export default function NotificationScreen() {
         </View>
 
         {/* Notifications List */}
-        <FlatList
-          contentContainerStyle={{ paddingBottom: 24 }}
-          data={filteredNotifications}
-          keyExtractor={(item) => item.id}
-          ListEmptyComponent={
-            <View className="flex-1 items-center justify-center py-20">
-              <Text className="text-default-400 text-sm">
-                No notifications found
-              </Text>
-            </View>
-          }
-          renderItem={({ item }) => {
-            const styles = typeStyles[item.type];
-            return (
-              <View className="mb-5">
-                <View className="flex-row items-center gap-4 rounded-2xl bg-[#F8F9FA] p-4">
-                  {/* Icon Circle */}
-                  <View
-                    className={`h-12 w-12 items-center justify-center rounded-full ${styles.bg}`}
-                  >
-                    <StyledIcons
-                      className={styles.color}
-                      name={styles.icon}
-                      size={22}
-                    />
-                  </View>
-                  {/* Content */}
-                  <View className="flex-1">
-                    <Text className="font-semibold text-base text-foreground">
-                      {item.title}
-                    </Text>
-                    <Text className="mt-1 text-default-500 text-sm leading-normal">
-                      {item.message}
-                    </Text>
-                  </View>
-                </View>
-                {/* Time Indicator */}
-                <Text className="mt-1.5 ml-4 text-default-400 text-xs">
-                  • {item.time}
+        {isLoading ? (
+          <View className="flex-1 items-center justify-center py-20">
+            <ActivityIndicator color="#F0B100" size="small" />
+            <Text className="mt-2 font-poppins text-xs text-gray-400">
+              Loading notifications...
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            contentContainerStyle={{ paddingBottom: 24 }}
+            data={filteredNotifications}
+            keyExtractor={(item) => String(item.id)}
+            ListEmptyComponent={
+              <View className="flex-1 items-center justify-center py-20">
+                <Text className="text-default-400 text-sm">
+                  No notifications found
                 </Text>
               </View>
-            );
-          }}
-          showsVerticalScrollIndicator={false}
-        />
+            }
+            renderItem={({ item }) => {
+              const styles = typeStyles[item.type] ||
+                typeStyles.default || {
+                  icon: "notifications-outline" as const,
+                  bg: "bg-[#E8F3FF]",
+                  color: "text-[#007AFF]",
+                };
+              return (
+                <View className="mb-5">
+                  <View
+                    className={`flex-row items-center gap-4 rounded-2xl p-4 ${
+                      !item.is_read
+                        ? "bg-[#FFFBF0] border border-[#FFE8A3]"
+                        : "bg-[#F8F9FA]"
+                    }`}
+                  >
+                    {/* Icon Circle */}
+                    <View
+                      className={`h-12 w-12 items-center justify-center rounded-full ${styles.bg}`}
+                    >
+                      <StyledIcons
+                        className={styles.color}
+                        name={styles.icon}
+                        size={22}
+                      />
+                    </View>
+                    {/* Content */}
+                    <View className="flex-1">
+                      <Text className="font-semibold text-base text-foreground">
+                        {item.title}
+                      </Text>
+                      <Text className="mt-1 text-default-500 text-sm leading-normal">
+                        {item.message}
+                      </Text>
+                    </View>
+                  </View>
+                  {/* Time Indicator */}
+                  <Text className="mt-1.5 ml-4 text-default-400 text-xs">
+                    • {formatNotificationTime(item.created_at)}
+                  </Text>
+                </View>
+              );
+            }}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
       </View>
     </Container>
   );

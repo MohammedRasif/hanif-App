@@ -27,7 +27,7 @@ export default function UserHomeScreen() {
             <Image
               className="h-12 w-12 rounded-full"
               source={{
-                uri: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
+                uri: "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1757735711/images_nfasdv.png",
               }}
             />
             <View>

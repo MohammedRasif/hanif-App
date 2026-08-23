@@ -1,9 +1,10 @@
 import type { Ionicons } from "@expo/vector-icons";
 import { Link, Stack, type Href } from "expo-router";
-import { Image, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Image, Pressable, Text, View } from "react-native";
 
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
+import { useGetProfileQuery } from "@/Redux/feature/auth";
 
 interface MenuItem {
   href: Href;
@@ -61,7 +62,17 @@ const supportItems: MenuItem[] = [
   },
 ];
 
+const DEFAULT_AVATAR =
+  "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1757735711/images_nfasdv.png";
+
 export default function ProfileScreen() {
+  const { data: profileResponse, isLoading } = useGetProfileQuery();
+  const profile = profileResponse?.data;
+
+  const fullName = profile?.full_name || profile?.username || "User";
+  const email = profile?.email || "";
+  const avatarUri = profile?.image || DEFAULT_AVATAR;
+
   return (
     <Container>
       <Stack.Screen options={{ headerShown: false }} />
@@ -69,30 +80,46 @@ export default function ProfileScreen() {
       <View className="flex-1 bg-white px-6 pt-14 pb-8">
         {/* Profile Card Header */}
         <View className="mb-8 flex-row items-center justify-between">
-          <View className="flex-row items-center gap-4">
-            <Image
-              className="h-16 w-16 rounded-full"
-              source={{
-                uri: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
-              }}
-            />
-            <View>
-              <Text className="font-bold text-2xl text-foreground">
-                Eleanor Smith
-              </Text>
-              <Text className="mt-1 text-default-400 text-sm">
-                eleanor.smith@email.com
+          {isLoading ? (
+            <View className="flex-row items-center gap-4 py-2">
+              <ActivityIndicator color="#F0B100" size="small" />
+              <Text className="font-poppins text-xs text-gray-400">
+                Loading profile...
               </Text>
             </View>
-          </View>
+          ) : (
+            <View className="flex-row items-center gap-4">
+              <Image
+                className="h-16 w-16 rounded-full"
+                source={{
+                  uri: avatarUri,
+                }}
+              />
+              <View>
+                <Text className="font-bold text-2xl text-foreground">
+                  {fullName}
+                </Text>
+                {email ? (
+                  <Text className="mt-1 text-default-400 text-sm">{email}</Text>
+                ) : null}
+              </View>
+            </View>
+          )}
+
           {/* Edit icon button */}
-          <Pressable className="h-10 w-10 items-center justify-center rounded-full bg-default-100 active:opacity-75">
-            <StyledIcons
-              className="text-default-700"
-              name="create-outline"
-              size={18}
-            />
-          </Pressable>
+          <Link
+            asChild
+            href="/(role)/user/profile/personal-info"
+            key="edit-icon"
+          >
+            <Pressable className="h-10 w-10 items-center justify-center rounded-full bg-default-100 active:opacity-75">
+              <StyledIcons
+                className="text-default-700"
+                name="create-outline"
+                size={18}
+              />
+            </Pressable>
+          </Link>
         </View>
 
         {/* Section: Personal */}

@@ -1,19 +1,56 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { setAccessToken, setRefreshToken, setUserData } from "@/lib/storage";
+import {
+  getAccessToken,
+  setAccessToken,
+  setRefreshToken,
+  setUserData,
+} from "@/lib/storage";
 
 const BASE_URL =
   process.env.EXPO_PUBLIC_API_URL || "http://10.10.29.119:8100/api";
+
+export interface UserProfileData {
+  id: string;
+  email: string;
+  username: string;
+  role: string;
+  full_name: string;
+  image: string | null;
+  phone: string;
+  address: string;
+  last_active_at?: string;
+  date_joined?: string;
+}
+
+export interface NotificationItem {
+  id: number;
+  user: string;
+  title: string;
+  message: string;
+  type: string;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface NotificationsData {
+  unread_count: number;
+  notifications: NotificationItem[];
+}
 
 export const authentication = createApi({
   reducerPath: "authentication",
   baseQuery: fetchBaseQuery({
     baseUrl: `${BASE_URL.replace(/\/$/, "")}/`,
     prepareHeaders: (headers) => {
+      const token = getAccessToken();
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
       headers.set("ngrok-skip-browser-warning", "true");
       return headers;
     },
   }),
-  tagTypes: ["User", "Agency", "TourPlan"],
+  tagTypes: ["User", "Agency", "TourPlan", "Profile"],
   endpoints: (builder) => ({
     // Register API
     register: builder.mutation({
@@ -111,6 +148,43 @@ export const authentication = createApi({
       }),
       invalidatesTags: ["User"],
     }),
+
+    // Get User Profile API: GET v1/auth/profile/
+    getProfile: builder.query<
+      { success: boolean; data: UserProfileData },
+      void
+    >({
+      query: () => ({
+        url: "v1/auth/profile/",
+        method: "GET",
+      }),
+      providesTags: ["Profile", "User"],
+    }),
+
+    // Update Profile API: PATCH v1/auth/profile/update/ (via FormData)
+    updateProfile: builder.mutation<
+      { success: boolean; data: UserProfileData; details?: string },
+      FormData
+    >({
+      query: (formData) => ({
+        url: "v1/auth/profile/update/",
+        method: "PATCH",
+        body: formData,
+      }),
+      invalidatesTags: ["Profile", "User"],
+    }),
+
+    // Get Notifications API: GET v1/notifications/
+    getNotifications: builder.query<
+      { success: boolean; data: NotificationsData },
+      void
+    >({
+      query: () => ({
+        url: "v1/notifications/",
+        method: "GET",
+      }),
+      providesTags: ["User"],
+    }),
   }),
 });
 
@@ -123,4 +197,7 @@ export const {
   useForgotPasswordMutation,
   useResetPasswordMutation,
   useSendOtpMutation,
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+  useGetNotificationsQuery,
 } = authentication;

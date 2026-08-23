@@ -9,7 +9,7 @@ interface SalonReviewsTabProps {
 }
 
 const DEFAULT_AVATAR =
-  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
+  "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1757735711/images_nfasdv.png";
 
 export const SalonReviewsTab: React.FC<SalonReviewsTabProps> = ({ shopId }) => {
   const {
