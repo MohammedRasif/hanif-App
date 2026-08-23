@@ -1,22 +1,71 @@
+import { Container } from "@/components/container";
+import { StyledIcons } from "@/lib";
+import { useChangePasswordMutation } from "@/Redux/feature/auth";
 import { Stack, useRouter } from "expo-router";
 import { Button, InputGroup, TextField } from "heroui-native";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
-
-import { Container } from "@/components/container";
-import { StyledIcons } from "@/lib";
+import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
 
 export default function ChangePasswordScreen() {
   const router = useRouter();
+
+  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [vis1, setVis1] = useState(false);
   const [vis2, setVis2] = useState(false);
   const [vis3, setVis3] = useState(false);
+
+  const [changePassword, { isLoading }] = useChangePasswordMutation();
 
   const handleBack = () => {
     if (router.canGoBack()) {
       router.back();
     } else {
       router.replace("/(role)/user/profile");
+    }
+  };
+
+  const handleSaveChanges = async () => {
+    if (!password || !newPassword || !confirmPassword) {
+      Alert.alert("Validation Error", "Please fill in all password fields.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      Alert.alert(
+        "Validation Error",
+        "New password and Confirm password do not match.",
+      );
+      return;
+    }
+
+    try {
+      const res = await changePassword({
+        password,
+        new_password: newPassword,
+        confirm_password: confirmPassword,
+      }).unwrap();
+
+      if (res.success || res.details || res.message) {
+        Alert.alert(
+          "Success",
+          res.details || res.message || "Password changed successfully!",
+        );
+        handleBack();
+      } else {
+        Alert.alert("Success", "Password changed successfully!");
+        handleBack();
+      }
+    } catch (err: any) {
+      console.error("Change password error:", err);
+      const errMsg =
+        err?.data?.details ||
+        err?.data?.message ||
+        err?.data?.error ||
+        "Failed to change password. Please check your current password.";
+      Alert.alert("Error", errMsg);
     }
   };
 
@@ -43,6 +92,7 @@ export default function ChangePasswordScreen() {
 
           {/* Password Inputs */}
           <View className="gap-4">
+            {/* Current Password Field */}
             <View>
               <Text className="mb-2 font-semibold text-foreground text-sm">
                 Current Password
@@ -51,8 +101,10 @@ export default function ChangePasswordScreen() {
                 <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-default-200 bg-white">
                   <InputGroup.Input
                     className="h-full w-full border-transparent bg-transparent pr-12 pl-4 text-foreground"
-                    placeholder="First words"
+                    onChangeText={setPassword}
+                    placeholder="Enter current password"
                     secureTextEntry={!vis1}
+                    value={password}
                   />
                   <InputGroup.Suffix className="absolute top-0 right-0 bottom-0 items-center justify-center pr-4 pl-2">
                     <Pressable onPress={() => setVis1(!vis1)}>
@@ -67,6 +119,7 @@ export default function ChangePasswordScreen() {
               </TextField>
             </View>
 
+            {/* New Password Field */}
             <View>
               <Text className="mb-2 font-semibold text-foreground text-sm">
                 New Password
@@ -75,8 +128,10 @@ export default function ChangePasswordScreen() {
                 <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-default-200 bg-white">
                   <InputGroup.Input
                     className="h-full w-full border-transparent bg-transparent pr-12 pl-4 text-foreground"
-                    placeholder="First words"
+                    onChangeText={setNewPassword}
+                    placeholder="Enter new password"
                     secureTextEntry={!vis2}
+                    value={newPassword}
                   />
                   <InputGroup.Suffix className="absolute top-0 right-0 bottom-0 items-center justify-center pr-4 pl-2">
                     <Pressable onPress={() => setVis2(!vis2)}>
@@ -91,6 +146,7 @@ export default function ChangePasswordScreen() {
               </TextField>
             </View>
 
+            {/* Confirm New Password Field */}
             <View>
               <Text className="mb-2 font-semibold text-foreground text-sm">
                 Confirm New Password
@@ -99,8 +155,10 @@ export default function ChangePasswordScreen() {
                 <InputGroup className="relative h-14 w-full flex-row items-center rounded-2xl border border-default-200 bg-white">
                   <InputGroup.Input
                     className="h-full w-full border-transparent bg-transparent pr-12 pl-4 text-foreground"
-                    placeholder="First words"
+                    onChangeText={setConfirmPassword}
+                    placeholder="Confirm new password"
                     secureTextEntry={!vis3}
+                    value={confirmPassword}
                   />
                   <InputGroup.Suffix className="absolute top-0 right-0 bottom-0 items-center justify-center pr-4 pl-2">
                     <Pressable onPress={() => setVis3(!vis3)}>
@@ -121,12 +179,17 @@ export default function ChangePasswordScreen() {
         <View className="mt-8 gap-3">
           <Button
             className="h-14 w-full items-center justify-center rounded-2xl bg-[#F0B100]"
-            onPress={handleBack}
+            isDisabled={isLoading}
+            onPress={handleSaveChanges}
             variant="primary"
           >
-            <Button.Label className="font-semibold text-base text-primary-foreground">
-              Save Changes
-            </Button.Label>
+            {isLoading ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <Button.Label className="font-semibold text-base text-primary-foreground">
+                Save Changes
+              </Button.Label>
+            )}
           </Button>
 
           <Button

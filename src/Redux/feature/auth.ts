@@ -174,6 +174,18 @@ export const authentication = createApi({
       invalidatesTags: ["Profile", "User"],
     }),
 
+    // Change Password API: POST v1/auth/password/change/
+    changePassword: builder.mutation<
+      { success: boolean; details?: string; message?: string },
+      { password?: string; new_password?: string; confirm_password?: string }
+    >({
+      query: (data) => ({
+        url: "v1/auth/password/change/",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
     // Get Notifications API: GET v1/notifications/
     getNotifications: builder.query<
       { success: boolean; data: NotificationsData },
@@ -199,5 +211,6 @@ export const {
   useSendOtpMutation,
   useGetProfileQuery,
   useUpdateProfileMutation,
+  useChangePasswordMutation,
   useGetNotificationsQuery,
 } = authentication;
