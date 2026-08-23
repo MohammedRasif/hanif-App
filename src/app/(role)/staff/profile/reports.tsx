@@ -1,8 +1,15 @@
 import { Container } from "@/components/container";
 import { StaffProfileTopHeader } from "@/feature/staff/profile";
 import { StyledIcons } from "@/lib";
+import { useGetStaffMeReportsQuery } from "@/Redux/feature/dashboard";
 import React, { useState } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
 
 interface ReportItem {
   amount: string;
@@ -12,46 +19,41 @@ interface ReportItem {
   service: string;
 }
 
-const MOCK_REPORTS: ReportItem[] = [
-  {
-    amount: "$40",
-    date: "29 may 2026",
-    id: "1",
-    name: "Trump",
-    service: "face wah",
-  },
-  {
-    amount: "$40",
-    date: "29 may 2026",
-    id: "2",
-    name: "Trump",
-    service: "face wah",
-  },
-  {
-    amount: "$40",
-    date: "29 may 2026",
-    id: "3",
-    name: "Trump",
-    service: "face wah",
-  },
-  {
-    amount: "$40",
-    date: "29 may 2026",
-    id: "4",
-    name: "Trump",
-    service: "face wah",
-  },
-  {
-    amount: "$40",
-    date: "29 may 2026",
-    id: "5",
-    name: "Trump",
-    service: "face wah",
-  },
-];
-
 export default function StaffReportsScreen() {
   const [selectedMonth] = useState("Jan");
+
+  const {
+    data: reportsResponse,
+    isLoading,
+    isError,
+  } = useGetStaffMeReportsQuery();
+
+  const reportData = reportsResponse?.data;
+  const historyList = Array.isArray(reportData?.history)
+    ? reportData.history
+    : [];
+
+  const transactions: ReportItem[] = historyList.map((t) => ({
+    id: String(t.id),
+    name: t.customer_name || "Customer",
+    service: t.service_name || "Service",
+    amount:
+      typeof t.price === "number" || !String(t.price).startsWith("$")
+        ? `$${t.price}`
+        : String(t.price),
+    date: t.date || "Today",
+  }));
+
+  const totalBookings =
+    reportData?.total_bookings !== undefined ? reportData.total_bookings : 0;
+  const totalRevenue =
+    reportData?.total_revenue !== undefined
+      ? typeof reportData.total_revenue === "number"
+        ? `$${reportData.total_revenue.toFixed(2)}`
+        : String(reportData.total_revenue).startsWith("$")
+          ? reportData.total_revenue
+          : `$${reportData.total_revenue}`
+      : "$0.00";
 
   return (
     <Container className="bg-white flex-1" isScrollable={false}>
@@ -84,7 +86,7 @@ export default function StaffReportsScreen() {
             Booking
           </Text>
           <Text className="mt-1 font-poppins-bold text-xl text-gray-900">
-            25
+            {totalBookings}
           </Text>
         </View>
 
@@ -94,39 +96,61 @@ export default function StaffReportsScreen() {
             Revenue
           </Text>
           <Text className="mt-1 font-poppins-bold text-xl text-gray-900">
-            $8788
+            {totalRevenue}
           </Text>
         </View>
       </View>
 
       {/* Transaction List */}
-      <FlatList
-        contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
-        data={MOCK_REPORTS}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View className="flex-row items-center justify-between border-b border-gray-100/80 py-3.5">
-            <View>
-              <Text className="font-poppins-semibold text-sm text-gray-900">
-                {item.name}
-              </Text>
-              <Text className="mt-0.5 font-poppins text-xs text-gray-400">
-                {item.service}
+      {isLoading ? (
+        <View className="py-12 items-center justify-center">
+          <ActivityIndicator color="#F0B100" size="small" />
+          <Text className="mt-2 font-poppins text-xs text-gray-400">
+            Loading reports...
+          </Text>
+        </View>
+      ) : isError ? (
+        <View className="py-16 items-center justify-center px-6">
+          <Text className="font-poppins-medium text-red-500 text-sm text-center">
+            Failed to load staff reports.
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
+          data={transactions}
+          keyExtractor={(item) => item.id}
+          ListEmptyComponent={
+            <View className="py-16 items-center justify-center">
+              <Text className="font-poppins text-gray-400 text-sm">
+                No data here
               </Text>
             </View>
+          }
+          renderItem={({ item }) => (
+            <View className="flex-row items-center justify-between border-b border-gray-100/80 py-3.5">
+              <View>
+                <Text className="font-poppins-semibold text-sm text-gray-900">
+                  {item.name}
+                </Text>
+                <Text className="mt-0.5 font-poppins text-xs text-gray-400">
+                  {item.service}
+                </Text>
+              </View>
 
-            <View className="items-end">
-              <Text className="font-poppins-bold text-sm text-gray-900">
-                {item.amount}
-              </Text>
-              <Text className="mt-0.5 font-poppins text-xs text-gray-400">
-                {item.date}
-              </Text>
+              <View className="items-end">
+                <Text className="font-poppins-bold text-sm text-gray-900">
+                  {item.amount}
+                </Text>
+                <Text className="mt-0.5 font-poppins text-xs text-gray-400">
+                  {item.date}
+                </Text>
+              </View>
             </View>
-          </View>
-        )}
-        showsVerticalScrollIndicator={false}
-      />
+          )}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </Container>
   );
 }

@@ -64,8 +64,8 @@ export const mainScreens: Screen[] = [
     icon: "man-outline" as const,
   },
   {
-    title: "Staff Screen",
-    desc: "All staff related  page",
+    title: "Barber / Staff Screen",
+    desc: "All Barber & Staff related page",
     href: "/(role)/staff" as Href,
     icon: "home-outline" as const,
   },

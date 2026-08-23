@@ -1,6 +1,6 @@
 import { ClientListView } from "@/components/client-management";
 import { Container } from "@/components/container";
-import { useRouter } from "expo-router";
+import { useRouter, type Href } from "expo-router";
 import React from "react";
 
 export default function StaffClientScreen() {
@@ -10,9 +10,16 @@ export default function StaffClientScreen() {
     <Container className="bg-white flex-1" isScrollable={false}>
       <ClientListView
         onPressAdd={() => console.log("Add new client clicked")}
-        onSelectGroup={() =>
-          router.push("/(role)/staff/client/group-client-select")
-        }
+        onSelectGroup={(group) => {
+          const groupKey = (group as any).key || group.id || "all";
+          router.push({
+            pathname: "/(role)/staff/client/group-client-select",
+            params: {
+              group: groupKey,
+              title: group.title,
+            },
+          } as Href);
+        }}
       />
     </Container>
   );

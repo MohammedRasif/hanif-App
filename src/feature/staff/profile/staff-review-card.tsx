@@ -3,17 +3,31 @@ import { Image } from "expo-image";
 import React from "react";
 import { Text, View } from "react-native";
 
-export const StaffReviewCard = () => {
+export interface StaffReviewCardProps {
+  comment?: string;
+  customerAvatar?: string | null;
+  customerName?: string;
+  date?: string;
+  rating?: number;
+}
+
+export const StaffReviewCard = ({
+  customerName = "john",
+  customerAvatar = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+  date = "29 may 2026",
+  rating = 5,
+  comment = "Great service!",
+}: StaffReviewCardProps) => {
   return (
     <View className="mb-4 rounded-2xl border border-gray-100 bg-white p-4">
-      {/* Top Row: 5 Stars + User Info */}
+      {/* Top Row: Stars + User Info */}
       <View className="flex-row items-center justify-between">
-        {/* 5 Yellow Stars */}
+        {/* Yellow Stars */}
         <View className="flex-row items-center gap-1">
           {[1, 2, 3, 4, 5].map((item) => (
             <StyledIcons
               key={item}
-              className="text-amber-400"
+              className={item <= rating ? "text-amber-400" : "text-gray-200"}
               name="star"
               size={18}
             />
@@ -24,16 +38,18 @@ export const StaffReviewCard = () => {
         <View className="flex-row items-center gap-2">
           <View className="items-end">
             <Text className="font-poppins-semibold text-xs text-gray-900">
-              john
+              {customerName}
             </Text>
             <Text className="mt-0.5 font-poppins text-[10px] text-gray-400">
-              29 may 2026
+              {date}
             </Text>
           </View>
           <Image
             contentFit="cover"
             source={{
-              uri: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+              uri:
+                customerAvatar ||
+                "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
             }}
             style={{ borderRadius: 16, height: 32, width: 32 }}
           />
@@ -42,13 +58,7 @@ export const StaffReviewCard = () => {
 
       {/* Review Content */}
       <Text className="mt-3 mb-2 font-poppins text-xs leading-relaxed text-gray-600">
-        we are the best on uk base shop we are the best on uk base shop we are
-        the best on uk base shop
-      </Text>
-
-      {/* Reply Footer */}
-      <Text className="font-poppins text-[10px] text-gray-400">
-        You replied
+        {comment}
       </Text>
     </View>
   );

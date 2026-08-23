@@ -1,9 +1,35 @@
 import { SharedProfileScreen, type ProfileMenuItem } from "@/components/shared";
+import { useGetProfileQuery } from "@/Redux/feature/auth";
+import { useGetStaffMeShopQuery } from "@/Redux/feature/dashboard";
 import { useRouter } from "expo-router";
 import React from "react";
 
+const DEFAULT_AVATAR =
+  "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1757735711/images_nfasdv.png";
+
 export default function StaffProfileScreen() {
   const router = useRouter();
+
+  // 1. Fetch user auth profile (GET /v1/auth/profile/)
+  const { data: userProfileResponse } = useGetProfileQuery();
+  const userProfile = userProfileResponse?.data;
+
+  // 2. Fetch staff shop info (GET /api/v1/barbers/me/shop/)
+  const { data: shopResponse } = useGetStaffMeShopQuery();
+  const shopData = shopResponse?.data;
+
+  // User Profile Mapping
+  const userName = userProfile?.full_name || userProfile?.username || "Barber";
+  const userSubtitle =
+    userProfile?.email || userProfile?.role || "Barber Staff";
+  const userAvatarUrl = userProfile?.image || DEFAULT_AVATAR;
+
+  // Shop Info Mapping
+  const coverImageUrl =
+    shopData?.banner ||
+    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg";
+  const avatarUrl = shopData?.logo || DEFAULT_AVATAR;
+  const locationTitle = shopData?.name || "Hampdenpark Barber";
 
   const STAFF_MENU_ITEMS: ProfileMenuItem[] = [
     {
@@ -40,14 +66,14 @@ export default function StaffProfileScreen() {
 
   return (
     <SharedProfileScreen
-      avatarUrl="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=300"
-      coverImageUrl="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=800"
-      locationTitle="Jazz barber (Hampdenpark)"
+      avatarUrl={avatarUrl}
+      coverImageUrl={coverImageUrl}
+      locationTitle={locationTitle}
       menuItems={STAFF_MENU_ITEMS}
       onSignOut={() => router.replace("/auth/login")}
-      userAvatarUrl="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150"
-      userName="James Carter"
-      userSubtitle="Barber"
+      userAvatarUrl={userAvatarUrl}
+      userName={userName}
+      userSubtitle={userSubtitle}
     />
   );
 }

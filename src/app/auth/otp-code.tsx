@@ -60,10 +60,14 @@ export default function OtpCodeScreen() {
           placement: "top",
         });
 
-        const role = res?.data?.user?.role || "USER";
-        if (role === "ADMIN") {
+        const rawRole = String(res?.data?.user?.role || "USER").toUpperCase();
+        if (rawRole === "ADMIN") {
           router.replace("/(role)/admin" as Href);
-        } else if (role === "STAFF") {
+        } else if (
+          rawRole === "BARBER" ||
+          rawRole === "STAFF" ||
+          rawRole === "BARBER_STAFF"
+        ) {
           router.replace("/(role)/staff" as Href);
         } else {
           router.replace("/(role)/user" as Href);
