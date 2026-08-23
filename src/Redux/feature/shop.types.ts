@@ -132,3 +132,29 @@ export interface BookingItem {
   updated_at: string;
   appointments_details: AppointmentDetailItem[];
 }
+
+export const buildServicesUrl = (
+  params?:
+    { shop?: string | number; barber?: string | number } | string | number,
+): string => {
+  if (typeof params === "object" && params !== null) {
+    const queryParts: string[] = [];
+    if (params.shop) queryParts.push(`shop=${params.shop}`);
+    if (params.barber) queryParts.push(`barber=${params.barber}`);
+    return `v1/services/?${queryParts.join("&")}`;
+  }
+  return `v1/services/?shop=${params || ""}`;
+};
+
+export const buildBarbersUrl = (
+  params?:
+    { shop?: string | number; service?: string | number } | string | number,
+): string => {
+  if (typeof params === "object" && params !== null) {
+    const queryParts: string[] = [];
+    if (params.shop) queryParts.push(`shop=${params.shop}`);
+    if (params.service) queryParts.push(`service=${params.service}`);
+    return `v1/barbers/?${queryParts.join("&")}`;
+  }
+  return `v1/barbers/?shop=${params || ""}`;
+};

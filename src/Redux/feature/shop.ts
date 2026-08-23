@@ -1,12 +1,14 @@
 import { baseApi } from "./baseApi";
-import type {
-  BarberItem,
-  BookingItem,
-  GalleryItem,
-  ReviewItem,
-  Shop,
-  ShopDetails,
-  ShopService,
+import {
+  buildBarbersUrl,
+  buildServicesUrl,
+  type BarberItem,
+  type BookingItem,
+  type GalleryItem,
+  type ReviewItem,
+  type Shop,
+  type ShopDetails,
+  type ShopService,
 } from "./shop.types";
 
 export * from "./shop.types";
@@ -14,10 +16,7 @@ export * from "./shop.types";
 export const shopApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getShops: builder.query<{ success: boolean; data: Shop[] }, void>({
-      query: () => ({
-        url: "v1/shops/",
-        method: "GET",
-      }),
+      query: () => "v1/shops/",
       providesTags: ["Shop"],
     }),
 
@@ -25,10 +24,7 @@ export const shopApi = baseApi.injectEndpoints({
       { success: boolean; data: ShopDetails },
       string | number
     >({
-      query: (id) => ({
-        url: `v1/shops/${id}/`,
-        method: "GET",
-      }),
+      query: (id) => `v1/shops/${id}/`,
       providesTags: ["Shop"],
     }),
 
@@ -36,21 +32,7 @@ export const shopApi = baseApi.injectEndpoints({
       { success: boolean; data: ShopService[] },
       { shop?: string | number; barber?: string | number } | string | number
     >({
-      query: (params) => {
-        if (typeof params === "object" && params !== null) {
-          const queryParts: string[] = [];
-          if (params.shop) queryParts.push(`shop=${params.shop}`);
-          if (params.barber) queryParts.push(`barber=${params.barber}`);
-          return {
-            url: `v1/services/?${queryParts.join("&")}`,
-            method: "GET",
-          };
-        }
-        return {
-          url: `v1/services/?shop=${params}`,
-          method: "GET",
-        };
-      },
+      query: (params) => buildServicesUrl(params),
       providesTags: ["Shop"],
     }),
 
@@ -58,10 +40,7 @@ export const shopApi = baseApi.injectEndpoints({
       { success: boolean; data: ReviewItem[] },
       string | number
     >({
-      query: (shopId) => ({
-        url: `v1/bookings/reviews/?shop_id=${shopId}`,
-        method: "GET",
-      }),
+      query: (shopId) => `v1/bookings/reviews/?shop_id=${shopId}`,
       providesTags: ["Shop"],
     }),
 
@@ -69,10 +48,7 @@ export const shopApi = baseApi.injectEndpoints({
       { success: boolean; data: GalleryItem[] },
       string | number
     >({
-      query: (shopId) => ({
-        url: `v1/shops/gallery/${shopId}`,
-        method: "GET",
-      }),
+      query: (shopId) => `v1/shops/gallery/${shopId}`,
       providesTags: ["Shop"],
     }),
 
@@ -80,21 +56,7 @@ export const shopApi = baseApi.injectEndpoints({
       { success: boolean; data: BarberItem[] },
       { shop?: string | number; service?: string | number } | string | number
     >({
-      query: (params) => {
-        if (typeof params === "object" && params !== null) {
-          const queryParts: string[] = [];
-          if (params.shop) queryParts.push(`shop=${params.shop}`);
-          if (params.service) queryParts.push(`service=${params.service}`);
-          return {
-            url: `v1/barbers/?${queryParts.join("&")}`,
-            method: "GET",
-          };
-        }
-        return {
-          url: `v1/barbers/?shop=${params}`,
-          method: "GET",
-        };
-      },
+      query: (params) => buildBarbersUrl(params),
       providesTags: ["Shop"],
     }),
 
@@ -102,10 +64,8 @@ export const shopApi = baseApi.injectEndpoints({
       { success: boolean; data: any },
       { barber_id: string | number; date: string; services: string | number }
     >({
-      query: ({ barber_id, date, services }) => ({
-        url: `v1/bookings/available-slots/?barber_id=${barber_id}&date=${date}&services=${services}`,
-        method: "GET",
-      }),
+      query: ({ barber_id, date, services }) =>
+        `v1/bookings/available-slots/?barber_id=${barber_id}&date=${date}&services=${services}`,
     }),
 
     createBooking: builder.mutation<
@@ -134,19 +94,14 @@ export const shopApi = baseApi.injectEndpoints({
       invalidatesTags: ["Shop"],
     }),
 
-    // Get Bookings List (upcoming or past)
     getBookings: builder.query<
       { success: boolean; data: BookingItem[] },
       "upcoming" | "past" | string
     >({
-      query: (type = "upcoming") => ({
-        url: `v1/booking/?type=${type}`,
-        method: "GET",
-      }),
+      query: (type = "upcoming") => `v1/booking/?type=${type}`,
       providesTags: ["Shop"],
     }),
 
-    // Cancel Booking by ID
     cancelBooking: builder.mutation<
       { success: boolean; details?: string; message?: string },
       string | number
@@ -158,7 +113,6 @@ export const shopApi = baseApi.injectEndpoints({
       invalidatesTags: ["Shop"],
     }),
 
-    // Update / Reschedule Booking by ID
     updateBooking: builder.mutation<
       { success: boolean; data?: any; message?: string },
       { id: string | number; data: Partial<BookingItem> | Record<string, any> }
