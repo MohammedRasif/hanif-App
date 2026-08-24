@@ -1,7 +1,7 @@
 import { CommonInput } from "@/components/shared";
 import { StyledIcons } from "@/lib";
 import { useForm } from "@tanstack/react-form";
-import { Button, Dialog } from "heroui-native";
+import { Dialog } from "heroui-native";
 import React from "react";
 import {
   Pressable,
@@ -63,10 +63,7 @@ export function ConfirmAddReservationDialog({
     <Dialog isOpen={isOpen} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="bg-black/60" />
-        <Dialog.Content
-          className="mx-4 max-h-[85%] rounded-[28px] bg-white p-6 shadow-2xl"
-          style={{ maxHeight: screenHeight * 0.85 }}
-        >
+        <Dialog.Content className="w-[92%] max-w-sm rounded-4xl bg-white p-6 shadow-2xl">
           {/* Header */}
           <View className="mb-4 flex-row items-center justify-between">
             <Dialog.Title className="font-bold text-2xl text-gray-900">
@@ -92,79 +89,78 @@ export function ConfirmAddReservationDialog({
           </Text>
 
           {/* Form Content */}
-          <View className="flex-1">
-            <ScrollView
-              className="flex-1"
-              contentContainerStyle={{ paddingBottom: 16 }}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-            >
-              <View className="gap-1 pt-1">
-                {/* Selected Service */}
-                <form.Field name="service">
-                  {(field) => (
-                    <CommonInput
-                      field={field}
-                      label="Service"
-                      placeholder="e.g. Hair Cut & Style"
-                    />
-                  )}
-                </form.Field>
+          <ScrollView
+            className="mb-4"
+            contentContainerStyle={{ paddingBottom: 8 }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            style={{ maxHeight: screenHeight * 0.45 }}
+          >
+            <View className="gap-1 pt-1">
+              {/* Selected Service */}
+              <form.Field name="service">
+                {(field) => (
+                  <CommonInput
+                    field={field}
+                    label="Service"
+                    placeholder="e.g. Hair Cut & Style"
+                  />
+                )}
+              </form.Field>
 
-                {/* Assigned Barber */}
-                <form.Field name="barber">
-                  {(field) => (
-                    <CommonInput
-                      field={field}
-                      label="Barber"
-                      placeholder="e.g. Isaac"
-                    />
-                  )}
-                </form.Field>
+              {/* Assigned Barber */}
+              <form.Field name="barber">
+                {(field) => (
+                  <CommonInput
+                    field={field}
+                    label="Barber"
+                    placeholder="e.g. Isaac"
+                  />
+                )}
+              </form.Field>
 
-                {/* Date & Time */}
-                <form.Field name="dateTime">
-                  {(field) => (
-                    <CommonInput
-                      field={field}
-                      label="Start Time"
-                      placeholder="e.g. 11:00 AM"
-                    />
-                  )}
-                </form.Field>
+              {/* Date & Time */}
+              <form.Field name="dateTime">
+                {(field) => (
+                  <CommonInput
+                    field={field}
+                    label="Start Time"
+                    placeholder="e.g. 11:00 AM"
+                  />
+                )}
+              </form.Field>
 
-                {/* End Time */}
-                <form.Field name="endTime">
-                  {(field) => (
-                    <CommonInput
-                      field={field}
-                      label="End Time"
-                      placeholder="e.g. 11:40 AM"
-                    />
-                  )}
-                </form.Field>
-              </View>
-            </ScrollView>
-          </View>
+              {/* End Time */}
+              <form.Field name="endTime">
+                {(field) => (
+                  <CommonInput
+                    field={field}
+                    label="End Time"
+                    placeholder="e.g. 11:40 AM"
+                  />
+                )}
+              </form.Field>
+            </View>
+          </ScrollView>
 
           {/* Pinned Bottom Actions */}
           <View className="flex-row items-center gap-3 pt-3 border-t border-gray-100">
-            <Button
-              className="h-14 flex-1 rounded-2xl border border-gray-200 bg-gray-50 active:bg-gray-100"
+            <Pressable
+              className="h-14 flex-1 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 active:bg-gray-100"
               onPress={onBack}
             >
               <Text className="font-semibold text-base text-gray-700">
                 Back
               </Text>
-            </Button>
-            <Button
-              className="h-14 flex-1 rounded-2xl bg-[#FF9500] active:bg-[#e08300]"
+            </Pressable>
+            <Pressable
+              className="h-14 flex-1 items-center justify-center rounded-2xl bg-[#FF9500] active:bg-[#e08300]"
               onPress={() => form.handleSubmit()}
             >
               <Text className="font-bold text-base text-white">
                 Next: Review
               </Text>
-            </Button>
+            </Pressable>
           </View>
         </Dialog.Content>
       </Dialog.Portal>

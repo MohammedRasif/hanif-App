@@ -2,7 +2,7 @@ import { CommonInput } from "@/components/shared";
 import { StyledIcons } from "@/lib";
 import { useForm } from "@tanstack/react-form";
 import { Image } from "expo-image";
-import { Button, Dialog } from "heroui-native";
+import { Dialog } from "heroui-native";
 import React, { useState } from "react";
 import {
   Pressable,
@@ -68,10 +68,7 @@ export function AddTimeOffDialog({
     <Dialog isOpen={isOpen} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="bg-black/60" />
-        <Dialog.Content
-          className="mx-4 max-h-[85%] rounded-[28px] bg-white p-6 shadow-2xl"
-          style={{ maxHeight: screenHeight * 0.85 }}
-        >
+        <Dialog.Content className="w-[92%] max-w-sm rounded-4xl bg-white p-6 shadow-2xl">
           {/* Header */}
           <View className="mb-4 flex-row items-center justify-between">
             <Dialog.Title className="font-bold text-2xl text-gray-900">
@@ -86,94 +83,93 @@ export function AddTimeOffDialog({
           </View>
 
           {/* Form Content */}
-          <View className="flex-1">
-            <ScrollView
-              className="flex-1"
-              contentContainerStyle={{ paddingBottom: 16 }}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-            >
-              {/* Selected Barber Card */}
-              <View className="mb-4 flex-row items-center gap-3.5 rounded-2xl border border-gray-100 bg-[#FAFAFA] p-3.5">
-                <Image
-                  className="h-12 w-12 rounded-full bg-gray-200"
-                  contentFit="cover"
-                  source={{ uri: barber.avatar }}
-                />
-                <View>
-                  <Text className="font-bold text-base text-gray-900">
-                    {barber.name}
-                  </Text>
-                  <Text className="font-medium text-gray-500 text-xs">
-                    {barber.role}
-                  </Text>
-                </View>
-              </View>
-
-              {/* All Day Toggle Switch */}
-              <View className="mb-4 flex-row items-center justify-between rounded-2xl border border-gray-100 bg-gray-50/50 p-4">
-                <Text className="font-semibold text-base text-gray-900">
-                  All day
+          <ScrollView
+            className="mb-4"
+            contentContainerStyle={{ paddingBottom: 8 }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            style={{ maxHeight: screenHeight * 0.5 }}
+          >
+            {/* Selected Barber Card */}
+            <View className="mb-4 flex-row items-center gap-3.5 rounded-2xl border border-gray-100 bg-[#FAFAFA] p-3.5">
+              <Image
+                className="h-12 w-12 rounded-full bg-gray-200"
+                contentFit="cover"
+                source={{ uri: barber.avatar }}
+              />
+              <View>
+                <Text className="font-bold text-base text-gray-900">
+                  {barber.name}
                 </Text>
-                <Pressable
-                  className={`h-7 w-12 items-center rounded-full p-0.5 transition-colors ${
-                    isAllDay ? "bg-[#FF9500]" : "bg-gray-300"
+                <Text className="font-medium text-gray-500 text-xs">
+                  {barber.role}
+                </Text>
+              </View>
+            </View>
+
+            {/* All Day Toggle Switch */}
+            <View className="mb-4 flex-row items-center justify-between rounded-2xl border border-gray-100 bg-gray-50/50 p-4">
+              <Text className="font-semibold text-base text-gray-900">
+                All day
+              </Text>
+              <Pressable
+                className={`h-7 w-12 items-center rounded-full p-0.5 transition-colors ${
+                  isAllDay ? "bg-[#FF9500]" : "bg-gray-300"
+                }`}
+                onPress={() => setIsAllDay(!isAllDay)}
+              >
+                <View
+                  className={`h-6 w-6 rounded-full bg-white shadow-xs transition-transform ${
+                    isAllDay ? "translate-x-2.5 self-end" : "self-start"
                   }`}
-                  onPress={() => setIsAllDay(!isAllDay)}
-                >
-                  <View
-                    className={`h-6 w-6 rounded-full bg-white shadow-xs transition-transform ${
-                      isAllDay ? "translate-x-2.5 self-end" : "self-start"
-                    }`}
+                />
+              </Pressable>
+            </View>
+
+            <View className="gap-1">
+              {/* Start Date */}
+              <form.Field name="startDate">
+                {(field) => (
+                  <CommonInput
+                    field={field}
+                    label="Start date"
+                    placeholder="DD-MM-YYYY"
                   />
-                </Pressable>
-              </View>
+                )}
+              </form.Field>
 
-              <View className="gap-1">
-                {/* Start Date */}
-                <form.Field name="startDate">
-                  {(field) => (
-                    <CommonInput
-                      field={field}
-                      label="Start date"
-                      placeholder="DD-MM-YYYY"
-                    />
-                  )}
-                </form.Field>
+              {/* End Date */}
+              <form.Field name="endDate">
+                {(field) => (
+                  <CommonInput
+                    field={field}
+                    label="End date"
+                    placeholder="DD-MM-YYYY"
+                  />
+                )}
+              </form.Field>
 
-                {/* End Date */}
-                <form.Field name="endDate">
-                  {(field) => (
-                    <CommonInput
-                      field={field}
-                      label="End date"
-                      placeholder="DD-MM-YYYY"
-                    />
-                  )}
-                </form.Field>
-
-                {/* Reason */}
-                <form.Field name="reason">
-                  {(field) => (
-                    <CommonInput
-                      field={field}
-                      label="Reason"
-                      placeholder="e.g. Personal vacation"
-                    />
-                  )}
-                </form.Field>
-              </View>
-            </ScrollView>
-          </View>
+              {/* Reason */}
+              <form.Field name="reason">
+                {(field) => (
+                  <CommonInput
+                    field={field}
+                    label="Reason"
+                    placeholder="e.g. Personal vacation"
+                  />
+                )}
+              </form.Field>
+            </View>
+          </ScrollView>
 
           {/* Pinned Bottom Action Button */}
           <View className="pt-3 border-t border-gray-100">
-            <Button
-              className="h-14 w-full rounded-2xl bg-[#FF9500] active:bg-[#e08300]"
+            <Pressable
+              className="h-14 w-full items-center justify-center rounded-2xl bg-[#FF9500] active:bg-[#e08300]"
               onPress={() => form.handleSubmit()}
             >
               <Text className="font-bold text-base text-white">Save</Text>
-            </Button>
+            </Pressable>
           </View>
         </Dialog.Content>
       </Dialog.Portal>
