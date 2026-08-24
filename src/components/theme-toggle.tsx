@@ -1,7 +1,6 @@
 import { StyledIcons } from "@/lib";
 import Haptics from "expo-haptics";
-import { Platform, Pressable } from "react-native";
-import Animated, { FadeOut, ZoomIn } from "react-native-reanimated";
+import { Platform, Pressable, View } from "react-native";
 
 import { useAppTheme } from "@/contexts/app-theme-context";
 
@@ -19,13 +18,13 @@ export function ThemeToggle() {
       }}
     >
       {isLight ? (
-        <Animated.View entering={ZoomIn} exiting={FadeOut} key="moon">
+        <View key="moon">
           <StyledIcons className="text-foreground" name="moon" size={20} />
-        </Animated.View>
+        </View>
       ) : (
-        <Animated.View entering={ZoomIn} exiting={FadeOut} key="sun">
+        <View key="sun">
           <StyledIcons className="text-foreground" name="sunny" size={20} />
-        </Animated.View>
+        </View>
       )}
     </Pressable>
   );

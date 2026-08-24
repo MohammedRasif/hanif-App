@@ -1,6 +1,6 @@
 import type { Ionicons } from "@expo/vector-icons";
 import { StyledIcons } from "@/lib";
-import { ShopDetails, useGetShopDetailsQuery } from "@/Redux/feature/shop";
+import { type ShopDetails, useGetShopDetailsQuery } from "@/Redux/feature/shop";
 import { Image } from "expo-image";
 import React from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";

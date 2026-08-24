@@ -1,12 +1,7 @@
 import { StyledIcons } from "@/lib";
 import type { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, type ComponentProps } from "react";
-import { Platform } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import React, { type ComponentProps } from "react";
+import { Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export interface TabBarIconProps {
@@ -22,24 +17,14 @@ export function TabBarIcon({
   iconName,
   focusedIconName,
 }: TabBarIconProps) {
-  const scale = useSharedValue(focused ? 1.12 : 1);
-
-  useEffect(() => {
-    scale.value = withTiming(focused ? 1.12 : 1, { duration: 180 });
-  }, [focused, scale]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
   return (
-    <Animated.View style={animatedStyle}>
+    <View style={focused ? { transform: [{ scale: 1.1 }] } : undefined}>
       <StyledIcons
         color={color}
         name={focused ? focusedIconName : iconName}
         size={24}
       />
-    </Animated.View>
+    </View>
   );
 }
 

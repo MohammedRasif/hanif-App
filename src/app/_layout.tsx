@@ -9,6 +9,7 @@ import { HeroUINativeProvider } from "heroui-native";
 import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import { View } from "react-native";
 import { Uniwind } from "uniwind";
 
 import { AppThemeProvider } from "@/contexts/app-theme-context";
@@ -39,7 +40,7 @@ export default function Layout() {
   }, [fontsLoaded]);
 
   if (!fontsLoaded) {
-    return null;
+    return <View style={{ flex: 1 }} />;
   }
 
   return (

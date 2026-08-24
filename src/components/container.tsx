@@ -10,12 +10,9 @@ import {
   KeyboardAvoidingView,
   KeyboardAwareScrollView,
 } from "react-native-keyboard-controller";
-import Animated, { type AnimatedProps } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const AnimatedView = Animated.createAnimatedComponent(View);
-
-type Props = AnimatedProps<ViewProps> & {
+type Props = ViewProps & {
   className?: string;
   isScrollable?: boolean;
   keyboardAvoiding?: boolean;
@@ -30,6 +27,7 @@ export function Container({
   keyboardAvoiding = false,
   safeAreaBottom = false,
   scrollViewProps,
+  style,
   ...props
 }: PropsWithChildren<Props>) {
   const insets = useSafeAreaInsets();
@@ -71,14 +69,17 @@ export function Container({
   }
 
   return (
-    <AnimatedView
+    <View
       className={cn("flex-1 bg-background", className)}
-      style={{
-        paddingBottom: safeAreaBottom ? insets.bottom : 0,
-      }}
+      style={[
+        {
+          paddingBottom: safeAreaBottom ? insets.bottom : 0,
+        },
+        style,
+      ]}
       {...props}
     >
       {content}
-    </AnimatedView>
+    </View>
   );
 }
