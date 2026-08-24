@@ -1,3 +1,4 @@
+import triggerIcon from "@/assets/calender-trigger.png";
 import { StyledIcons } from "@/lib";
 import { Image } from "expo-image";
 import React from "react";
@@ -93,10 +94,10 @@ export function StaffTimeOffView({
 
       {/* Floating Action Button (FAB) */}
       <Pressable
-        className="absolute bottom-8 right-6 h-14 w-14 items-center justify-center rounded-full bg-black shadow-lg active:scale-95 z-20"
+        className="absolute bottom-8 right-6 h-14 w-14 items-center justify-center rounded-full bg-black shadow-lg active:scale-95 z-20 overflow-hidden"
         onPress={onAddNewTimeOff}
       >
-        <StyledIcons className="text-white" name="sunny-outline" size={26} />
+        <Image className="h-7 w-7" contentFit="contain" source={triggerIcon} />
       </Pressable>
     </View>
   );

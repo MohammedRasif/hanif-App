@@ -4,5 +4,8 @@ export * from "./opening-calendar-view";
 export * from "./staff-time-off-view";
 export * from "./business-hours-view";
 export * from "./staff-working-hours-view";
+export * from "./shift-view";
+export * from "./add-business-days-off-view";
+export * from "./add-staff-time-off-view";
 export * from "./types";
 export * from "./mock-data";
