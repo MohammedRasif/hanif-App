@@ -27,7 +27,7 @@ export default function AdminProfileScreen() {
       label: "Schedule management",
       iconName: "calendar-outline",
       onPress: () => {
-        console.log("Schedule management clicked");
+        router.push("/(role)/admin/profile/schedule-management");
       },
     },
     {
