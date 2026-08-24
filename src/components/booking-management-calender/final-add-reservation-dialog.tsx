@@ -69,11 +69,12 @@ export function FinalAddReservationDialog({
             <Dialog.Title className="font-bold text-2xl text-gray-900">
               Add new reservation
             </Dialog.Title>
-            <Dialog.Close asChild>
-              <Pressable className="h-9 w-9 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200">
-                <StyledIcons className="text-gray-600" name="close" size={20} />
-              </Pressable>
-            </Dialog.Close>
+            <Pressable
+              className="h-9 w-9 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200"
+              onPress={() => onOpenChange(false)}
+            >
+              <StyledIcons className="text-gray-600" name="close" size={20} />
+            </Pressable>
           </View>
 
           {/* Stepper Indicator */}

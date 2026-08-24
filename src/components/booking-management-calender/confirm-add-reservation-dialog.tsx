@@ -72,11 +72,12 @@ export function ConfirmAddReservationDialog({
             <Dialog.Title className="font-bold text-2xl text-gray-900">
               Add new reservation
             </Dialog.Title>
-            <Dialog.Close asChild>
-              <Pressable className="h-9 w-9 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200">
-                <StyledIcons className="text-gray-600" name="close" size={20} />
-              </Pressable>
-            </Dialog.Close>
+            <Pressable
+              className="h-9 w-9 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200"
+              onPress={() => onOpenChange(false)}
+            >
+              <StyledIcons className="text-gray-600" name="close" size={20} />
+            </Pressable>
           </View>
 
           {/* Stepper Indicator */}
@@ -98,80 +99,48 @@ export function ConfirmAddReservationDialog({
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
             >
-              <View className="gap-3.5 pt-1">
+              <View className="gap-1 pt-1">
                 {/* Selected Service */}
                 <form.Field name="service">
                   {(field) => (
-                    <View>
-                      <Text className="mb-1.5 font-medium text-gray-700 text-sm">
-                        Service
-                      </Text>
-                      <CommonInput
-                        className="h-12 rounded-2xl border border-gray-200 bg-gray-50/50 px-4 text-gray-900 text-sm"
-                        onBlur={field.handleBlur}
-                        onChangeText={field.handleChange}
-                        placeholder="e.g. Hair Cut & Style"
-                        placeholderTextColor="#9CA3AF"
-                        value={field.state.value}
-                      />
-                    </View>
+                    <CommonInput
+                      field={field}
+                      label="Service"
+                      placeholder="e.g. Hair Cut & Style"
+                    />
                   )}
                 </form.Field>
 
                 {/* Assigned Barber */}
                 <form.Field name="barber">
                   {(field) => (
-                    <View>
-                      <Text className="mb-1.5 font-medium text-gray-700 text-sm">
-                        Barber
-                      </Text>
-                      <CommonInput
-                        className="h-12 rounded-2xl border border-gray-200 bg-gray-50/50 px-4 text-gray-900 text-sm"
-                        onBlur={field.handleBlur}
-                        onChangeText={field.handleChange}
-                        placeholder="e.g. Isaac"
-                        placeholderTextColor="#9CA3AF"
-                        value={field.state.value}
-                      />
-                    </View>
+                    <CommonInput
+                      field={field}
+                      label="Barber"
+                      placeholder="e.g. Isaac"
+                    />
                   )}
                 </form.Field>
 
                 {/* Date & Time */}
                 <form.Field name="dateTime">
                   {(field) => (
-                    <View>
-                      <Text className="mb-1.5 font-medium text-gray-700 text-sm">
-                        Start Time
-                      </Text>
-                      <CommonInput
-                        className="h-12 rounded-2xl border border-gray-200 bg-gray-50/50 px-4 text-gray-900 text-sm"
-                        onBlur={field.handleBlur}
-                        onChangeText={field.handleChange}
-                        placeholder="e.g. 11:00 AM"
-                        placeholderTextColor="#9CA3AF"
-                        value={field.state.value}
-                      />
-                    </View>
+                    <CommonInput
+                      field={field}
+                      label="Start Time"
+                      placeholder="e.g. 11:00 AM"
+                    />
                   )}
                 </form.Field>
 
                 {/* End Time */}
                 <form.Field name="endTime">
                   {(field) => (
-                    <View>
-                      <Text className="mb-1.5 font-medium text-gray-700 text-sm">
-                        End Time
-                      </Text>
-                      <CommonInput
-                        className="h-12 rounded-2xl border border-gray-200 bg-gray-50/50 px-4 text-gray-900 text-sm"
-                        onBlur={field.handleBlur}
-                        onChangeText={field.handleChange}
-                        placeholder="e.g. 11:40 AM"
-                        placeholderTextColor="#9CA3AF"
-                        value={field.state.value}
-                      />
-                    </View>
+                    <CommonInput
+                      field={field}
+                      label="End Time"
+                      placeholder="e.g. 11:40 AM"
+                    />
                   )}
                 </form.Field>
               </View>

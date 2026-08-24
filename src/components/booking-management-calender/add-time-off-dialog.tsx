@@ -77,11 +77,12 @@ export function AddTimeOffDialog({
             <Dialog.Title className="font-bold text-2xl text-gray-900">
               Add time off
             </Dialog.Title>
-            <Dialog.Close asChild>
-              <Pressable className="h-9 w-9 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200">
-                <StyledIcons className="text-gray-600" name="close" size={20} />
-              </Pressable>
-            </Dialog.Close>
+            <Pressable
+              className="h-9 w-9 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200"
+              onPress={() => onOpenChange(false)}
+            >
+              <StyledIcons className="text-gray-600" name="close" size={20} />
+            </Pressable>
           </View>
 
           {/* Form Content */}
@@ -128,66 +129,37 @@ export function AddTimeOffDialog({
                 </Pressable>
               </View>
 
-              <View className="gap-3.5">
+              <View className="gap-1">
                 {/* Start Date */}
                 <form.Field name="startDate">
                   {(field) => (
-                    <View>
-                      <Text className="mb-1.5 font-medium text-gray-700 text-sm">
-                        Start date
-                      </Text>
-                      <CommonInput
-                        className="h-12 rounded-2xl border border-gray-200 bg-gray-50/50 px-4 text-gray-900 text-sm"
-                        onBlur={field.handleBlur}
-                        onChangeText={field.handleChange}
-                        placeholder="DD-MM-YYYY"
-                        placeholderTextColor="#9CA3AF"
-                        value={field.state.value}
-                      />
-                    </View>
+                    <CommonInput
+                      field={field}
+                      label="Start date"
+                      placeholder="DD-MM-YYYY"
+                    />
                   )}
                 </form.Field>
 
                 {/* End Date */}
                 <form.Field name="endDate">
                   {(field) => (
-                    <View>
-                      <Text className="mb-1.5 font-medium text-gray-700 text-sm">
-                        End date
-                      </Text>
-                      <CommonInput
-                        className="h-12 rounded-2xl border border-gray-200 bg-gray-50/50 px-4 text-gray-900 text-sm"
-                        onBlur={field.handleBlur}
-                        onChangeText={field.handleChange}
-                        placeholder="DD-MM-YYYY"
-                        placeholderTextColor="#9CA3AF"
-                        value={field.state.value}
-                      />
-                    </View>
+                    <CommonInput
+                      field={field}
+                      label="End date"
+                      placeholder="DD-MM-YYYY"
+                    />
                   )}
                 </form.Field>
 
                 {/* Reason */}
                 <form.Field name="reason">
                   {(field) => (
-                    <View>
-                      <Text className="mb-1.5 font-medium text-gray-700 text-sm">
-                        Reason
-                      </Text>
-                      <CommonInput
-                        className="h-12 rounded-2xl border border-gray-200 bg-gray-50/50 px-4 text-gray-900 text-sm"
-                        onBlur={field.handleBlur}
-                        onChangeText={field.handleChange}
-                        placeholder="e.g. Personal vacation"
-                        placeholderTextColor="#9CA3AF"
-                        value={field.state.value}
-                      />
-                      {field.state.meta.errors ? (
-                        <Text className="mt-1 text-red-500 text-xs">
-                          {field.state.meta.errors.join(", ")}
-                        </Text>
-                      ) : null}
-                    </View>
+                    <CommonInput
+                      field={field}
+                      label="Reason"
+                      placeholder="e.g. Personal vacation"
+                    />
                   )}
                 </form.Field>
               </View>
