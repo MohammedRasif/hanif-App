@@ -11,7 +11,12 @@ export default function AdminProfileLayout() {
     >
       <Stack.Screen name="index" />
       <Stack.Screen name="personal-setting" />
+      <Stack.Screen name="reports" />
+      <Stack.Screen name="reviews" />
+      <Stack.Screen name="service-setup" />
       <Stack.Screen name="shop" />
+      <Stack.Screen name="shop-settings" />
+      <Stack.Screen name="staff-management" />
     </Stack>
   );
 }

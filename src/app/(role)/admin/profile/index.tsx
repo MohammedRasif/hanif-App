@@ -19,7 +19,7 @@ export default function AdminProfileScreen() {
       label: "Service setup",
       iconName: "cut-outline",
       onPress: () => {
-        console.log("Service setup clicked");
+        router.push("/(role)/admin/profile/service-setup");
       },
     },
     {
@@ -35,7 +35,7 @@ export default function AdminProfileScreen() {
       label: "Reports",
       iconName: "bar-chart-outline",
       onPress: () => {
-        console.log("Reports clicked");
+        router.push("/(role)/admin/profile/reports");
       },
     },
     {
@@ -43,7 +43,7 @@ export default function AdminProfileScreen() {
       label: "Staff management",
       iconName: "bar-chart-outline",
       onPress: () => {
-        console.log("Staff management clicked");
+        router.push("/(role)/admin/profile/staff-management");
       },
     },
     {
@@ -51,7 +51,7 @@ export default function AdminProfileScreen() {
       label: "Shop Settings",
       iconName: "settings-outline",
       onPress: () => {
-        console.log("Shop Settings clicked");
+        router.push("/(role)/admin/profile/shop-settings");
       },
     },
     {
@@ -59,7 +59,7 @@ export default function AdminProfileScreen() {
       label: "Reviews",
       iconName: "notifications-outline",
       onPress: () => {
-        console.log("Reviews clicked");
+        router.push("/(role)/admin/profile/reviews");
       },
     },
   ];
