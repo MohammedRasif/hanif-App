@@ -7,3 +7,4 @@ export * from "./calendar-types";
 export * from "./confirm-add-reservation-dialog";
 export * from "./final-add-reservation-dialog";
 export * from "./booking-calendar-menu";
+export * from "./booking-detail-modal";

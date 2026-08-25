@@ -1,9 +1,16 @@
 import CustomCalendar from "@/lib/calender";
+import type { Appointment } from "@/lib/calender/types";
+import { useToast } from "heroui-native";
 import React, { useState } from "react";
 import { View } from "react-native";
 import { AddReservationDialog } from "./add-reservation-dialog";
 import { AddTimeOffDialog } from "./add-time-off-dialog";
 import { BookingCalendarMenu } from "./booking-calendar-menu";
+import {
+  BookAgainConfirmModal,
+  BookAgainFormModal,
+  CheckoutPageView,
+} from "./booking-detail-modal";
 import { ConfirmAddReservationDialog } from "./confirm-add-reservation-dialog";
 import { FinalAddReservationDialog } from "./final-add-reservation-dialog";
 
@@ -18,6 +25,7 @@ export function BookingManagementCalendar({
   onBookingConfirmed,
   onTimeOffSaved,
 }: BookingManagementCalendarProps) {
+  const { toast } = useToast();
   const [selectedDateStr, setSelectedDateStr] = useState(initialDateStr);
 
   // Dialog Visibility State for 3-Step Booking Flow
@@ -26,7 +34,21 @@ export function BookingManagementCalendar({
   const [isStep3Open, setIsStep3Open] = useState(false);
   const [isTimeOffDialogOpen, setIsTimeOffDialogOpen] = useState(false);
 
+  // Checkout & Book Again Flow States
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isBookAgainFormOpen, setIsBookAgainFormOpen] = useState(false);
+  const [isBookAgainConfirmOpen, setIsBookAgainConfirmOpen] = useState(false);
+  const [bookAgainData, setBookAgainData] = useState<any>({});
+
   const [bookingAccumulator, setBookingAccumulator] = useState<any>({});
+
+  // Handle Clicking any Appointment in Calendar Grid
+  const handlePressAppointment = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setIsCheckoutOpen(true);
+  };
 
   // Step 1 Submission -> Open Step 2
   const handleStep1Submit = (customerData: any) => {
@@ -44,7 +66,12 @@ export function BookingManagementCalendar({
 
   // Step 3 Submission -> Final Booking Confirmed
   const handleStep3Confirm = (finalData: any) => {
-    console.log("Final Booking Confirmed:", finalData);
+    toast.show({
+      label: "Successfully booked!",
+      description: "Reservation added to calendar.",
+      variant: "success",
+      placement: "top",
+    });
     onBookingConfirmed?.(finalData);
     setIsStep3Open(false);
     setBookingAccumulator({});
@@ -54,15 +81,97 @@ export function BookingManagementCalendar({
     timeOffDuration: string;
     timeOffReason: string;
   }) => {
-    console.log("Time Off Submitted:", data);
+    toast.show({
+      label: "Time off saved!",
+      description: data.timeOffReason || "Time off added to schedule.",
+      variant: "success",
+      placement: "top",
+    });
     onTimeOffSaved?.(data);
     setIsTimeOffDialogOpen(false);
   };
+
+  // Handle Unpaid Actions
+  const handleCancelUnpaid = () => {
+    toast.show({
+      label: "Order cancelled",
+      description: "The unpaid booking has been cancelled.",
+      variant: "danger",
+      placement: "top",
+    });
+    setIsCheckoutOpen(false);
+  };
+
+  const handleCompleteOrder = () => {
+    if (selectedAppointment) {
+      (selectedAppointment as any).status = "completed";
+      (selectedAppointment as any).isPaid = true;
+      (selectedAppointment as any).paymentStatus = "Paid";
+    }
+    toast.show({
+      label: "Payment completed!",
+      description: "Order marked as paid successfully.",
+      variant: "success",
+      placement: "top",
+    });
+    setIsCheckoutOpen(false);
+  };
+
+  // Handle Book Again Flow
+  const handleDoneBookAgainForm = (formData: any) => {
+    setBookAgainData(formData);
+    setIsBookAgainConfirmOpen(true);
+  };
+
+  const handleConfirmBookAgain = () => {
+    setIsBookAgainConfirmOpen(false);
+    toast.show({
+      label: "Successfully booked!",
+      description: "New appointment has been created.",
+      variant: "success",
+      placement: "top",
+    });
+    onBookingConfirmed?.(bookAgainData);
+  };
+
+  if (isCheckoutOpen && selectedAppointment) {
+    return (
+      <View className="flex-1 bg-white">
+        <CheckoutPageView
+          appointment={selectedAppointment}
+          onBack={() => setIsCheckoutOpen(false)}
+          onCancelUnpaid={handleCancelUnpaid}
+          onCompleteOrder={handleCompleteOrder}
+          onOpenBookAgain={() => setIsBookAgainFormOpen(true)}
+        />
+
+        {/* Book Again Step 1: Form Popup Dialog (Image 3) */}
+        <BookAgainFormModal
+          isOpen={isBookAgainFormOpen}
+          onDone={handleDoneBookAgainForm}
+          onOpenChange={setIsBookAgainFormOpen}
+        />
+
+        {/* Book Again Step 2: Confirmation Summary Popup Dialog (Image 4) */}
+        <BookAgainConfirmModal
+          bookingData={bookAgainData}
+          isOpen={isBookAgainConfirmOpen}
+          onBack={() => {
+            setIsBookAgainConfirmOpen(false);
+            setIsBookAgainFormOpen(true);
+          }}
+          onConfirm={handleConfirmBookAgain}
+          onOpenChange={setIsBookAgainConfirmOpen}
+        />
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-white">
       <CustomCalendar
         activeDateStr={selectedDateStr}
+        onPressAppointment={handlePressAppointment}
         onSelectDate={(day) => setSelectedDateStr(day.fullDateStr)}
       >
         {/* Floating Menu Action Overlay */}
