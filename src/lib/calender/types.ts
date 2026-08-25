@@ -42,6 +42,7 @@ export interface CalendarProps {
   hourHeight?: number;
   onPressAppointment?: (appointment: Appointment) => void;
   onPressFab?: () => void;
+  onPressFilter?: () => void;
   onSelectDate?: (day: DayItem) => void;
   renderEventCard?: (appointment: Appointment) => React.ReactNode;
   renderFab?: () => React.ReactNode;

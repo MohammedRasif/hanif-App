@@ -20,6 +20,7 @@ export function CustomCalendar({
   hourHeight = 120,
   onPressAppointment,
   onPressFab,
+  onPressFilter,
   onSelectDate: propsOnSelectDate,
   renderEventCard,
   renderFab,
@@ -49,6 +50,7 @@ export function CustomCalendar({
       <CalendarHeaderView
         activeDateStr={activeDateStr}
         days={days}
+        onPressFilter={onPressFilter}
         onSelectDate={handleSelectDate}
         workingHoursLabel={workingHoursLabel}
       />

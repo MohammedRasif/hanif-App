@@ -6,6 +6,7 @@ import type { DayItem } from "./types";
 type Props = {
   activeDateStr?: string;
   days: DayItem[];
+  onPressFilter?: () => void;
   onSelectDate?: (day: DayItem) => void;
   title?: string;
   workingHoursLabel?: string;
@@ -14,6 +15,7 @@ type Props = {
 export function CalendarHeaderView({
   activeDateStr,
   days,
+  onPressFilter,
   onSelectDate,
   title = "Appointments",
   workingHoursLabel = "9.00 - 6.00 pm",
@@ -33,7 +35,10 @@ export function CalendarHeaderView({
 
         {/* Top Right Action Icons */}
         <View className="flex-row items-center gap-3">
-          <Pressable className="h-11 w-11 items-center justify-center rounded-full bg-gray-100 active:opacity-70">
+          <Pressable
+            className="h-11 w-11 items-center justify-center rounded-full bg-gray-100 active:opacity-70"
+            onPress={onPressFilter}
+          >
             <StyledIcons
               className="text-gray-700"
               name="options-outline"

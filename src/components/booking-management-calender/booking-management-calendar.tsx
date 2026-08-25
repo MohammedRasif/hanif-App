@@ -13,6 +13,10 @@ import {
 } from "./booking-detail-modal";
 import { ConfirmAddReservationDialog } from "./confirm-add-reservation-dialog";
 import { FinalAddReservationDialog } from "./final-add-reservation-dialog";
+import {
+  StaffFilterBottomSheet,
+  StaffWorkingHoursPage,
+} from "./staff-filter-working-hours";
 
 export interface BookingManagementCalendarProps {
   initialDateStr?: string;
@@ -27,6 +31,11 @@ export function BookingManagementCalendar({
 }: BookingManagementCalendarProps) {
   const { toast } = useToast();
   const [selectedDateStr, setSelectedDateStr] = useState(initialDateStr);
+
+  // Staff Filter & Working Hours Flow States
+  const [isStaffFilterOpen, setIsStaffFilterOpen] = useState(false);
+  const [isWorkingHoursPageOpen, setIsWorkingHoursPageOpen] = useState(false);
+  const [selectedStaffForHours, setSelectedStaffForHours] = useState<any>(null);
 
   // Dialog Visibility State for 3-Step Booking Flow
   const [isStep1Open, setIsStep1Open] = useState(false);
@@ -48,6 +57,12 @@ export function BookingManagementCalendar({
   const handlePressAppointment = (appointment: Appointment) => {
     setSelectedAppointment(appointment);
     setIsCheckoutOpen(true);
+  };
+
+  // Handle Selecting Staff Member from Filter Bottom Sheet -> Open Working Hours Page
+  const handleSelectStaffForHours = (staffItem: any) => {
+    setSelectedStaffForHours(staffItem);
+    setIsWorkingHoursPageOpen(true);
   };
 
   // Step 1 Submission -> Open Step 2
@@ -134,6 +149,18 @@ export function BookingManagementCalendar({
     onBookingConfirmed?.(bookAgainData);
   };
 
+  // Render Staff Working Hours Page (Image 3) when active
+  if (isWorkingHoursPageOpen) {
+    return (
+      <StaffWorkingHoursPage
+        onBack={() => setIsWorkingHoursPageOpen(false)}
+        onSaveAll={() => setIsWorkingHoursPageOpen(false)}
+        staffName={selectedStaffForHours?.name || "Isaac"}
+      />
+    );
+  }
+
+  // Render Full-Screen Checkout Page (Image 1-5) when an appointment is selected
   if (isCheckoutOpen && selectedAppointment) {
     return (
       <View className="flex-1 bg-white">
@@ -172,12 +199,20 @@ export function BookingManagementCalendar({
       <CustomCalendar
         activeDateStr={selectedDateStr}
         onPressAppointment={handlePressAppointment}
+        onPressFilter={() => setIsStaffFilterOpen(true)}
         onSelectDate={(day) => setSelectedDateStr(day.fullDateStr)}
       >
         {/* Floating Menu Action Overlay */}
         <BookingCalendarMenu
           onOpenReservationDialog={() => setIsStep1Open(true)}
           onOpenTimeOffDialog={() => setIsTimeOffDialogOpen(true)}
+        />
+
+        {/* Staff Filter Bottom Sheet (Image 2) */}
+        <StaffFilterBottomSheet
+          isOpen={isStaffFilterOpen}
+          onOpenChange={setIsStaffFilterOpen}
+          onSelectStaffHours={handleSelectStaffForHours}
         />
 
         {/* Step 1: Customer Selection Modal */}
