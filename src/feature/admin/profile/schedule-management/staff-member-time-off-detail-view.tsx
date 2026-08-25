@@ -4,45 +4,35 @@ import { Image } from "expo-image";
 import React, { useState } from "react";
 import { FlatList, Modal, Pressable, Text, View } from "react-native";
 
-export interface StaffTimeOffItem {
+export interface StaffDetailItem {
   avatarUrl?: string;
   id: string;
   name: string;
   role?: string;
-  subtitle: string;
 }
 
-interface StaffTimeOffViewProps {
-  onAddNewTimeOff?: () => void;
+export interface TimeOffRecord {
+  date: string;
+  id: string;
+  reason: string;
+}
+
+interface StaffMemberTimeOffDetailViewProps {
   onBack: () => void;
-  onSelectStaff?: (item: StaffTimeOffItem) => void;
-  onSelectTimeOff?: (item: StaffTimeOffItem) => void;
+  staff?: StaffDetailItem;
 }
 
-const DEFAULT_STAFF_TIME_OFF_LIST: StaffTimeOffItem[] = [
+const DEFAULT_TIME_OFF_RECORDS: TimeOffRecord[] = [
   {
     id: "1",
-    name: "isaac",
-    role: "manager",
-    subtitle: "Today",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+    date: "Today",
+    reason: "Sick day",
   },
   {
     id: "2",
-    name: "isaac",
-    role: "manager",
-    subtitle: "Today",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+    date: "30 july 2026",
+    reason: "Sick day",
   },
-];
-
-const MOCK_STAFF_OPTIONS = [
-  "Isaac",
-  "Alex (Senior barber)",
-  "Sarah (Stylist)",
-  "Jhon (barber)",
 ];
 
 const MOCK_REASON_OPTIONS = [
@@ -61,48 +51,42 @@ const DATE_OPTIONS = [
   "Custom Date",
 ];
 
-export function StaffTimeOffView({
+export function StaffMemberTimeOffDetailView({
   onBack,
-  onAddNewTimeOff,
-  onSelectStaff,
-  onSelectTimeOff,
-}: StaffTimeOffViewProps) {
-  const [timeOffList] = useState<StaffTimeOffItem[]>(
-    DEFAULT_STAFF_TIME_OFF_LIST,
+  staff = {
+    id: "1",
+    name: "Isaac",
+    role: "manager",
+  },
+}: StaffMemberTimeOffDetailViewProps) {
+  const [records, setRecords] = useState<TimeOffRecord[]>(
+    DEFAULT_TIME_OFF_RECORDS,
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Modal form states
-  const [selectedStaff, setSelectedStaff] = useState("Isaac");
   const [selectedReason, setSelectedReason] = useState("Reason");
   const [isAllDay, setIsAllDay] = useState(true);
   const [startDate, setStartDate] = useState("Today");
   const [endDate, setEndDate] = useState("Today");
   const [isApproved, setIsApproved] = useState(false);
 
-  // Pickers modal states
-  const [isStaffPickerOpen, setIsStaffPickerOpen] = useState(false);
+  // Pickers
   const [isReasonPickerOpen, setIsReasonPickerOpen] = useState(false);
   const [isStartDatePickerOpen, setIsStartDatePickerOpen] = useState(false);
   const [isEndDatePickerOpen, setIsEndDatePickerOpen] = useState(false);
 
-  const handleRowClick = (item: StaffTimeOffItem) => {
-    if (onSelectStaff) {
-      onSelectStaff(item);
-    } else if (onSelectTimeOff) {
-      onSelectTimeOff(item);
-    }
-  };
-
-  const handleFabClick = () => {
-    if (onAddNewTimeOff) {
-      onAddNewTimeOff();
-    } else {
-      setIsModalOpen(true);
-    }
-  };
-
   const handleSaveModal = () => {
+    if (selectedReason !== "Reason") {
+      setRecords((prev) => [
+        {
+          id: String(Date.now()),
+          date: startDate,
+          reason: selectedReason,
+        },
+        ...prev,
+      ]);
+    }
     setIsModalOpen(false);
   };
 
@@ -122,45 +106,27 @@ export function StaffTimeOffView({
         </Pressable>
 
         <Text className="font-bold text-xl text-gray-900 tracking-tight">
-          Time off Today
+          {staff.name}
         </Text>
 
         <View className="w-10" />
       </View>
 
-      {/* Main List */}
+      {/* Time Off Records List */}
       <View className="flex-1 px-6 pt-2">
         <FlatList
           contentContainerStyle={{ paddingBottom: 100 }}
-          data={timeOffList}
+          data={records}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <Pressable
-              className="mb-3.5 flex-row items-center justify-between rounded-3xl bg-[#F8F9FA] p-4.5 active:bg-gray-100"
-              onPress={() => handleRowClick(item)}
-            >
-              <View className="flex-row items-center gap-3.5">
-                <Image
-                  className="h-12 w-12 rounded-full bg-gray-200"
-                  contentFit="cover"
-                  source={{ uri: item.avatarUrl }}
-                />
-                <View>
-                  <Text className="font-bold text-base text-gray-900 capitalize">
-                    {item.name}
-                  </Text>
-                  <Text className="font-medium text-xs text-gray-400 mt-0.5">
-                    {item.subtitle}
-                  </Text>
-                </View>
-              </View>
-
-              <StyledIcons
-                className="text-gray-900"
-                name="chevron-forward"
-                size={18}
-              />
-            </Pressable>
+            <View className="py-4 border-b border-gray-100">
+              <Text className="font-bold text-base text-gray-900">
+                {item.date}
+              </Text>
+              <Text className="font-medium text-xs text-gray-400 mt-1">
+                {item.reason}
+              </Text>
+            </View>
           )}
           showsVerticalScrollIndicator={false}
         />
@@ -168,8 +134,8 @@ export function StaffTimeOffView({
 
       {/* Floating Action Button (FAB) */}
       <Pressable
-        className="absolute bottom-8 right-6 h-14 w-14 items-center justify-center rounded-full bg-black shadow-xl active:scale-95 z-20 overflow-hidden"
-        onPress={handleFabClick}
+        className="absolute bottom-8 right-6 h-14 w-14 items-center justify-center rounded-full bg-black shadow-xl active:scale-95 overflow-hidden z-20"
+        onPress={() => setIsModalOpen(true)}
       >
         <Image
           contentFit="contain"
@@ -193,33 +159,32 @@ export function StaffTimeOffView({
             </Text>
 
             {/* Staff Card */}
-            <Pressable
-              className="mb-4 flex-row items-center gap-3.5 rounded-2xl bg-[#F8F9FA] p-3.5 active:bg-gray-100"
-              onPress={() => setIsStaffPickerOpen(true)}
-            >
-              <Image
-                className="h-12 w-12 rounded-full bg-gray-200"
-                contentFit="cover"
-                source={{
-                  uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-                }}
-              />
+            <View className="mb-4 flex-row items-center gap-3.5 rounded-2xl bg-[#F8F9FA] p-3.5">
+              {staff.avatarUrl ? (
+                <Image
+                  className="h-12 w-12 rounded-full bg-gray-200"
+                  contentFit="cover"
+                  source={{ uri: staff.avatarUrl }}
+                />
+              ) : (
+                <View className="h-12 w-12 items-center justify-center rounded-full bg-gray-200">
+                  <StyledIcons
+                    className="text-gray-900"
+                    name="person"
+                    size={22}
+                  />
+                </View>
+              )}
 
-              <View className="flex-1">
+              <View>
                 <Text className="font-bold text-base text-gray-900">
-                  {selectedStaff}
+                  {staff.name}
                 </Text>
                 <Text className="font-medium text-xs text-gray-400 mt-0.5">
-                  manager
+                  {staff.role || "manager"}
                 </Text>
               </View>
-
-              <StyledIcons
-                className="text-gray-400"
-                name="chevron-down"
-                size={18}
-              />
-            </Pressable>
+            </View>
 
             {/* Reason Dropdown */}
             <Pressable
@@ -353,53 +318,6 @@ export function StaffTimeOffView({
             </Pressable>
           </View>
         </View>
-
-        {/* Staff Picker Modal */}
-        <Modal
-          animationType="fade"
-          onRequestClose={() => setIsStaffPickerOpen(false)}
-          transparent
-          visible={isStaffPickerOpen}
-        >
-          <View className="flex-1 items-center justify-center bg-black/50 px-6">
-            <View className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl">
-              <Text className="mb-3 font-bold text-xl text-gray-900">
-                Select Staff Member
-              </Text>
-              {MOCK_STAFF_OPTIONS.map((st) => (
-                <Pressable
-                  className={`py-3.5 px-3.5 mb-1.5 rounded-xl flex-row items-center justify-between ${
-                    selectedStaff === st
-                      ? "bg-amber-500/10"
-                      : "active:bg-gray-100"
-                  }`}
-                  key={st}
-                  onPress={() => {
-                    setSelectedStaff(st);
-                    setIsStaffPickerOpen(false);
-                  }}
-                >
-                  <Text
-                    className={`font-semibold text-base ${
-                      selectedStaff === st
-                        ? "text-[#FF9500] font-bold"
-                        : "text-gray-900"
-                    }`}
-                  >
-                    {st}
-                  </Text>
-                  {selectedStaff === st && (
-                    <StyledIcons
-                      className="text-[#FF9500]"
-                      name="checkmark"
-                      size={18}
-                    />
-                  )}
-                </Pressable>
-              ))}
-            </View>
-          </View>
-        </Modal>
 
         {/* Reason Picker Modal */}
         <Modal

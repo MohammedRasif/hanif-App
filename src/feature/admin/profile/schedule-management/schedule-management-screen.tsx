@@ -7,6 +7,7 @@ import { BusinessHoursView } from "./business-hours-view";
 import { OpeningCalendarView } from "./opening-calendar-view";
 import { ScheduleMenuView } from "./schedule-menu-view";
 import { ShiftView } from "./shift-view";
+import { StaffMemberTimeOffDetailView } from "./staff-member-time-off-detail-view";
 import { StaffTimeOffView } from "./staff-time-off-view";
 import { StaffWorkingHoursView } from "./staff-working-hours-view";
 import type { ScheduleManagementProps, ScheduleSubPage } from "./types";
@@ -17,6 +18,7 @@ export function ScheduleManagementScreen({
 }: ScheduleManagementProps) {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState<ScheduleSubPage>(initialPage);
+  const [selectedStaffMember, setSelectedStaffMember] = useState<any>(null);
   const [navigationHistory, setNavigationHistory] = useState<ScheduleSubPage[]>(
     [initialPage],
   );
@@ -68,6 +70,15 @@ export function ScheduleManagementScreen({
         <StaffTimeOffView
           onAddNewTimeOff={() => handleNavigate("add-staff-time-off")}
           onBack={handleBack}
+          onSelectStaff={(staff) => {
+            setSelectedStaffMember(staff);
+            handleNavigate("staff-time-off-detail");
+          }}
+        />
+      ) : currentPage === "staff-time-off-detail" ? (
+        <StaffMemberTimeOffDetailView
+          onBack={handleBack}
+          staff={selectedStaffMember}
         />
       ) : currentPage === "business-hours" ? (
         <BusinessHoursView onBack={handleBack} />

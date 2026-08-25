@@ -65,6 +65,16 @@ export function ShiftView({ onBack, onSelectShift }: ShiftViewProps) {
   const [startTime, setStartTime] = useState("10:50 am");
   const [endTime, setEndTime] = useState("05:30 pm");
 
+  // Break states
+  const [hasBreak, setHasBreak] = useState(false);
+  const [breakStartTime, setBreakStartTime] = useState("10:50 am");
+  const [breakEndTime, setBreakEndTime] = useState("05:30 pm");
+
+  // Staff member time off states
+  const [hasTimeOff, setHasTimeOff] = useState(false);
+  const [timeOffStartTime, setTimeOffStartTime] = useState("10:50 am");
+  const [timeOffEndTime, setTimeOffEndTime] = useState("05:30 pm");
+
   const handleOpenShiftModal = (item: StaffShiftItem) => {
     setSelectedShift(item);
     setIsShiftEnabled(true);
@@ -78,6 +88,21 @@ export function ShiftView({ onBack, onSelectShift }: ShiftViewProps) {
       setStartTime("10:50 am");
       setEndTime("05:30 pm");
     }
+
+    if (item.breakHours) {
+      setHasBreak(true);
+      setBreakStartTime("02:00 pm");
+      setBreakEndTime("03:00 pm");
+    } else {
+      setHasBreak(false);
+      setBreakStartTime("10:50 am");
+      setBreakEndTime("05:30 pm");
+    }
+
+    setHasTimeOff(false);
+    setTimeOffStartTime("10:50 am");
+    setTimeOffEndTime("05:30 pm");
+
     setIsModalOpen(true);
     onSelectShift?.(item);
   };
@@ -87,7 +112,13 @@ export function ShiftView({ onBack, onSelectShift }: ShiftViewProps) {
       setShifts((prev) =>
         prev.map((s) =>
           s.id === selectedShift.id
-            ? { ...s, hours: `${startTime} – ${endTime}` }
+            ? {
+                ...s,
+                hours: `${startTime} – ${endTime}`,
+                breakHours: hasBreak
+                  ? `Break: ${breakStartTime} - ${breakEndTime}`
+                  : undefined,
+              }
             : s,
         ),
       );
@@ -209,7 +240,7 @@ export function ShiftView({ onBack, onSelectShift }: ShiftViewProps) {
               </View>
             </View>
 
-            {/* Time Range Row: [10:50 am] to [05:30 pm] */}
+            {/* Shift Time Range Row: [10:50 am] to [05:30 pm] */}
             <View className="mt-4 flex-row items-center justify-between gap-2.5">
               <View className="h-13 flex-1 items-center justify-center rounded-2xl border border-gray-200 bg-white px-3">
                 <TextInput
@@ -239,15 +270,49 @@ export function ShiftView({ onBack, onSelectShift }: ShiftViewProps) {
               <Text className="font-bold text-lg text-gray-900 mb-2">
                 Break
               </Text>
-              <Pressable
-                className="h-14 w-full flex-row items-center gap-2 rounded-2xl bg-[#F8F9FA] px-4 active:bg-gray-100"
-                onPress={() => console.log("Add break pressed")}
-              >
-                <StyledIcons className="text-gray-900" name="add" size={20} />
-                <Text className="font-bold text-sm text-gray-900">
-                  Add break
-                </Text>
-              </Pressable>
+              <View className="rounded-2xl bg-[#F8F9FA] p-3.5">
+                <Pressable
+                  className="flex-row items-center gap-2 active:opacity-75"
+                  onPress={() => setHasBreak(!hasBreak)}
+                >
+                  <StyledIcons
+                    className="text-gray-900"
+                    name={hasBreak ? "remove" : "add"}
+                    size={20}
+                  />
+                  <Text className="font-bold text-sm text-gray-900">
+                    Add break
+                  </Text>
+                </Pressable>
+
+                {hasBreak && (
+                  <View className="mt-3 flex-row items-center justify-between gap-2.5">
+                    <View className="h-13 flex-1 items-center justify-center rounded-2xl border border-gray-200 bg-white px-3">
+                      <TextInput
+                        className="text-center font-semibold text-sm text-gray-900 w-full"
+                        onChangeText={setBreakStartTime}
+                        placeholder="10:50 am"
+                        placeholderTextColor="#9CA3AF"
+                        value={breakStartTime}
+                      />
+                    </View>
+
+                    <Text className="font-medium text-sm text-gray-600 px-1">
+                      to
+                    </Text>
+
+                    <View className="h-13 flex-1 items-center justify-center rounded-2xl border border-gray-200 bg-white px-3">
+                      <TextInput
+                        className="text-center font-semibold text-sm text-gray-900 w-full"
+                        onChangeText={setBreakEndTime}
+                        placeholder="05:30 pm"
+                        placeholderTextColor="#9CA3AF"
+                        value={breakEndTime}
+                      />
+                    </View>
+                  </View>
+                )}
+              </View>
             </View>
 
             {/* Staff Member Time Off Section */}
@@ -255,15 +320,49 @@ export function ShiftView({ onBack, onSelectShift }: ShiftViewProps) {
               <Text className="font-bold text-lg text-gray-900 mb-2">
                 Staff member time off
               </Text>
-              <Pressable
-                className="h-14 w-full flex-row items-center gap-2 rounded-2xl bg-[#F8F9FA] px-4 active:bg-gray-100"
-                onPress={() => console.log("Add time off pressed")}
-              >
-                <StyledIcons className="text-gray-900" name="add" size={20} />
-                <Text className="font-bold text-sm text-gray-900">
-                  Add time off
-                </Text>
-              </Pressable>
+              <View className="rounded-2xl bg-[#F8F9FA] p-3.5">
+                <Pressable
+                  className="flex-row items-center gap-2 active:opacity-75"
+                  onPress={() => setHasTimeOff(!hasTimeOff)}
+                >
+                  <StyledIcons
+                    className="text-gray-900"
+                    name={hasTimeOff ? "remove" : "add"}
+                    size={20}
+                  />
+                  <Text className="font-bold text-sm text-gray-900">
+                    Add time off
+                  </Text>
+                </Pressable>
+
+                {hasTimeOff && (
+                  <View className="mt-3 flex-row items-center justify-between gap-2.5">
+                    <View className="h-13 flex-1 items-center justify-center rounded-2xl border border-gray-200 bg-white px-3">
+                      <TextInput
+                        className="text-center font-semibold text-sm text-gray-900 w-full"
+                        onChangeText={setTimeOffStartTime}
+                        placeholder="10:50 am"
+                        placeholderTextColor="#9CA3AF"
+                        value={timeOffStartTime}
+                      />
+                    </View>
+
+                    <Text className="font-medium text-sm text-gray-600 px-1">
+                      to
+                    </Text>
+
+                    <View className="h-13 flex-1 items-center justify-center rounded-2xl border border-gray-200 bg-white px-3">
+                      <TextInput
+                        className="text-center font-semibold text-sm text-gray-900 w-full"
+                        onChangeText={setTimeOffEndTime}
+                        placeholder="05:30 pm"
+                        placeholderTextColor="#9CA3AF"
+                        value={timeOffEndTime}
+                      />
+                    </View>
+                  </View>
+                )}
+              </View>
             </View>
 
             {/* Save Action Button */}

@@ -2,6 +2,7 @@ export type ScheduleSubPage =
   | "menu"
   | "opening-calendar"
   | "staff-time-off"
+  | "staff-time-off-detail"
   | "business-hours"
   | "staff-working-hours"
   | "shift"

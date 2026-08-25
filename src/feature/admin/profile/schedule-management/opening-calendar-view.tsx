@@ -1,4 +1,5 @@
 import triggerIcon from "@/assets/calender-trigger.png";
+
 import { StyledIcons } from "@/lib";
 import { Image } from "expo-image";
 import React, { useState } from "react";
@@ -292,9 +293,9 @@ export function OpeningCalendarView({
             <StyledIcons className="text-white" name="close" size={26} />
           ) : (
             <Image
-              className="h-8 w-8"
               contentFit="contain"
               source={triggerIcon}
+              style={{ width: 30, height: 30 }}
             />
           )}
         </Pressable>
