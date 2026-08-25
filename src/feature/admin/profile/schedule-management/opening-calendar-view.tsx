@@ -1,9 +1,14 @@
+import triggerIcon from "@/assets/calender-trigger.png";
+
 import { StyledIcons } from "@/lib";
+import { Image } from "expo-image";
 import React, { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 interface OpeningCalendarViewProps {
   onBack: () => void;
+  onNavigateToAddBusinessDaysOff?: () => void;
+  onNavigateToAddStaffTimeOff?: () => void;
   onNavigateToBusinessHours?: () => void;
   onNavigateToShift?: () => void;
   onNavigateToTimeOff?: () => void;
@@ -14,9 +19,12 @@ export function OpeningCalendarView({
   onNavigateToTimeOff,
   onNavigateToShift,
   onNavigateToBusinessHours,
+  onNavigateToAddBusinessDaysOff,
+  onNavigateToAddStaffTimeOff,
 }: OpeningCalendarViewProps) {
   const [selectedDay, setSelectedDay] = useState(18);
   const [currentMonth] = useState("January 2024");
+  const [isSpeedDialOpen, setIsSpeedDialOpen] = useState(false);
 
   // Mock days grid matching the design
   const calendarRows = [
@@ -231,13 +239,67 @@ export function OpeningCalendarView({
         </Pressable>
       </ScrollView>
 
-      {/* Floating Action Button (FAB) */}
-      <Pressable
-        className="absolute bottom-8 right-6 h-14 w-14 items-center justify-center rounded-full bg-black shadow-lg active:scale-95 z-20"
-        onPress={onNavigateToTimeOff}
-      >
-        <StyledIcons className="text-white" name="sunny-outline" size={26} />
-      </Pressable>
+      {/* Backdrop overlay to dismiss speed dial when open */}
+      {isSpeedDialOpen && (
+        <Pressable
+          className="absolute inset-0 z-40 bg-black/10"
+          onPress={() => setIsSpeedDialOpen(false)}
+        />
+      )}
+
+      {/* Floating Action Menu Container */}
+      <View className="absolute bottom-8 right-6 items-end z-50">
+        {/* Speed Dial Menu Items */}
+        {isSpeedDialOpen && (
+          <View className="items-end mb-3 gap-2.5">
+            {/* Option 1: Add business full days off */}
+            <Pressable
+              className="active:scale-95"
+              onPress={() => {
+                setIsSpeedDialOpen(false);
+                onNavigateToAddBusinessDaysOff?.();
+              }}
+            >
+              <View className="rounded-full bg-black px-5 py-3 shadow-xl">
+                <Text className="font-bold text-sm text-white">
+                  Add business full days off
+                </Text>
+              </View>
+            </Pressable>
+
+            {/* Option 2: Add staff member time off */}
+            <Pressable
+              className="active:scale-95"
+              onPress={() => {
+                setIsSpeedDialOpen(false);
+                onNavigateToAddStaffTimeOff?.();
+              }}
+            >
+              <View className="rounded-full bg-black px-5 py-3 shadow-xl">
+                <Text className="font-bold text-sm text-white">
+                  Add staff member time off
+                </Text>
+              </View>
+            </Pressable>
+          </View>
+        )}
+
+        {/* Floating Action Button (FAB) */}
+        <Pressable
+          className="h-14 w-14 items-center justify-center rounded-full bg-black shadow-xl active:scale-95 overflow-hidden"
+          onPress={() => setIsSpeedDialOpen(!isSpeedDialOpen)}
+        >
+          {isSpeedDialOpen ? (
+            <StyledIcons className="text-white" name="close" size={26} />
+          ) : (
+            <Image
+              contentFit="contain"
+              source={triggerIcon}
+              style={{ width: 30, height: 30 }}
+            />
+          )}
+        </Pressable>
+      </View>
     </View>
   );
 }

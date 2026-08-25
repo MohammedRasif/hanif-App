@@ -1,72 +1,67 @@
 import { StyledIcons } from "@/lib";
+import { Image } from "expo-image";
 import React, { useState } from "react";
 import {
+  FlatList,
   Modal,
   Pressable,
-  ScrollView,
   Switch,
   Text,
   TextInput,
   View,
 } from "react-native";
 
-interface DaySchedule {
+export interface StaffShiftItem {
+  avatarUrl?: string;
   breakHours?: string;
-  day: string;
+  duration: string;
   hours: string;
-  isClosed?: boolean;
+  id: string;
+  name: string;
 }
 
-const DEFAULT_BUSINESS_HOURS: DaySchedule[] = [
+export const MOCK_SHIFTS: StaffShiftItem[] = [
   {
-    day: "Saturday",
-    hours: "10:00 am – 05:00 pm",
-    breakHours: "Break: 2:00 pm -03:00 pm",
+    id: "1",
+    name: "isaac",
+    duration: "8h:30 m",
+    hours: "09:00 – 05:30 pm",
   },
   {
-    day: "Monday",
-    hours: "10:00 am – 05:00 pm",
+    id: "2",
+    name: "isaac",
+    duration: "8h:30 m",
+    hours: "09:00 – 05:30 pm",
+    breakHours: "Break: 2:00 pm - 3:00 pm",
   },
   {
-    day: "Tuesday",
-    hours: "10:00 am – 05:00 pm",
+    id: "3",
+    name: "isaac",
+    duration: "8h:30 m",
+    hours: "09:00 – 05:30 pm",
   },
   {
-    day: "Wednesday",
-    hours: "10:00 am – 05:00 pm",
-  },
-  {
-    day: "Thursday",
-    hours: "Closed",
-    isClosed: true,
-  },
-  {
-    day: "Friday",
-    hours: "10:00 am – 05:00 pm",
-  },
-  {
-    day: "Sunday",
-    hours: "Closed",
-    isClosed: true,
+    id: "4",
+    name: "isaac",
+    duration: "8h:30 m",
+    hours: "09:00 – 05:30 pm",
   },
 ];
 
-interface BusinessHoursViewProps {
+export interface ShiftViewProps {
   onBack: () => void;
-  onSave?: () => void;
+  onSelectShift?: (shift: StaffShiftItem) => void;
 }
 
-export function BusinessHoursView({ onBack, onSave }: BusinessHoursViewProps) {
-  const [scheduleList, setScheduleList] = useState<DaySchedule[]>(
-    DEFAULT_BUSINESS_HOURS,
-  );
-  const [selectedDayItem, setSelectedDayItem] = useState<DaySchedule | null>(
+export function ShiftView({ onBack, onSelectShift }: ShiftViewProps) {
+  const [shifts, setShifts] = useState<StaffShiftItem[]>(MOCK_SHIFTS);
+  const [selectedShift, setSelectedShift] = useState<StaffShiftItem | null>(
     null,
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Modal form states
-  const [isDayEnabled, setIsDayEnabled] = useState(true);
+  const [isShiftEnabled, setIsShiftEnabled] = useState(true);
   const [startTime, setStartTime] = useState("10:50 am");
   const [endTime, setEndTime] = useState("05:30 pm");
 
@@ -75,21 +70,20 @@ export function BusinessHoursView({ onBack, onSave }: BusinessHoursViewProps) {
   const [breakStartTime, setBreakStartTime] = useState("10:50 am");
   const [breakEndTime, setBreakEndTime] = useState("05:30 pm");
 
-  const handleOpenEditModal = (item: DaySchedule) => {
-    setSelectedDayItem(item);
-    setIsDayEnabled(!item.isClosed);
+  // Staff member time off states
+  const [hasTimeOff, setHasTimeOff] = useState(false);
+  const [timeOffStartTime, setTimeOffStartTime] = useState("10:50 am");
+  const [timeOffEndTime, setTimeOffEndTime] = useState("05:30 pm");
 
-    if (!item.isClosed && item.hours.includes("–")) {
-      const parts = item.hours.split("–");
-      const first = parts[0];
-      const second = parts[1];
-      if (first && second) {
-        setStartTime(first.trim());
-        setEndTime(second.trim());
-      } else {
-        setStartTime("10:50 am");
-        setEndTime("05:30 pm");
-      }
+  const handleOpenShiftModal = (item: StaffShiftItem) => {
+    setSelectedShift(item);
+    setIsShiftEnabled(true);
+    const parts = item.hours.split("–");
+    const firstPart = parts[0];
+    const secondPart = parts[1];
+    if (firstPart && secondPart) {
+      setStartTime(firstPart.trim());
+      setEndTime(secondPart.trim());
     } else {
       setStartTime("10:50 am");
       setEndTime("05:30 pm");
@@ -105,41 +99,32 @@ export function BusinessHoursView({ onBack, onSave }: BusinessHoursViewProps) {
       setBreakEndTime("05:30 pm");
     }
 
+    setHasTimeOff(false);
+    setTimeOffStartTime("10:50 am");
+    setTimeOffEndTime("05:30 pm");
+
     setIsModalOpen(true);
+    onSelectShift?.(item);
   };
 
   const handleSaveModal = () => {
-    if (selectedDayItem) {
-      setScheduleList((prev) =>
-        prev.map((item) => {
-          if (item.day === selectedDayItem.day) {
-            if (!isDayEnabled) {
-              return {
-                ...item,
-                hours: "Closed",
-                isClosed: true,
-                breakHours: undefined,
-              };
-            }
-            return {
-              ...item,
-              hours: `${startTime} – ${endTime}`,
-              isClosed: false,
-              breakHours: hasBreak
-                ? `Break: ${breakStartTime} - ${breakEndTime}`
-                : undefined,
-            };
-          }
-          return item;
-        }),
+    if (selectedShift) {
+      setShifts((prev) =>
+        prev.map((s) =>
+          s.id === selectedShift.id
+            ? {
+                ...s,
+                hours: `${startTime} – ${endTime}`,
+                breakHours: hasBreak
+                  ? `Break: ${breakStartTime} - ${breakEndTime}`
+                  : undefined,
+              }
+            : s,
+        ),
       );
     }
     setIsModalOpen(false);
-    setSelectedDayItem(null);
-  };
-
-  const handleSave = () => {
-    onSave ? onSave() : onBack();
+    setSelectedShift(null);
   };
 
   return (
@@ -158,38 +143,53 @@ export function BusinessHoursView({ onBack, onSave }: BusinessHoursViewProps) {
         </Pressable>
 
         <Text className="font-bold text-xl text-gray-900 tracking-tight">
-          Business hours
+          Shift
         </Text>
 
         <View className="w-10" />
       </View>
 
-      {/* Main Content */}
-      <ScrollView
-        className="flex-1 px-6"
-        contentContainerStyle={{ paddingBottom: 24 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Section Heading */}
-        <Text className="font-bold text-lg text-gray-900 mt-2 mb-2">
-          Opening Hours
-        </Text>
-
-        {/* Schedule Rows */}
-        <View className="mb-6">
-          {scheduleList.map((item, index) => (
+      {/* Main List */}
+      <View className="flex-1 px-6 pt-2">
+        <FlatList
+          contentContainerStyle={{ paddingBottom: 40 }}
+          data={shifts}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
             <Pressable
-              className="py-4.5 flex-row items-center justify-between border-b border-gray-100/90 active:bg-gray-50/50"
-              key={index}
-              onPress={() => handleOpenEditModal(item)}
+              className="mb-3.5 flex-row items-center justify-between rounded-3xl bg-[#F8F9FA] p-4.5 active:bg-gray-100"
+              onPress={() => handleOpenShiftModal(item)}
             >
-              {/* Day Name */}
-              <Text className="font-bold text-base text-gray-900">
-                {item.day}
-              </Text>
+              {/* Left Side: Avatar + Name + Duration */}
+              <View className="flex-row items-center gap-3.5">
+                {item.avatarUrl ? (
+                  <Image
+                    className="h-12 w-12 rounded-full bg-gray-200"
+                    contentFit="cover"
+                    source={{ uri: item.avatarUrl }}
+                  />
+                ) : (
+                  <View className="h-12 w-12 items-center justify-center rounded-full bg-gray-200">
+                    <StyledIcons
+                      className="text-gray-900"
+                      name="person"
+                      size={22}
+                    />
+                  </View>
+                )}
 
-              {/* Hours + Chevron */}
-              <View className="flex-row items-center gap-3">
+                <View>
+                  <Text className="font-bold text-base text-gray-900">
+                    {item.name}
+                  </Text>
+                  <Text className="font-medium text-xs text-gray-400 mt-0.5">
+                    {item.duration}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Right Side: Hours + Chevron */}
+              <View className="flex-row items-center gap-2.5">
                 <View className="items-end">
                   <Text className="font-semibold text-sm text-gray-900">
                     {item.hours}
@@ -208,21 +208,12 @@ export function BusinessHoursView({ onBack, onSave }: BusinessHoursViewProps) {
                 />
               </View>
             </Pressable>
-          ))}
-        </View>
-      </ScrollView>
-
-      {/* Bottom Fixed Action Button */}
-      <View className="px-6 pb-8 pt-3 bg-white border-t border-gray-100">
-        <Pressable
-          className="h-14 w-full items-center justify-center rounded-2xl bg-[#FF9500] active:bg-[#e08300]"
-          onPress={handleSave}
-        >
-          <Text className="font-bold text-base text-white">Save</Text>
-        </Pressable>
+          )}
+          showsVerticalScrollIndicator={false}
+        />
       </View>
 
-      {/* Edit Day Schedule Modal (Dialog matching screenshot) */}
+      {/* Edit Shift Modal */}
       <Modal
         animationType="fade"
         onRequestClose={() => setIsModalOpen(false)}
@@ -231,19 +222,17 @@ export function BusinessHoursView({ onBack, onSave }: BusinessHoursViewProps) {
       >
         <View className="flex-1 items-center justify-center bg-black/50 px-6">
           <View className="w-full max-w-sm rounded-4xl bg-white p-6 shadow-2xl">
-            {/* Header: Day Title + Enable Switch */}
+            {/* Header: Title + Enable Switch */}
             <View className="flex-row items-start justify-between">
-              <Text className="font-bold text-2xl text-gray-900">
-                {selectedDayItem?.day || "Saturday"}
-              </Text>
+              <Text className="font-bold text-2xl text-gray-900">Shift</Text>
 
               <View className="items-center">
                 <Switch
                   ios_backgroundColor="#e5e7eb"
-                  onValueChange={setIsDayEnabled}
+                  onValueChange={setIsShiftEnabled}
                   thumbColor="#ffffff"
                   trackColor={{ false: "#d1d5db", true: "#10B981" }}
-                  value={isDayEnabled}
+                  value={isShiftEnabled}
                 />
                 <Text className="font-medium text-xs text-gray-500 mt-1 text-center">
                   Enable
@@ -251,12 +240,11 @@ export function BusinessHoursView({ onBack, onSave }: BusinessHoursViewProps) {
               </View>
             </View>
 
-            {/* Time Range Row: [10:50 am] to [05:30 pm] */}
+            {/* Shift Time Range Row: [10:50 am] to [05:30 pm] */}
             <View className="mt-4 flex-row items-center justify-between gap-2.5">
               <View className="h-13 flex-1 items-center justify-center rounded-2xl border border-gray-200 bg-white px-3">
                 <TextInput
                   className="text-center font-semibold text-sm text-gray-900 w-full"
-                  editable={isDayEnabled}
                   onChangeText={setStartTime}
                   placeholder="10:50 am"
                   placeholderTextColor="#9CA3AF"
@@ -269,7 +257,6 @@ export function BusinessHoursView({ onBack, onSave }: BusinessHoursViewProps) {
               <View className="h-13 flex-1 items-center justify-center rounded-2xl border border-gray-200 bg-white px-3">
                 <TextInput
                   className="text-center font-semibold text-sm text-gray-900 w-full"
-                  editable={isDayEnabled}
                   onChangeText={setEndTime}
                   placeholder="05:30 pm"
                   placeholderTextColor="#9CA3AF"
@@ -321,6 +308,56 @@ export function BusinessHoursView({ onBack, onSave }: BusinessHoursViewProps) {
                         placeholder="05:30 pm"
                         placeholderTextColor="#9CA3AF"
                         value={breakEndTime}
+                      />
+                    </View>
+                  </View>
+                )}
+              </View>
+            </View>
+
+            {/* Staff Member Time Off Section */}
+            <View className="mt-5">
+              <Text className="font-bold text-lg text-gray-900 mb-2">
+                Staff member time off
+              </Text>
+              <View className="rounded-2xl bg-[#F8F9FA] p-3.5">
+                <Pressable
+                  className="flex-row items-center gap-2 active:opacity-75"
+                  onPress={() => setHasTimeOff(!hasTimeOff)}
+                >
+                  <StyledIcons
+                    className="text-gray-900"
+                    name={hasTimeOff ? "remove" : "add"}
+                    size={20}
+                  />
+                  <Text className="font-bold text-sm text-gray-900">
+                    Add time off
+                  </Text>
+                </Pressable>
+
+                {hasTimeOff && (
+                  <View className="mt-3 flex-row items-center justify-between gap-2.5">
+                    <View className="h-13 flex-1 items-center justify-center rounded-2xl border border-gray-200 bg-white px-3">
+                      <TextInput
+                        className="text-center font-semibold text-sm text-gray-900 w-full"
+                        onChangeText={setTimeOffStartTime}
+                        placeholder="10:50 am"
+                        placeholderTextColor="#9CA3AF"
+                        value={timeOffStartTime}
+                      />
+                    </View>
+
+                    <Text className="font-medium text-sm text-gray-600 px-1">
+                      to
+                    </Text>
+
+                    <View className="h-13 flex-1 items-center justify-center rounded-2xl border border-gray-200 bg-white px-3">
+                      <TextInput
+                        className="text-center font-semibold text-sm text-gray-900 w-full"
+                        onChangeText={setTimeOffEndTime}
+                        placeholder="05:30 pm"
+                        placeholderTextColor="#9CA3AF"
+                        value={timeOffEndTime}
                       />
                     </View>
                   </View>
