@@ -8,6 +8,7 @@
     "start": "expo start",
     "dev": "expo start --clear",
     "android": "expo run:android",
+    "android:setup": "node dev-setup.js",
     "ios": "expo run:ios",
     "prebuild": "expo prebuild  --clean",
     "web": "expo start --web",

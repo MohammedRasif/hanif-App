@@ -6,6 +6,7 @@ import { Pressable, Text, View } from "react-native";
 
 import { Container } from "@/components/container";
 import { getErrorMessage, StyledIcons } from "@/lib";
+import { setAccessToken, setRefreshToken, setUserData } from "@/lib/storage";
 import {
   useRegisterVerifyOtpMutation,
   useResendOtpMutation,
@@ -53,6 +54,10 @@ export default function OtpCodeScreen() {
         const res = await registerVerifyOtpApi(payload).unwrap();
         console.log("[Register Verify OTP API Success Response]:", res);
 
+        if (res?.data?.access) setAccessToken(res.data.access);
+        if (res?.data?.refresh) setRefreshToken(res.data.refresh);
+        if (res?.data?.user) setUserData(res.data.user);
+
         toast.show({
           label: "Email Verified!",
           description: res?.details || "Email verified successfully.",
@@ -75,6 +80,10 @@ export default function OtpCodeScreen() {
       } else {
         const res = await verifyOtpApi(payload).unwrap();
         console.log("[Verify OTP API Success Response]:", res);
+
+        if (res?.data?.access) setAccessToken(res.data.access);
+        if (res?.data?.refresh) setRefreshToken(res.data.refresh);
+        if (res?.data?.user) setUserData(res.data.user);
 
         toast.show({
           label: "Code Verified!",

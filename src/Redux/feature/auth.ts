@@ -1,13 +1,20 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import {
-  getAccessToken,
-  setAccessToken,
-  setRefreshToken,
-  setUserData,
-} from "@/lib/storage";
+import { getAccessToken } from "@/lib/storage";
 
-const BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL || "http://10.10.29.119:8100/api";
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:8200/api";
+
+// Raw base query with auth headers
+const rawBaseQuery = fetchBaseQuery({
+  baseUrl: `${BASE_URL.replace(/\/$/, "")}/`,
+  prepareHeaders: (headers) => {
+    const token = getAccessToken();
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
+    headers.set("ngrok-skip-browser-warning", "true");
+    return headers;
+  },
+});
 
 export interface UserProfileData {
   id: string;
@@ -39,17 +46,50 @@ export interface NotificationsData {
 
 export const authentication = createApi({
   reducerPath: "authentication",
-  baseQuery: fetchBaseQuery({
-    baseUrl: `${BASE_URL.replace(/\/$/, "")}/`,
-    prepareHeaders: (headers) => {
-      const token = getAccessToken();
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      headers.set("ngrok-skip-browser-warning", "true");
-      return headers;
-    },
-  }),
+  baseQuery: async (args, api, extraOptions) => {
+    const requestUrl =
+      typeof args === "string"
+        ? `${BASE_URL.replace(/\/$/, "")}/${args}`
+        : `${BASE_URL.replace(/\/$/, "")}/${(args as any).url}`;
+    const method =
+      typeof args === "string" ? "GET" : ((args as any).method ?? "GET");
+    const body = typeof args === "string" ? undefined : (args as any).body;
+
+    console.log(
+      "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" +
+        "\n📤 [REQUEST]" +
+        `\n   Endpoint : ${api.endpoint}` +
+        `\n   Method   : ${method}` +
+        `\n   URL      : ${requestUrl}` +
+        `\n   Payload  :\n${body ? JSON.stringify(body, null, 4) : "   none"}` +
+        "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+    );
+
+    const result = await rawBaseQuery(args, api, extraOptions);
+
+    if (result.error) {
+      console.log(
+        "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" +
+          "\n❌ [RESPONSE ERROR]" +
+          `\n   Endpoint  : ${api.endpoint}` +
+          `\n   URL       : ${requestUrl}` +
+          `\n   Status    : ${result.error.status}` +
+          `\n   Error     :\n${JSON.stringify(result.error.data, null, 4)}` +
+          "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+      );
+    } else {
+      console.log(
+        "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" +
+          "\n✅ [RESPONSE SUCCESS]" +
+          `\n   Endpoint  : ${api.endpoint}` +
+          `\n   URL       : ${requestUrl}` +
+          `\n   Data      :\n${JSON.stringify(result.data, null, 4)}` +
+          "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+      );
+    }
+
+    return result;
+  },
   tagTypes: ["User", "Agency", "TourPlan", "Profile"],
   endpoints: (builder) => ({
     // Register API
@@ -78,15 +118,6 @@ export const authentication = createApi({
         method: "POST",
         body: data,
       }),
-      transformResponse: (response: any) => {
-        if (response?.data?.access) {
-          setAccessToken(response.data.access);
-        }
-        if (response?.data?.refresh) {
-          setRefreshToken(response.data.refresh);
-        }
-        return response;
-      },
       invalidatesTags: ["User"],
     }),
 
@@ -106,18 +137,6 @@ export const authentication = createApi({
         method: "POST",
         body: data,
       }),
-      transformResponse: (response: any) => {
-        if (response?.data?.access) {
-          setAccessToken(response.data.access);
-        }
-        if (response?.data?.refresh) {
-          setRefreshToken(response.data.refresh);
-        }
-        if (response?.data?.user) {
-          setUserData(response.data.user);
-        }
-        return response;
-      },
       invalidatesTags: ["User"],
     }),
 

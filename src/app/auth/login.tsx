@@ -9,6 +9,7 @@ import { z } from "zod";
 import { AuthHeader, AuthInput, SocialAuth } from "@/components/auth";
 import { Container } from "@/components/container";
 import { getErrorMessage, StyledIcons } from "@/lib";
+import { setAccessToken, setRefreshToken, setUserData } from "@/lib/storage";
 import { useLoginMutation } from "@/Redux/feature/auth";
 
 const loginSchema = z.object({
@@ -48,6 +49,16 @@ export default function LoginScreen() {
       console.log("[Submitting Login Form]:", payload);
       const res = await loginApi(payload).unwrap();
       console.log("[Login API Success Response]:", res);
+
+      if (res?.data?.access) {
+        setAccessToken(res.data.access);
+      }
+      if (res?.data?.refresh) {
+        setRefreshToken(res.data.refresh);
+      }
+      if (res?.data?.user) {
+        setUserData(res.data.user);
+      }
 
       toast.show({
         label: "Welcome back!",
