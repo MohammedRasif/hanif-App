@@ -1,13 +1,10 @@
-import { useGetBookingDataQuery } from "@/Redux/feature/bookingApi";
-import CustomCalendar from "@/lib/calender";
-import {
-  transformCalendarApiData,
-  transformListApiData,
-} from "@/lib/calender/api-transformer";
+import CustomCalendar, {
+  DEFAULT_APPOINTMENTS,
+  DEFAULT_BARBERS,
+} from "@/lib/calender";
 import type { Appointment } from "@/lib/calender/types";
-import { getUserData } from "@/lib/storage";
 import { useToast } from "heroui-native";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { View } from "react-native";
 import { AddReservationDialog } from "./add-reservation-dialog";
 import { AddTimeOffDialog } from "./add-time-off-dialog";
@@ -17,7 +14,7 @@ import {
   BookAgainFormModal,
   CheckoutPageView,
 } from "./booking-detail-modal";
-import { BookingListView } from "./booking-list-view";
+import { BookingListView, DEFAULT_BOOKING_GROUPS } from "./booking-list-view";
 import { ConfirmAddReservationDialog } from "./confirm-add-reservation-dialog";
 import { FinalAddReservationDialog } from "./final-add-reservation-dialog";
 import {
@@ -38,64 +35,12 @@ export function BookingManagementCalendar({
 }: BookingManagementCalendarProps) {
   const { toast } = useToast();
 
-  // Get Today's Date ISO string (YYYY-MM-DD)
-  const todayStr = useMemo(() => new Date().toISOString().split("T")[0], []);
   const [selectedDateStr, setSelectedDateStr] = useState(
-    initialDateStr || todayStr,
+    initialDateStr || "2026-07-18",
   );
   const [currentViewMode, setCurrentViewMode] = useState<"calendar" | "list">(
     "calendar",
   );
-
-  // Extract user details (role and shop_id) dynamically from logged-in session
-  const userData = useMemo(() => getUserData(), []);
-  const shopId = userData?.shops?.[0]?.id || 1;
-  const viewType =
-    userData?.role === "barber" || userData?.role === "staff"
-      ? "staff"
-      : "admin";
-
-  // 📡 Dynamic API Call for /api/v1/booking/
-  const {
-    data: apiResponse,
-    isLoading: isApiLoading,
-    refetch,
-  } = useGetBookingDataQuery({
-    date: selectedDateStr,
-    display_mode: currentViewMode,
-    shop_id: shopId,
-    view_type: viewType,
-  });
-
-  // Transform Calendar API Response
-  const { barbers: apiBarbers, appointments: apiAppointments } = useMemo(() => {
-    if (
-      currentViewMode === "calendar" &&
-      apiResponse?.data &&
-      Array.isArray(apiResponse.data)
-    ) {
-      return transformCalendarApiData(
-        apiResponse.data,
-        selectedDateStr || todayStr,
-      );
-    }
-    return { barbers: [], appointments: [] };
-  }, [apiResponse, currentViewMode, selectedDateStr, todayStr]);
-
-  // Transform List API Response
-  const listGroups = useMemo(() => {
-    if (
-      currentViewMode === "list" &&
-      apiResponse?.data &&
-      apiResponse.data.bookings
-    ) {
-      return transformListApiData(
-        apiResponse.data,
-        selectedDateStr || todayStr,
-      );
-    }
-    return undefined;
-  }, [apiResponse, currentViewMode, selectedDateStr, todayStr]);
 
   // Staff Filter & Working Hours Flow States
   const [isStaffFilterOpen, setIsStaffFilterOpen] = useState(false);
@@ -155,7 +100,6 @@ export function BookingManagementCalendar({
     onBookingConfirmed?.(finalData);
     setIsStep3Open(false);
     setBookingAccumulator({});
-    refetch();
   };
 
   const handleSaveTimeOff = (data: {
@@ -181,7 +125,6 @@ export function BookingManagementCalendar({
       placement: "top",
     });
     setIsCheckoutOpen(false);
-    refetch();
   };
 
   const handleCompleteOrder = () => {
@@ -197,7 +140,6 @@ export function BookingManagementCalendar({
       placement: "top",
     });
     setIsCheckoutOpen(false);
-    refetch();
   };
 
   // Handle Book Again Flow
@@ -215,15 +157,13 @@ export function BookingManagementCalendar({
       placement: "top",
     });
     onBookingConfirmed?.(bookAgainData);
-    refetch();
   };
 
   // Render Dashboard Appointments List View (Image 1) when active
   if (currentViewMode === "list") {
     return (
       <BookingListView
-        groups={listGroups}
-        isLoading={isApiLoading}
+        groups={DEFAULT_BOOKING_GROUPS}
         onSwitchToCalendar={() => setCurrentViewMode("calendar")}
       />
     );
@@ -278,8 +218,8 @@ export function BookingManagementCalendar({
     <View className="flex-1 bg-white">
       <CustomCalendar
         activeDateStr={selectedDateStr}
-        appointments={apiAppointments}
-        barbers={apiBarbers}
+        appointments={DEFAULT_APPOINTMENTS}
+        barbers={DEFAULT_BARBERS}
         onPressAppointment={handlePressAppointment}
         onPressFilter={() => setIsStaffFilterOpen(true)}
         onPressListView={() => setCurrentViewMode("list")}
