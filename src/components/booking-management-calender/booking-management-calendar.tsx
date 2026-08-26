@@ -11,6 +11,7 @@ import {
   BookAgainFormModal,
   CheckoutPageView,
 } from "./booking-detail-modal";
+import { BookingListView } from "./booking-list-view";
 import { ConfirmAddReservationDialog } from "./confirm-add-reservation-dialog";
 import { FinalAddReservationDialog } from "./final-add-reservation-dialog";
 import {
@@ -31,6 +32,9 @@ export function BookingManagementCalendar({
 }: BookingManagementCalendarProps) {
   const { toast } = useToast();
   const [selectedDateStr, setSelectedDateStr] = useState(initialDateStr);
+  const [currentViewMode, setCurrentViewMode] = useState<"calendar" | "list">(
+    "calendar",
+  );
 
   // Staff Filter & Working Hours Flow States
   const [isStaffFilterOpen, setIsStaffFilterOpen] = useState(false);
@@ -149,6 +153,15 @@ export function BookingManagementCalendar({
     onBookingConfirmed?.(bookAgainData);
   };
 
+  // Render Dashboard Appointments List View (Image 1) when active
+  if (currentViewMode === "list") {
+    return (
+      <BookingListView
+        onSwitchToCalendar={() => setCurrentViewMode("calendar")}
+      />
+    );
+  }
+
   // Render Staff Working Hours Page (Image 3) when active
   if (isWorkingHoursPageOpen) {
     return (
@@ -200,6 +213,7 @@ export function BookingManagementCalendar({
         activeDateStr={selectedDateStr}
         onPressAppointment={handlePressAppointment}
         onPressFilter={() => setIsStaffFilterOpen(true)}
+        onPressListView={() => setCurrentViewMode("list")}
         onSelectDate={(day) => setSelectedDateStr(day.fullDateStr)}
       >
         {/* Floating Menu Action Overlay */}

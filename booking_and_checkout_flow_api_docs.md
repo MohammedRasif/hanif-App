@@ -52,6 +52,8 @@ Retrieves all appointments for a given date grouped by barber/staff columns.
   | `shop_id`      | integer             | Yes      | ID of the shop                           | `1`          |
   | `date`         | string (YYYY-MM-DD) | No       | Target calendar date (defaults to today) | `2026-07-15` |
 
+booking first page api all data
+
 #### Request Example:
 
 ```http
@@ -193,10 +195,6 @@ Authorization: Bearer <token>
 
 ```json
 {
-  "status": true,
-  "code": "CLIENTS_RETRIEVED",
-  "details": "Clients retrieved",
-  "data": {
     "new_clients": [
       {
         "id": "c1f7a01d-5cf5-4cf5-b103-6f81dfce1101",

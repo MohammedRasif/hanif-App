@@ -21,6 +21,7 @@ export function CustomCalendar({
   onPressAppointment,
   onPressFab,
   onPressFilter,
+  onPressListView,
   onSelectDate: propsOnSelectDate,
   renderEventCard,
   renderFab,
@@ -51,6 +52,7 @@ export function CustomCalendar({
         activeDateStr={activeDateStr}
         days={days}
         onPressFilter={onPressFilter}
+        onPressListView={onPressListView}
         onSelectDate={handleSelectDate}
         workingHoursLabel={workingHoursLabel}
       />

@@ -9,3 +9,4 @@ export * from "./final-add-reservation-dialog";
 export * from "./booking-calendar-menu";
 export * from "./booking-detail-modal";
 export * from "./staff-filter-working-hours";
+export * from "./booking-list-view";
