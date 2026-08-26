@@ -1,10 +1,39 @@
 import { StyledIcons } from "@/lib";
 import { Image } from "expo-image";
 import React from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
 import type { StaffMemberItem } from "./types";
 
+const DEFAULT_PROFILE_IMAGE =
+  "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1757735711/images_nfasdv.png";
+
+function formatImageUrl(url?: string | null): string {
+  if (!url || typeof url !== "string" || !url.trim()) {
+    return DEFAULT_PROFILE_IMAGE;
+  }
+  const cleanUrl = url.trim();
+  if (
+    cleanUrl.startsWith("http://") ||
+    cleanUrl.startsWith("https://") ||
+    cleanUrl.startsWith("file://") ||
+    cleanUrl.startsWith("content://")
+  ) {
+    return cleanUrl;
+  }
+  const apiHost = (
+    process.env.EXPO_PUBLIC_API_URL || "http://10.10.29.119:8200/api"
+  ).replace(/\/api\/?$/, "");
+  return `${apiHost.replace(/\/$/, "")}/${cleanUrl.replace(/^\//, "")}`;
+}
+
 interface StaffListViewProps {
+  isLoading?: boolean;
   onAddNewStaff: () => void;
   onBack: () => void;
   onSelectStaff: (staff: StaffMemberItem) => void;
@@ -16,6 +45,7 @@ export function StaffListView({
   onBack,
   onSelectStaff,
   onAddNewStaff,
+  isLoading = false,
 }: StaffListViewProps) {
   return (
     <View className="flex-1 bg-white">
@@ -41,51 +71,64 @@ export function StaffListView({
 
       {/* Main List */}
       <View className="flex-1 px-6 pt-2">
-        <FlatList
-          contentContainerStyle={{ paddingBottom: 100 }}
-          data={staffList}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Pressable
-              className="mb-3.5 flex-row items-center justify-between rounded-3xl bg-[#F8F9FA] p-4 active:bg-gray-100"
-              onPress={() => onSelectStaff(item)}
-            >
-              <View className="flex-row items-center gap-3.5">
-                {item.avatarUrl ? (
+        {isLoading ? (
+          <View className="py-20 items-center justify-center">
+            <ActivityIndicator color="#000" size="large" />
+            <Text className="font-medium text-sm text-gray-500 mt-3">
+              Loading staff members...
+            </Text>
+          </View>
+        ) : staffList.length === 0 ? (
+          <View className="py-20 items-center justify-center">
+            <StyledIcons
+              className="text-gray-300 mb-2"
+              name="people-outline"
+              size={40}
+            />
+            <Text className="font-bold text-base text-gray-800">
+              No staff members found
+            </Text>
+            <Text className="text-xs text-gray-400 mt-1">
+              Tap + to invite a new staff member.
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            contentContainerStyle={{ paddingBottom: 100 }}
+            data={staffList}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <Pressable
+                className="mb-3.5 flex-row items-center justify-between rounded-3xl bg-[#F8F9FA] p-4 active:bg-gray-100"
+                onPress={() => onSelectStaff(item)}
+              >
+                <View className="flex-row items-center gap-3.5">
                   <Image
                     className="h-12 w-12 rounded-full bg-gray-200"
                     contentFit="cover"
-                    source={{ uri: item.avatarUrl }}
+                    source={{ uri: formatImageUrl(item.avatarUrl) }}
                   />
-                ) : (
-                  <View className="h-12 w-12 items-center justify-center rounded-full bg-gray-200">
-                    <StyledIcons
-                      className="text-gray-900"
-                      name="person"
-                      size={22}
-                    />
+
+                  <View>
+                    <Text className="font-bold text-base text-gray-900">
+                      {item.name}
+                    </Text>
+                    <Text className="font-medium text-xs text-gray-400 mt-0.5">
+                      {item.position || item.role}
+                    </Text>
                   </View>
-                )}
-
-                <View>
-                  <Text className="font-bold text-base text-gray-900">
-                    {item.name}
-                  </Text>
-                  <Text className="font-medium text-xs text-gray-400 mt-0.5">
-                    {item.role}
-                  </Text>
                 </View>
-              </View>
 
-              <StyledIcons
-                className="text-gray-900"
-                name="chevron-forward"
-                size={18}
-              />
-            </Pressable>
-          )}
-          showsVerticalScrollIndicator={false}
-        />
+                <StyledIcons
+                  className="text-gray-900"
+                  name="chevron-forward"
+                  size={18}
+                />
+              </Pressable>
+            )}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
       </View>
 
       {/* Floating Action Button (FAB) */}

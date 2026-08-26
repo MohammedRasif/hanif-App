@@ -18,12 +18,13 @@ export function ServiceSetupScreen({ onBack }: ServiceSetupProps) {
     data: servicesResponse,
     isLoading: isServicesLoading,
     refetch,
-  } = useGetShopServicesQuery(shopId);
+  } = useGetShopServicesQuery(shopId, { refetchOnMountOrArgChange: true });
 
   const [currentView, setCurrentView] = useState<"list" | "form">("list");
   const [selectedService, setSelectedService] = useState<ServiceItem | null>(
     null,
   );
+  const [isSyncing, setIsSyncing] = useState(false);
 
   // Transform API response (Returns [] if no data, NO mock data fallback!)
   const services: ServiceItem[] = useMemo(() => {
@@ -45,6 +46,7 @@ export function ServiceSetupScreen({ onBack }: ServiceSetupProps) {
     if (currentView === "form") {
       setCurrentView("list");
       setSelectedService(null);
+      refetch();
     } else {
       if (onBack) {
         onBack();
@@ -64,23 +66,33 @@ export function ServiceSetupScreen({ onBack }: ServiceSetupProps) {
     setCurrentView("form");
   };
 
-  const handleSaveService = (_savedService: ServiceItem) => {
+  const handleSaveService = async (_savedService: ServiceItem) => {
+    setIsSyncing(true);
     setCurrentView("list");
     setSelectedService(null);
-    refetch();
+    try {
+      await refetch();
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
-  const handleDeleteService = (_serviceId: string) => {
+  const handleDeleteService = async (_serviceId: string) => {
+    setIsSyncing(true);
     setCurrentView("list");
     setSelectedService(null);
-    refetch();
+    try {
+      await refetch();
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   return (
     <View className="flex-1 bg-white">
       {currentView === "list" ? (
         <ServiceListView
-          isLoading={isServicesLoading}
+          isLoading={isServicesLoading || isSyncing}
           onAddNewService={handleAddNewService}
           onBack={handleBack}
           onSelectService={handleSelectService}

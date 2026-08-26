@@ -214,7 +214,7 @@ export const shopApi = baseApi.injectEndpoints({
       invalidatesTags: ["Shop"],
     }),
 
-    // Update Service: PATCH /v1/services/:id/
+    // Update Service: PUT /v1/services/:id/
     updateService: builder.mutation<
       { code?: string; data?: any; details?: string; success?: boolean },
       {
@@ -234,7 +234,104 @@ export const shopApi = baseApi.injectEndpoints({
     >({
       query: ({ id, data }) => ({
         url: `v1/services/${id}/`,
-        method: "PATCH",
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["Shop"],
+    }),
+
+    // Get Barbers List by Shop: GET /v1/barbers/?shop_id={shop_id}
+    getBarbersByShop: builder.query<
+      { code?: string; data: any[]; details?: string; success?: boolean },
+      number | string
+    >({
+      query: (shopId) => {
+        console.log(`[RTK QUERY HIT] GET v1/barbers/?shop_id=${shopId}`);
+        return `v1/barbers/?shop_id=${shopId}`;
+      },
+      providesTags: ["Shop"],
+    }),
+
+    // Create Barber: POST /v1/barbers/
+    createBarber: builder.mutation<
+      { code?: string; data?: any; details?: string; success?: boolean },
+      FormData | Record<string, any>
+    >({
+      query: (body) => {
+        console.log(
+          `[RTK QUERY HIT] POST v1/barbers/ Body:`,
+          JSON.stringify(body, null, 2),
+        );
+        return {
+          url: "v1/barbers/",
+          method: "POST",
+          body,
+        };
+      },
+      invalidatesTags: ["Shop"],
+    }),
+
+    // Update Barber: PUT /v1/barbers/:id/
+    updateBarber: builder.mutation<
+      { code?: string; data?: any; details?: string; success?: boolean },
+      { id: number | string; data: FormData | Record<string, any> }
+    >({
+      query: ({ id, data }) => {
+        console.log(
+          `[RTK QUERY HIT] PUT v1/barbers/${id}/ Body:`,
+          JSON.stringify(data, null, 2),
+        );
+        return {
+          url: `v1/barbers/${id}/`,
+          method: "PUT",
+          body: data,
+        };
+      },
+      invalidatesTags: ["Shop"],
+    }),
+
+    // Delete Barber: DELETE /v1/barbers/:id/
+    deleteBarber: builder.mutation<
+      { code?: string; details?: string; success?: boolean },
+      number | string
+    >({
+      query: (id) => {
+        console.log(`[RTK QUERY HIT] DELETE v1/barbers/${id}/`);
+        return {
+          url: `v1/barbers/${id}/`,
+          method: "DELETE",
+        };
+      },
+      invalidatesTags: ["Shop"],
+    }),
+
+    // Update Shop Details: PUT /v1/shops/:id/
+    updateShopDetails: builder.mutation<
+      { code?: string; data?: any; details?: string; success?: boolean },
+      { id: number | string; data: FormData | Record<string, any> }
+    >({
+      query: ({ id, data }) => {
+        console.log(
+          `[RTK QUERY HIT] PUT v1/shops/${id}/ Body:`,
+          JSON.stringify(data, null, 2),
+        );
+        return {
+          url: `v1/shops/${id}/`,
+          method: "PUT",
+          body: data,
+        };
+      },
+      invalidatesTags: ["Shop"],
+    }),
+
+    // Update Shop Gallery Image: PUT /v1/shops/gallery/:id/
+    updateShopGallery: builder.mutation<
+      { code?: string; data?: any; details?: string; success?: boolean },
+      { id: number | string; data: FormData | Record<string, any> }
+    >({
+      query: ({ id, data }) => ({
+        url: `v1/shops/gallery/${id}/`,
+        method: "PUT",
         body: data,
       }),
       invalidatesTags: ["Shop"],
@@ -262,4 +359,10 @@ export const {
   useGetBarberOptionsByShopQuery,
   useCreateServiceMutation,
   useUpdateServiceMutation,
+  useGetBarbersByShopQuery,
+  useCreateBarberMutation,
+  useUpdateBarberMutation,
+  useDeleteBarberMutation,
+  useUpdateShopDetailsMutation,
+  useUpdateShopGalleryMutation,
 } = shopApi;
