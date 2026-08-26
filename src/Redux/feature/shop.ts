@@ -213,6 +213,32 @@ export const shopApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Shop"],
     }),
+
+    // Update Service: PATCH /v1/services/:id/
+    updateService: builder.mutation<
+      { code?: string; data?: any; details?: string; success?: boolean },
+      {
+        id: number | string;
+        data: Partial<{
+          barbers: (number | string)[];
+          category: number | string;
+          description?: string;
+          duration_minutes: number;
+          image?: any;
+          is_active?: boolean;
+          name: string;
+          price: string;
+          shop: number | string;
+        }>;
+      }
+    >({
+      query: ({ id, data }) => ({
+        url: `v1/services/${id}/`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["Shop"],
+    }),
   }),
   overrideExisting: true,
 });
@@ -235,4 +261,5 @@ export const {
   useGetCategoriesByShopQuery,
   useGetBarberOptionsByShopQuery,
   useCreateServiceMutation,
+  useUpdateServiceMutation,
 } = shopApi;

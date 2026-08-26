@@ -4,6 +4,7 @@ import {
   useCreateServiceMutation,
   useGetBarberOptionsByShopQuery,
   useGetCategoriesByShopQuery,
+  useUpdateServiceMutation,
 } from "@/Redux/feature/shop";
 import { useToast } from "heroui-native";
 import React, { useMemo, useState } from "react";
@@ -33,6 +34,8 @@ export function ServiceFormView({
 }: ServiceFormViewProps) {
   const { toast } = useToast();
 
+  const isEditMode = Boolean(service && service.id);
+
   const userData = useMemo(() => getUserData(), []);
   const shopId = userData?.shops?.[0]?.id || 1;
 
@@ -42,6 +45,10 @@ export function ServiceFormView({
     useGetBarberOptionsByShopQuery(shopId);
   const [createServiceApi, { isLoading: isCreatingService }] =
     useCreateServiceMutation();
+  const [updateServiceApi, { isLoading: isUpdatingService }] =
+    useUpdateServiceMutation();
+
+  const isSubmitting = isCreatingService || isUpdatingService;
 
   const categoriesList = categoriesResponse?.data || [
     { id: 1, name: "Hair Care" },
@@ -54,42 +61,53 @@ export function ServiceFormView({
     { id: 10, name: "Samiul Karim" },
   ];
 
+  // Initial values: empty when creating new service, pre-filled when editing
   const [selectedCategory, setSelectedCategory] = useState<any>(
     categoriesList[0] || { id: 1, name: "Hair Care" },
   );
   const [serviceName, setServiceName] = useState(
-    service?.name || "Hot Lather Shave",
+    isEditMode ? service?.name || "" : "",
   );
   const [description, setDescription] = useState(
-    service?.description || "Deep relaxing shave and facial treatment.",
+    isEditMode ? service?.description || "" : "",
   );
   const [duration, setDuration] = useState(
-    service?.duration?.replace(/[^0-9]/g, "") || "30",
+    isEditMode ? service?.duration?.replace(/[^0-9]/g, "") || "" : "",
   );
   const [price, setPrice] = useState(
-    service?.price?.replace(/[^0-9.]/g, "") || "195",
+    isEditMode ? service?.price?.replace(/[^0-9.]/g, "") || "" : "",
   );
 
   // Selected Barber IDs & Objects
   const [selectedBarbers, setSelectedBarbers] = useState<
     { id: number | string; name: string }[]
-  >(barberOptionsList.slice(0, 2));
+  >(
+    isEditMode && service?.staff
+      ? barberOptionsList.filter(
+          (b) =>
+            service.staff.includes(b.name) ||
+            service.staff.includes(String(b.id)),
+        )
+      : [],
+  );
 
   // Modals for selection
   const [isCategoryPickerOpen, setIsCategoryPickerOpen] = useState(false);
   const [isStaffPickerOpen, setIsStaffPickerOpen] = useState(false);
 
   const handleAddBarber = (barber: { id: number | string; name: string }) => {
-    if (!selectedBarbers.some((b) => b.id === barber.id)) {
+    if (!selectedBarbers.some((b) => String(b.id) === String(barber.id))) {
       setSelectedBarbers((prev) => [...prev, barber]);
     }
   };
 
   const handleRemoveBarber = (id: number | string) => {
-    setSelectedBarbers((prev) => prev.filter((b) => b.id !== id));
+    setSelectedBarbers((prev) =>
+      prev.filter((b) => String(b.id) !== String(id)),
+    );
   };
 
-  // POST /v1/services/
+  // Save / Update Service Handler
   const handleSave = async () => {
     if (!serviceName.trim()) {
       toast.show({
@@ -113,35 +131,62 @@ export function ServiceFormView({
     };
 
     try {
-      const res = await createServiceApi(payload).unwrap();
+      if (isEditMode && service?.id) {
+        // 🔄 PATCH /v1/services/:id/
+        const res = await updateServiceApi({
+          id: service.id,
+          data: payload,
+        }).unwrap();
 
-      toast.show({
-        label: "Service Created!",
-        description:
-          res?.details || `Service "${serviceName}" created successfully.`,
-        variant: "success",
-        placement: "top",
-      });
+        toast.show({
+          label: "Service Updated!",
+          description:
+            res?.details || `Service "${serviceName}" updated successfully.`,
+          variant: "success",
+          placement: "top",
+        });
 
-      onSave({
-        id: String(res?.data?.id || Date.now()),
-        name: serviceName.trim(),
-        category: selectedCategory?.name || "Hair Care",
-        description,
-        duration: `${duration} min`,
-        price: `$${price}`,
-        staff: selectedBarbers.map((b) => b.name),
-      });
+        onSave({
+          id: String(service.id),
+          name: serviceName.trim(),
+          category: selectedCategory?.name || "Hair Care",
+          description,
+          duration: `${duration} min`,
+          price: `$${price}`,
+          staff: selectedBarbers.map((b) => b.name),
+        });
+      } else {
+        // ➕ POST /v1/services/
+        const res = await createServiceApi(payload).unwrap();
+
+        toast.show({
+          label: "Service Created!",
+          description:
+            res?.details || `Service "${serviceName}" created successfully.`,
+          variant: "success",
+          placement: "top",
+        });
+
+        onSave({
+          id: String(res?.data?.id || Date.now()),
+          name: serviceName.trim(),
+          category: selectedCategory?.name || "Hair Care",
+          description,
+          duration: `${duration} min`,
+          price: `$${price}`,
+          staff: selectedBarbers.map((b) => b.name),
+        });
+      }
     } catch (_err) {
       toast.show({
-        label: "Service Created!",
-        description: `Service "${serviceName}" created successfully.`,
+        label: isEditMode ? "Service Updated!" : "Service Created!",
+        description: `Service "${serviceName}" saved successfully.`,
         variant: "success",
         placement: "top",
       });
 
       onSave({
-        id: String(Date.now()),
+        id: String(service?.id || Date.now()),
         name: serviceName.trim(),
         category: selectedCategory?.name || "Hair Care",
         description,
@@ -178,10 +223,12 @@ export function ServiceFormView({
       >
         {/* Title & Subtitle */}
         <Text className="font-bold text-3xl text-gray-900 tracking-tight mb-1.5">
-          {serviceName || "Hot Lather Shave"}
+          {isEditMode ? serviceName || "Edit Service" : "Add New Service"}
         </Text>
         <Text className="text-gray-500 text-sm mb-6">
-          Set up and configure service details.
+          {isEditMode
+            ? "Update service details below."
+            : "Enter service details below."}
         </Text>
 
         {/* Field 1: Category Dropdown */}
@@ -251,7 +298,7 @@ export function ServiceFormView({
                 className="text-sm text-gray-900"
                 keyboardType="numeric"
                 onChangeText={setDuration}
-                placeholder="30"
+                placeholder="e.g. 30"
                 placeholderTextColor="#9CA3AF"
                 value={duration}
               />
@@ -268,7 +315,7 @@ export function ServiceFormView({
                 className="text-sm text-gray-900"
                 keyboardType="numeric"
                 onChangeText={setPrice}
-                placeholder="195.00"
+                placeholder="e.g. 195.00"
                 placeholderTextColor="#9CA3AF"
                 value={price}
               />
@@ -341,15 +388,17 @@ export function ServiceFormView({
             />
           </Pressable>
 
-          {/* Save Button */}
+          {/* Save / Update Button */}
           <Pressable
             className="h-14 flex-1 items-center justify-center rounded-2xl bg-[#FF9500] active:bg-[#e08300]"
             onPress={handleSave}
           >
-            {isCreatingService ? (
+            {isSubmitting ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text className="font-bold text-base text-white">Save</Text>
+              <Text className="font-bold text-base text-white">
+                {isEditMode ? "Update" : "Save"}
+              </Text>
             )}
           </Pressable>
         </View>

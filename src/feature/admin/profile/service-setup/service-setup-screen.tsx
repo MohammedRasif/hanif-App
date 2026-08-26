@@ -60,15 +60,7 @@ export function ServiceSetupScreen({ onBack }: ServiceSetupProps) {
   };
 
   const handleAddNewService = () => {
-    setSelectedService({
-      id: Date.now().toString(),
-      name: "",
-      category: "Hair Care",
-      description: "",
-      duration: "30 min",
-      price: "$50",
-      staff: [],
-    });
+    setSelectedService(null);
     setCurrentView("form");
   };
 
