@@ -68,7 +68,13 @@ export default function LoginScreen() {
       });
 
       const rawRole = String(res?.data?.user?.role || "USER").toUpperCase();
-      if (rawRole === "ADMIN") {
+      if (
+        rawRole === "ADMIN" ||
+        rawRole === "SUPER_ADMIN" ||
+        rawRole === "SUPERADMIN" ||
+        rawRole === "OWNER" ||
+        rawRole === "SHOP_ADMIN"
+      ) {
         router.replace("/(role)/admin" as Href);
       } else if (
         rawRole === "BARBER" ||

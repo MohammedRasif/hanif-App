@@ -124,6 +124,95 @@ export const shopApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Shop"],
     }),
+    // Select Active Shop: POST /v1/shops/select/
+    selectShop: builder.mutation<
+      { success?: boolean; code?: string; details?: string },
+      { shop: number | string }
+    >({
+      query: (body) => ({
+        url: "v1/shops/select/",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Shop", "Dashboard"],
+    }),
+
+    // Create New Shop: POST /v1/shops/
+    createShop: builder.mutation<
+      { success?: boolean; code?: string; details?: string; data?: any },
+      { location: string; name: string }
+    >({
+      query: (body) => ({
+        url: "v1/shops/",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Shop"],
+    }),
+
+    // Create Category: POST /v1/categories/
+    createCategory: builder.mutation<
+      { success?: boolean; code?: string; details?: string; data?: any },
+      {
+        display_order?: number;
+        is_active?: boolean;
+        name: string;
+        shop: number | string;
+      }
+    >({
+      query: (body) => ({
+        url: "v1/categories/",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Shop"],
+    }),
+
+    // Get Categories by Shop: GET /v1/categories/?shop=<shop_id>
+    getCategoriesByShop: builder.query<
+      { code?: string; data: any[]; details?: string; success?: boolean },
+      number | string
+    >({
+      query: (shopId) => `v1/categories/?shop=${shopId}`,
+      providesTags: ["Shop"],
+    }),
+
+    // Get Barber Options by Shop: GET /v1/barbers/by-shop/?shop=<shop_id>
+    getBarberOptionsByShop: builder.query<
+      {
+        code?: string;
+        data: { id: number | string; name: string }[];
+        details?: string;
+        success?: boolean;
+      },
+      number | string
+    >({
+      query: (shopId) => `v1/barbers/by-shop/?shop=${shopId}`,
+      providesTags: ["Shop"],
+    }),
+
+    // Create Service: POST /v1/services/
+    createService: builder.mutation<
+      { code?: string; data?: any; details?: string; success?: boolean },
+      {
+        barbers: (number | string)[];
+        category: number | string;
+        description?: string;
+        duration_minutes: number;
+        image?: any;
+        is_active?: boolean;
+        name: string;
+        price: string;
+        shop: number | string;
+      }
+    >({
+      query: (body) => ({
+        url: "v1/services/",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Shop"],
+    }),
   }),
   overrideExisting: true,
 });
@@ -140,4 +229,10 @@ export const {
   useGetBookingsQuery,
   useCancelBookingMutation,
   useUpdateBookingMutation,
+  useSelectShopMutation,
+  useCreateShopMutation,
+  useCreateCategoryMutation,
+  useGetCategoriesByShopQuery,
+  useGetBarberOptionsByShopQuery,
+  useCreateServiceMutation,
 } = shopApi;

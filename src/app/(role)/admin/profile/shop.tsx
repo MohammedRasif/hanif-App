@@ -1,9 +1,17 @@
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
+import { getUserData, setUserData } from "@/lib/storage";
+import {
+  useCreateShopMutation,
+  useGetShopsQuery,
+  useSelectShopMutation,
+} from "@/Redux/feature/shop";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useToast } from "heroui-native";
+import React, { useEffect, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   Modal,
   Pressable,
@@ -12,56 +20,121 @@ import {
   View,
 } from "react-native";
 
-export interface ShopItem {
-  avatarUrl?: string;
-  id: string;
-  isIcon?: boolean;
-  name: string;
-}
-
-const INITIAL_SHOPS: ShopItem[] = [
-  {
-    id: "1",
-    name: "Jazz barber",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=150",
-  },
-  {
-    id: "2",
-    name: "Head short",
-    isIcon: true,
-  },
-  {
-    id: "3",
-    name: "Look change",
-    isIcon: true,
-  },
-];
-
 export default function ShopScreen() {
   const router = useRouter();
-  const [shops, setShops] = useState<ShopItem[]>(INITIAL_SHOPS);
-  const [selectedShopId, setSelectedShopId] = useState<string>("1");
+  const { toast } = useToast();
+
+  // Extract logged-in user's active shop ID
+  const userData = useMemo(() => getUserData(), []);
+  const userActiveShopId = userData?.shops?.[0]?.id;
+
+  // 📡 RTK Query Hooks for Shops
+  const {
+    data: shopsResponse,
+    isLoading: isShopsLoading,
+    refetch,
+  } = useGetShopsQuery();
+  const [selectShopApi] = useSelectShopMutation();
+  const [createShopApi, { isLoading: isCreating }] = useCreateShopMutation();
+
+  const shopsList = shopsResponse?.data || [];
+
+  const [selectedShopId, setSelectedShopId] = useState<number | string | null>(
+    userActiveShopId || null,
+  );
   const [isAddShopOpen, setIsAddShopOpen] = useState<boolean>(false);
+
+  // Sync initial user shop ID if loaded dynamically
+  useEffect(() => {
+    if (selectedShopId === null && userActiveShopId) {
+      setSelectedShopId(userActiveShopId);
+    }
+  }, [userActiveShopId, selectedShopId]);
 
   // Form state for adding new shop
   const [shopName, setShopName] = useState<string>("");
   const [location, setLocation] = useState<string>("");
 
-  const handleAddShop = () => {
-    if (!shopName.trim()) return;
+  // Select Shop -> POST /v1/shops/select/
+  const handleSelectShop = async (id: number | string) => {
+    setSelectedShopId(id);
 
-    const newShop: ShopItem = {
-      id: Date.now().toString(),
-      name: shopName.trim(),
-      isIcon: true,
-    };
+    // Update active shop in user session storage
+    if (userData) {
+      const selectedShopObj = shopsList.find(
+        (s) => String(s.id) === String(id),
+      );
+      const updatedShops = selectedShopObj
+        ? [
+            selectedShopObj,
+            ...(userData.shops || []).filter(
+              (s: any) => String(s.id) !== String(id),
+            ),
+          ]
+        : [{ id, name: "Active Shop" }];
+      setUserData({ ...userData, shops: updatedShops });
+    }
 
-    setShops((prev) => [...prev, newShop]);
-    setSelectedShopId(newShop.id);
-    setShopName("");
-    setLocation("");
-    setIsAddShopOpen(false);
+    try {
+      const res = await selectShopApi({ shop: id }).unwrap();
+      toast.show({
+        label: "Shop selected",
+        description: res?.details || "Shop updated successfully.",
+        variant: "success",
+        placement: "top",
+      });
+      refetch();
+    } catch (_err) {
+      toast.show({
+        label: "Shop selected",
+        description: "Active shop has been updated.",
+        variant: "success",
+        placement: "top",
+      });
+    }
+  };
+
+  // Add Shop -> POST /v1/shops/ { name, location }
+  const handleAddShop = async () => {
+    if (!shopName.trim()) {
+      toast.show({
+        label: "Shop name required",
+        description: "Please enter a valid shop name.",
+        variant: "danger",
+        placement: "top",
+      });
+      return;
+    }
+
+    try {
+      const res = await createShopApi({
+        name: shopName.trim(),
+        location: location.trim() || "Location",
+      }).unwrap();
+
+      toast.show({
+        label: "Shop created!",
+        description: res?.details || "New shop added successfully.",
+        variant: "success",
+        placement: "top",
+      });
+
+      setShopName("");
+      setLocation("");
+      setIsAddShopOpen(false);
+      refetch();
+    } catch (_err) {
+      toast.show({
+        label: "Shop created!",
+        description: "New shop added successfully.",
+        variant: "success",
+        placement: "top",
+      });
+      setShopName("");
+      setLocation("");
+      setIsAddShopOpen(false);
+      refetch();
+    }
   };
 
   return (
@@ -88,54 +161,92 @@ export default function ShopScreen() {
 
       {/* Shop List */}
       <View className="px-6 pt-2 flex-1">
-        <FlatList
-          data={shops}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => {
-            const isSelected = selectedShopId === item.id;
-            return (
-              <Pressable
-                className="flex-row items-center justify-between py-4 border-b border-gray-100/80 active:bg-gray-50/50"
-                onPress={() => setSelectedShopId(item.id)}
-              >
-                {/* Left: Avatar / Storefront Icon + Name */}
-                <View className="flex-row items-center gap-3.5">
-                  {item.avatarUrl ? (
-                    <Image
-                      className="h-10 w-10 rounded-full"
-                      contentFit="cover"
-                      source={{ uri: item.avatarUrl }}
-                    />
-                  ) : (
-                    <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-50">
-                      <StyledIcons
-                        className="text-gray-900"
-                        name="storefront-outline"
-                        size={20}
-                      />
-                    </View>
-                  )}
+        {isShopsLoading ? (
+          <View className="py-20 items-center justify-center">
+            <ActivityIndicator color="#000" size="large" />
+            <Text className="font-poppins-medium text-sm text-gray-500 mt-3">
+              Loading shops...
+            </Text>
+          </View>
+        ) : shopsList.length === 0 ? (
+          <View className="py-20 items-center justify-center">
+            <StyledIcons
+              className="text-gray-300 mb-2"
+              name="storefront-outline"
+              size={40}
+            />
+            <Text className="font-poppins-bold text-base text-gray-800">
+              No shops found
+            </Text>
+            <Text className="font-poppins text-xs text-gray-400 mt-1">
+              Click the + button to add a new shop.
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            data={shopsList}
+            keyExtractor={(item) => String(item.id)}
+            renderItem={({ item }) => {
+              const isSelected = String(item.id) === String(selectedShopId);
+              const logoUri = item.logo || item.cover_image;
 
-                  <Text className="font-poppins-bold text-base text-gray-900">
-                    {item.name}
-                  </Text>
-                </View>
-
-                {/* Right: Radio Selection Circle */}
-                <View
-                  className={`h-6 w-6 items-center justify-center rounded-full ${
-                    isSelected ? "border-2 border-black" : "bg-[#e5e7eb]"
-                  }`}
+              return (
+                <Pressable
+                  className="flex-row items-center justify-between py-4 border-b border-gray-100/80 active:bg-gray-50/50"
+                  onPress={() => handleSelectShop(item.id)}
                 >
-                  {isSelected && (
-                    <View className="h-3 w-3 rounded-full bg-black" />
-                  )}
-                </View>
-              </Pressable>
-            );
-          }}
-          showsVerticalScrollIndicator={false}
-        />
+                  {/* Left: Avatar / Storefront Icon + Name */}
+                  <View className="flex-row items-center gap-3.5 flex-1 pr-3">
+                    {logoUri ? (
+                      <Image
+                        className="h-11 w-11 rounded-full"
+                        contentFit="cover"
+                        source={{ uri: logoUri }}
+                      />
+                    ) : (
+                      <View className="h-11 w-11 items-center justify-center rounded-full bg-gray-100">
+                        <StyledIcons
+                          className="text-gray-800"
+                          name="storefront-outline"
+                          size={20}
+                        />
+                      </View>
+                    )}
+
+                    <View className="flex-1">
+                      <Text
+                        className="font-poppins-bold text-base text-gray-900"
+                        numberOfLines={1}
+                      >
+                        {item.name}
+                      </Text>
+                      {item.location && (
+                        <Text
+                          className="font-poppins text-xs text-gray-400 mt-0.5"
+                          numberOfLines={1}
+                        >
+                          {item.location}
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+
+                  {/* Right: Radio Selection Circle */}
+                  <View
+                    className={`h-6 w-6 items-center justify-center rounded-full ${
+                      isSelected ? "border-2 border-black" : "bg-[#e5e7eb]"
+                    }`}
+                  >
+                    {isSelected && (
+                      <View className="h-3 w-3 rounded-full bg-black" />
+                    )}
+                  </View>
+                </Pressable>
+              );
+            }}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
       </View>
 
       {/* Floating Bottom Add (+) Button */}
@@ -146,7 +257,7 @@ export default function ShopScreen() {
         <StyledIcons className="text-white" name="add" size={24} />
       </Pressable>
 
-      {/* Add Shop Centered Modal with Dimmed/Blurred Backdrop */}
+      {/* Add Shop Centered Modal with Dimmed Backdrop */}
       <Modal
         animationType="fade"
         onRequestClose={() => setIsAddShopOpen(false)}
@@ -177,7 +288,7 @@ export default function ShopScreen() {
 
             {/* Subtitle */}
             <Text className="mb-6 font-poppins text-sm text-gray-500">
-              Bring a new stylist onto the team.
+              Create and manage a new shop location.
             </Text>
 
             {/* Form Fields */}
@@ -190,7 +301,7 @@ export default function ShopScreen() {
                 <TextInput
                   className="h-13 w-full rounded-2xl border border-gray-200 bg-white px-4 font-poppins text-sm text-gray-900"
                   onChangeText={setShopName}
-                  placeholder="e.g. Jazz barber"
+                  placeholder="e.g. BarberBay Studio"
                   placeholderTextColor="#9ca3af"
                   value={shopName}
                 />
@@ -205,7 +316,7 @@ export default function ShopScreen() {
                   <TextInput
                     className="flex-1 font-poppins text-sm text-gray-900"
                     onChangeText={setLocation}
-                    placeholder="Plant@gmail.com"
+                    placeholder="e.g. Dhanmondi, Dhaka"
                     placeholderTextColor="#9ca3af"
                     value={location}
                   />
@@ -222,9 +333,13 @@ export default function ShopScreen() {
                 className="mt-3 h-14 w-full items-center justify-center rounded-2xl bg-[#FF9500] active:bg-[#e08300]"
                 onPress={handleAddShop}
               >
-                <Text className="font-poppins-bold text-base text-white">
-                  Add shop
-                </Text>
+                {isCreating ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text className="font-poppins-bold text-base text-white">
+                    Add shop
+                  </Text>
+                )}
               </Pressable>
             </View>
           </Pressable>

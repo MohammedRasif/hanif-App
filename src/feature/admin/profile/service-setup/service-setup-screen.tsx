@@ -1,18 +1,45 @@
+import { getUserData } from "@/lib/storage";
+import { useGetShopServicesQuery } from "@/Redux/feature/shop";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { View } from "react-native";
-import { MOCK_SERVICES } from "./mock-data";
 import { ServiceFormView } from "./service-form-view";
 import { ServiceListView } from "./service-list-view";
 import type { ServiceItem, ServiceSetupProps } from "./types";
 
 export function ServiceSetupScreen({ onBack }: ServiceSetupProps) {
   const router = useRouter();
+
+  const userData = useMemo(() => getUserData(), []);
+  const shopId = userData?.shops?.[0]?.id || 1;
+
+  // 📡 GET /v1/services/?shop=<shop_id>
+  const {
+    data: servicesResponse,
+    isLoading: isServicesLoading,
+    refetch,
+  } = useGetShopServicesQuery(shopId);
+
   const [currentView, setCurrentView] = useState<"list" | "form">("list");
-  const [services, setServices] = useState<ServiceItem[]>(MOCK_SERVICES);
   const [selectedService, setSelectedService] = useState<ServiceItem | null>(
     null,
   );
+
+  // Transform API response (Returns [] if no data, NO mock data fallback!)
+  const services: ServiceItem[] = useMemo(() => {
+    if (servicesResponse?.data && Array.isArray(servicesResponse.data)) {
+      return servicesResponse.data.map((s: any) => ({
+        id: String(s.id),
+        name: s.name,
+        category: s.category?.name || "Hair Care",
+        description: s.description || "",
+        duration: `${s.duration_minutes || 30} min`,
+        price: `$${s.price || "0.00"}`,
+        staff: s.barbers || [],
+      }));
+    }
+    return [];
+  }, [servicesResponse]);
 
   const handleBack = () => {
     if (currentView === "form") {
@@ -36,37 +63,32 @@ export function ServiceSetupScreen({ onBack }: ServiceSetupProps) {
     setSelectedService({
       id: Date.now().toString(),
       name: "",
-      category: "Skin Care",
+      category: "Hair Care",
       description: "",
       duration: "30 min",
       price: "$50",
-      staff: ["Jhon"],
+      staff: [],
     });
     setCurrentView("form");
   };
 
-  const handleSaveService = (savedService: ServiceItem) => {
-    setServices((prev) => {
-      const exists = prev.some((s) => s.id === savedService.id);
-      if (exists) {
-        return prev.map((s) => (s.id === savedService.id ? savedService : s));
-      }
-      return [savedService, ...prev];
-    });
+  const handleSaveService = (_savedService: ServiceItem) => {
     setCurrentView("list");
     setSelectedService(null);
+    refetch();
   };
 
-  const handleDeleteService = (serviceId: string) => {
-    setServices((prev) => prev.filter((s) => s.id !== serviceId));
+  const handleDeleteService = (_serviceId: string) => {
     setCurrentView("list");
     setSelectedService(null);
+    refetch();
   };
 
   return (
     <View className="flex-1 bg-white">
       {currentView === "list" ? (
         <ServiceListView
+          isLoading={isServicesLoading}
           onAddNewService={handleAddNewService}
           onBack={handleBack}
           onSelectService={handleSelectService}

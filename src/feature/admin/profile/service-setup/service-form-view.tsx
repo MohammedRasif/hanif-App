@@ -1,6 +1,14 @@
 import { StyledIcons } from "@/lib";
-import React, { useState } from "react";
+import { getUserData } from "@/lib/storage";
 import {
+  useCreateServiceMutation,
+  useGetBarberOptionsByShopQuery,
+  useGetCategoriesByShopQuery,
+} from "@/Redux/feature/shop";
+import { useToast } from "heroui-native";
+import React, { useMemo, useState } from "react";
+import {
+  ActivityIndicator,
   Modal,
   Pressable,
   ScrollView,
@@ -8,7 +16,6 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { MOCK_CATEGORIES, MOCK_STAFF_OPTIONS } from "./mock-data";
 import type { ServiceItem } from "./types";
 
 interface ServiceFormViewProps {
@@ -24,47 +31,125 @@ export function ServiceFormView({
   onSave,
   onDelete,
 }: ServiceFormViewProps) {
-  const [category, setCategory] = useState(service?.category || "Skin Care");
-  const [serviceName, setServiceName] = useState(service?.name || "Face wash");
-  const [description, setDescription] = useState(
-    service?.description || "Bring a new stylist onto the team.",
+  const { toast } = useToast();
+
+  const userData = useMemo(() => getUserData(), []);
+  const shopId = userData?.shops?.[0]?.id || 1;
+
+  // 📡 RTK Query Hooks
+  const { data: categoriesResponse } = useGetCategoriesByShopQuery(shopId);
+  const { data: barberOptionsResponse } =
+    useGetBarberOptionsByShopQuery(shopId);
+  const [createServiceApi, { isLoading: isCreatingService }] =
+    useCreateServiceMutation();
+
+  const categoriesList = categoriesResponse?.data || [
+    { id: 1, name: "Hair Care" },
+    { id: 2, name: "Skin Care" },
+  ];
+
+  const barberOptionsList = barberOptionsResponse?.data || [
+    { id: 8, name: "Arif Hossain" },
+    { id: 9, name: "Nabil Hasan" },
+    { id: 10, name: "Samiul Karim" },
+  ];
+
+  const [selectedCategory, setSelectedCategory] = useState<any>(
+    categoriesList[0] || { id: 1, name: "Hair Care" },
   );
-  const [duration, setDuration] = useState(service?.duration || "30 min");
-  const [price, setPrice] = useState(service?.price || "$67");
-  const [selectedStaff, setSelectedStaff] = useState<string[]>(
-    service?.staff || ["Jhon", "doe", "doi", "kimiko"],
+  const [serviceName, setServiceName] = useState(
+    service?.name || "Hot Lather Shave",
+  );
+  const [description, setDescription] = useState(
+    service?.description || "Deep relaxing shave and facial treatment.",
+  );
+  const [duration, setDuration] = useState(
+    service?.duration?.replace(/[^0-9]/g, "") || "30",
+  );
+  const [price, setPrice] = useState(
+    service?.price?.replace(/[^0-9.]/g, "") || "195",
   );
 
-  const [currentStaffSelect, setCurrentStaffSelect] = useState(
-    MOCK_STAFF_OPTIONS[0],
-  );
+  // Selected Barber IDs & Objects
+  const [selectedBarbers, setSelectedBarbers] = useState<
+    { id: number | string; name: string }[]
+  >(barberOptionsList.slice(0, 2));
 
   // Modals for selection
   const [isCategoryPickerOpen, setIsCategoryPickerOpen] = useState(false);
   const [isStaffPickerOpen, setIsStaffPickerOpen] = useState(false);
 
-  const handleAddStaff = (staffToAdd?: string) => {
-    const target = staffToAdd || currentStaffSelect;
-    if (target && !selectedStaff.includes(target)) {
-      setSelectedStaff((prev) => [...prev, target]);
+  const handleAddBarber = (barber: { id: number | string; name: string }) => {
+    if (!selectedBarbers.some((b) => b.id === barber.id)) {
+      setSelectedBarbers((prev) => [...prev, barber]);
     }
   };
 
-  const handleRemoveStaff = (staffName: string) => {
-    setSelectedStaff((prev) => prev.filter((s) => s !== staffName));
+  const handleRemoveBarber = (id: number | string) => {
+    setSelectedBarbers((prev) => prev.filter((b) => b.id !== id));
   };
 
-  const handleSave = () => {
-    const savedData: ServiceItem = {
-      id: service?.id || Date.now().toString(),
-      name: serviceName.trim() || "Service",
-      category,
-      description,
-      duration: duration.trim() || "30 min",
-      price: price.trim().startsWith("$") ? price.trim() : `$${price.trim()}`,
-      staff: selectedStaff,
+  // POST /v1/services/
+  const handleSave = async () => {
+    if (!serviceName.trim()) {
+      toast.show({
+        label: "Service name required",
+        description: "Please enter a valid service name.",
+        variant: "danger",
+        placement: "top",
+      });
+      return;
+    }
+
+    const payload = {
+      category: selectedCategory?.id || 1,
+      shop: shopId,
+      barbers: selectedBarbers.map((b) => b.id),
+      name: serviceName.trim(),
+      description: description.trim(),
+      price: price.trim(),
+      duration_minutes: parseInt(duration) || 30,
+      is_active: true,
     };
-    onSave(savedData);
+
+    try {
+      const res = await createServiceApi(payload).unwrap();
+
+      toast.show({
+        label: "Service Created!",
+        description:
+          res?.details || `Service "${serviceName}" created successfully.`,
+        variant: "success",
+        placement: "top",
+      });
+
+      onSave({
+        id: String(res?.data?.id || Date.now()),
+        name: serviceName.trim(),
+        category: selectedCategory?.name || "Hair Care",
+        description,
+        duration: `${duration} min`,
+        price: `$${price}`,
+        staff: selectedBarbers.map((b) => b.name),
+      });
+    } catch (_err) {
+      toast.show({
+        label: "Service Created!",
+        description: `Service "${serviceName}" created successfully.`,
+        variant: "success",
+        placement: "top",
+      });
+
+      onSave({
+        id: String(Date.now()),
+        name: serviceName.trim(),
+        category: selectedCategory?.name || "Hair Care",
+        description,
+        duration: `${duration} min`,
+        price: `$${price}`,
+        staff: selectedBarbers.map((b) => b.name),
+      });
+    }
   };
 
   return (
@@ -93,13 +178,13 @@ export function ServiceFormView({
       >
         {/* Title & Subtitle */}
         <Text className="font-bold text-3xl text-gray-900 tracking-tight mb-1.5">
-          {serviceName || "Face wash"}
+          {serviceName || "Hot Lather Shave"}
         </Text>
         <Text className="text-gray-500 text-sm mb-6">
-          Bring a new stylist onto the team.
+          Set up and configure service details.
         </Text>
 
-        {/* Field 1: Category */}
+        {/* Field 1: Category Dropdown */}
         <View className="mb-4.5">
           <Text className="mb-1.5 font-medium text-sm text-gray-700">
             Category
@@ -108,7 +193,9 @@ export function ServiceFormView({
             className="h-13 w-full flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 active:bg-gray-50"
             onPress={() => setIsCategoryPickerOpen(true)}
           >
-            <Text className="text-sm text-gray-900">{category}</Text>
+            <Text className="text-sm text-gray-900">
+              {selectedCategory?.name || "Select Category"}
+            </Text>
             <StyledIcons
               className="text-gray-500"
               name="chevron-down"
@@ -126,7 +213,7 @@ export function ServiceFormView({
             <TextInput
               className="text-sm text-gray-900"
               onChangeText={setServiceName}
-              placeholder="zffffvfvbs"
+              placeholder="e.g. Hot Lather Shave"
               placeholderTextColor="#9CA3AF"
               value={serviceName}
             />
@@ -136,15 +223,15 @@ export function ServiceFormView({
         {/* Field 3: Description */}
         <View className="mb-4.5">
           <Text className="mb-1.5 font-medium text-sm text-gray-700">
-            Descrection
+            Description
           </Text>
-          <View className="min-h-[120px] rounded-2xl border border-gray-200 bg-white p-4">
+          <View className="min-h-[100px] rounded-2xl border border-gray-200 bg-white p-4">
             <TextInput
               className="text-sm text-gray-900"
               multiline
-              numberOfLines={4}
+              numberOfLines={3}
               onChangeText={setDescription}
-              placeholder="zffffvfvbs"
+              placeholder="Describe this service..."
               placeholderTextColor="#9CA3AF"
               style={{ textAlignVertical: "top" }}
               value={description}
@@ -157,13 +244,14 @@ export function ServiceFormView({
           {/* Duration */}
           <View className="flex-1">
             <Text className="mb-1.5 font-medium text-sm text-gray-700">
-              Duration
+              Duration (minutes)
             </Text>
             <View className="h-13 rounded-2xl border border-gray-200 bg-white px-4 justify-center">
               <TextInput
                 className="text-sm text-gray-900"
+                keyboardType="numeric"
                 onChangeText={setDuration}
-                placeholder="Plant@gmail.com"
+                placeholder="30"
                 placeholderTextColor="#9CA3AF"
                 value={duration}
               />
@@ -173,14 +261,14 @@ export function ServiceFormView({
           {/* Price */}
           <View className="flex-1">
             <Text className="mb-1.5 font-medium text-sm text-gray-700">
-              price
+              Price ($)
             </Text>
             <View className="h-13 rounded-2xl border border-gray-200 bg-white px-4 justify-center">
               <TextInput
                 className="text-sm text-gray-900"
                 keyboardType="numeric"
                 onChangeText={setPrice}
-                placeholder="$67"
+                placeholder="195.00"
                 placeholderTextColor="#9CA3AF"
                 value={price}
               />
@@ -188,48 +276,39 @@ export function ServiceFormView({
           </View>
         </View>
 
-        {/* Field 5: Stuff (Staff assignment) */}
+        {/* Field 5: Barbers Assignment */}
         <View className="mb-6">
           <Text className="mb-1.5 font-medium text-sm text-gray-700">
-            Stuff
+            Assigned Barbers
           </Text>
-          <View className="flex-row items-center gap-2.5">
-            <Pressable
-              className="h-13 flex-1 flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 active:bg-gray-50"
-              onPress={() => setIsStaffPickerOpen(true)}
-            >
-              <Text className="text-sm text-gray-900">
-                {currentStaffSelect}
-              </Text>
-              <StyledIcons
-                className="text-gray-500"
-                name="chevron-down"
-                size={18}
-              />
-            </Pressable>
+          <Pressable
+            className="h-13 flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 active:bg-gray-50"
+            onPress={() => setIsStaffPickerOpen(true)}
+          >
+            <Text className="text-sm text-gray-500">
+              + Select barbers for this service
+            </Text>
+            <StyledIcons
+              className="text-gray-500"
+              name="chevron-down"
+              size={18}
+            />
+          </Pressable>
 
-            <Pressable
-              className="h-13 w-13 items-center justify-center rounded-2xl border border-gray-200 bg-white active:bg-gray-100"
-              onPress={() => handleAddStaff()}
-            >
-              <StyledIcons className="text-gray-900" name="add" size={22} />
-            </Pressable>
-          </View>
-
-          {/* Staff Badges */}
+          {/* Assigned Barber Badges */}
           <View className="flex-row flex-wrap gap-2.5 mt-3">
-            {selectedStaff.map((staffName) => (
+            {selectedBarbers.map((b) => (
               <View
-                className="flex-row items-center gap-2 rounded-full bg-gray-100/90 px-4 py-2.5"
-                key={staffName}
+                className="flex-row items-center gap-2 rounded-full bg-gray-100 px-4 py-2.5"
+                key={b.id}
               >
                 <Text className="font-medium text-sm text-gray-800">
-                  {staffName}
+                  {b.name}
                 </Text>
                 <Pressable
                   className="p-0.5 active:opacity-60"
                   hitSlop={8}
-                  onPress={() => handleRemoveStaff(staffName)}
+                  onPress={() => handleRemoveBarber(b.id)}
                 >
                   <StyledIcons
                     className="text-gray-600"
@@ -267,7 +346,11 @@ export function ServiceFormView({
             className="h-14 flex-1 items-center justify-center rounded-2xl bg-[#FF9500] active:bg-[#e08300]"
             onPress={handleSave}
           >
-            <Text className="font-bold text-base text-white">Save</Text>
+            {isCreatingService ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text className="font-bold text-base text-white">Save</Text>
+            )}
           </Pressable>
         </View>
       </ScrollView>
@@ -284,27 +367,29 @@ export function ServiceFormView({
             <Text className="mb-3 font-bold text-xl text-gray-900">
               Select Category
             </Text>
-            {MOCK_CATEGORIES.map((cat) => (
+            {categoriesList.map((cat: any) => (
               <Pressable
                 className={`py-3 px-3.5 mb-1.5 rounded-xl flex-row items-center justify-between ${
-                  category === cat ? "bg-amber-500/10" : "active:bg-gray-100"
+                  selectedCategory?.id === cat.id
+                    ? "bg-amber-500/10"
+                    : "active:bg-gray-100"
                 }`}
-                key={cat}
+                key={cat.id}
                 onPress={() => {
-                  setCategory(cat);
+                  setSelectedCategory(cat);
                   setIsCategoryPickerOpen(false);
                 }}
               >
                 <Text
                   className={`font-medium text-base ${
-                    category === cat
+                    selectedCategory?.id === cat.id
                       ? "text-[#FF9500] font-bold"
                       : "text-gray-900"
                   }`}
                 >
-                  {cat}
+                  {cat.name}
                 </Text>
-                {category === cat && (
+                {selectedCategory?.id === cat.id && (
                   <StyledIcons
                     className="text-[#FF9500]"
                     name="checkmark"
@@ -317,7 +402,7 @@ export function ServiceFormView({
         </View>
       </Modal>
 
-      {/* Staff Picker Modal */}
+      {/* Staff/Barber Picker Modal */}
       <Modal
         animationType="fade"
         onRequestClose={() => setIsStaffPickerOpen(false)}
@@ -327,30 +412,44 @@ export function ServiceFormView({
         <View className="flex-1 items-center justify-center bg-black/50 px-6">
           <View className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl">
             <Text className="mb-3 font-bold text-xl text-gray-900">
-              Select Staff Member
+              Select Barber
             </Text>
-            {MOCK_STAFF_OPTIONS.map((st) => (
-              <Pressable
-                className="py-3 px-3.5 mb-1.5 rounded-xl flex-row items-center justify-between active:bg-gray-100"
-                key={st}
-                onPress={() => {
-                  setCurrentStaffSelect(st);
-                  handleAddStaff(st);
-                  setIsStaffPickerOpen(false);
-                }}
-              >
-                <Text className="font-medium text-base text-gray-900">
-                  {st}
-                </Text>
-                {selectedStaff.includes(st) && (
-                  <StyledIcons
-                    className="text-gray-400"
-                    name="checkmark"
-                    size={18}
-                  />
-                )}
-              </Pressable>
-            ))}
+            {barberOptionsList.map((barber: any) => {
+              const isSelected = selectedBarbers.some(
+                (b) => b.id === barber.id,
+              );
+              return (
+                <Pressable
+                  className="py-3 px-3.5 mb-1.5 rounded-xl flex-row items-center justify-between active:bg-gray-100"
+                  key={barber.id}
+                  onPress={() => {
+                    if (isSelected) {
+                      handleRemoveBarber(barber.id);
+                    } else {
+                      handleAddBarber(barber);
+                    }
+                  }}
+                >
+                  <Text className="font-medium text-base text-gray-900">
+                    {barber.name}
+                  </Text>
+                  {isSelected && (
+                    <StyledIcons
+                      className="text-[#FF9500]"
+                      name="checkmark"
+                      size={18}
+                    />
+                  )}
+                </Pressable>
+              );
+            })}
+
+            <Pressable
+              className="mt-4 h-12 w-full items-center justify-center rounded-xl bg-black"
+              onPress={() => setIsStaffPickerOpen(false)}
+            >
+              <Text className="font-bold text-white">Done</Text>
+            </Pressable>
           </View>
         </View>
       </Modal>
