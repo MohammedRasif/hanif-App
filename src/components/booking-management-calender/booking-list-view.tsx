@@ -20,7 +20,7 @@ export interface BookingGroup {
   workingHours: string;
 }
 
-const DEFAULT_BOOKING_GROUPS: BookingGroup[] = [
+export const DEFAULT_BOOKING_GROUPS: BookingGroup[] = [
   {
     dateTitle: "Today",
     workingHours: "9.00 - 6.00 pm",
@@ -85,13 +85,20 @@ const DEFAULT_BOOKING_GROUPS: BookingGroup[] = [
 
 type BookingListViewProps = {
   groups?: BookingGroup[];
+  isLoading?: boolean;
   onSwitchToCalendar: () => void;
 };
 
 export function BookingListView({
   onSwitchToCalendar,
-  groups = DEFAULT_BOOKING_GROUPS,
+  groups = [],
+  isLoading = false,
 }: BookingListViewProps) {
+  const isEmpty =
+    !groups ||
+    groups.length === 0 ||
+    groups.every((g) => !g.items || g.items.length === 0);
+
   return (
     <Container className="flex-1 bg-white" isScrollable={false}>
       {/* Scrollable Content */}
@@ -100,110 +107,151 @@ export function BookingListView({
         contentContainerStyle={{ paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
-        {groups.map((group, index) => (
-          <View className="mb-8" key={`${group.dateTitle}-${index}`}>
-            {/* Group Header (Title & Calendar Switch Button for first group) */}
-            <View className="flex-row items-center justify-between mb-4">
-              <View>
-                <Text className="font-bold text-2xl text-gray-900 tracking-tight">
-                  {group.dateTitle}
-                </Text>
-                <Text className="mt-0.5 text-xs text-gray-400 font-normal">
-                  {group.workingHours}
-                </Text>
-              </View>
+        {/* Top Bar with Switch Button */}
+        <View className="flex-row items-center justify-between mb-4">
+          <View>
+            <Text className="font-bold text-2xl text-gray-900 tracking-tight">
+              Today
+            </Text>
+            <Text className="mt-0.5 text-xs text-gray-400 font-normal">
+              9.00 - 6.00 pm
+            </Text>
+          </View>
 
-              {index === 0 && (
-                <Pressable
-                  className="h-11 w-11 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200"
-                  onPress={onSwitchToCalendar}
-                >
-                  <StyledIcons
-                    className="text-gray-900"
-                    name="calendar-outline"
-                    size={20}
-                  />
-                </Pressable>
+          <Pressable
+            className="h-11 w-11 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200"
+            onPress={onSwitchToCalendar}
+          >
+            <StyledIcons
+              className="text-gray-900"
+              name="calendar-outline"
+              size={20}
+            />
+          </Pressable>
+        </View>
+
+        {isLoading ? (
+          <View className="py-20 items-center justify-center">
+            <StyledIcons
+              className="text-gray-400 animate-spin mb-3"
+              name="sync-outline"
+              size={32}
+            />
+            <Text className="font-medium text-base text-gray-500">
+              Loading appointments...
+            </Text>
+          </View>
+        ) : isEmpty ? (
+          <View className="py-20 items-center justify-center">
+            <View className="h-16 w-16 items-center justify-center rounded-full bg-gray-100 mb-4">
+              <StyledIcons
+                className="text-gray-400"
+                name="calendar-outline"
+                size={32}
+              />
+            </View>
+            <Text className="font-bold text-lg text-gray-900 mb-1">
+              No appointments found
+            </Text>
+            <Text className="font-normal text-sm text-gray-400 text-center max-w-xs">
+              There are no appointments recorded for this date.
+            </Text>
+          </View>
+        ) : (
+          groups.map((group, index) => (
+            <View className="mb-8" key={`${group.dateTitle}-${index}`}>
+              {/* Group Header (if not first index) */}
+              {index > 0 && (
+                <View className="mb-4">
+                  <Text className="font-bold text-2xl text-gray-900 tracking-tight">
+                    {group.dateTitle}
+                  </Text>
+                  <Text className="mt-0.5 text-xs text-gray-400 font-normal">
+                    {group.workingHours}
+                  </Text>
+                </View>
               )}
-            </View>
 
-            {/* Summary Metrics Card */}
-            <View className="flex-row items-center justify-between rounded-3xl border border-gray-100 bg-[#F9FAFB] p-5 mb-5 shadow-2xs">
-              <View className="flex-1 items-start">
-                <Text className="text-xs font-medium text-gray-400">Value</Text>
-                <Text className="mt-1 font-bold text-lg text-gray-900">
-                  {group.totalValue}
-                </Text>
+              {/* Summary Metrics Card */}
+              <View className="flex-row items-center justify-between rounded-3xl border border-gray-100 bg-[#F9FAFB] p-5 mb-5 shadow-2xs">
+                <View className="flex-1 items-start">
+                  <Text className="text-xs font-medium text-gray-400">
+                    Value
+                  </Text>
+                  <Text className="mt-1 font-bold text-lg text-gray-900">
+                    {group.totalValue}
+                  </Text>
+                </View>
+
+                <View className="h-8 w-px bg-gray-200 mx-2" />
+
+                <View className="flex-1 items-start pl-2">
+                  <Text className="text-xs font-medium text-gray-400">
+                    Appointment
+                  </Text>
+                  <Text className="mt-1 font-bold text-lg text-gray-900">
+                    {group.appointmentCount}
+                  </Text>
+                </View>
+
+                <View className="h-8 w-px bg-gray-200 mx-2" />
+
+                <View className="flex-1 items-start pl-2">
+                  <Text className="text-xs font-medium text-gray-400">
+                    New clint
+                  </Text>
+                  <Text className="mt-1 font-bold text-lg text-gray-900">
+                    {group.newClientCount}
+                  </Text>
+                </View>
               </View>
 
-              <View className="h-8 w-px bg-gray-200 mx-2" />
+              {/* Appointments List */}
+              <View className="gap-5">
+                {group.items.map((item) => (
+                  <View
+                    className="flex-row items-center justify-between"
+                    key={item.id}
+                  >
+                    <View className="flex-row items-center gap-3">
+                      {/* Left Orange Accent Indicator Line */}
+                      <View className="h-10 w-1 rounded-full bg-[#FF9500]" />
 
-              <View className="flex-1 items-start pl-2">
-                <Text className="text-xs font-medium text-gray-400">
-                  Appointment
-                </Text>
-                <Text className="mt-1 font-bold text-lg text-gray-900">
-                  {group.appointmentCount}
-                </Text>
-              </View>
+                      {/* User Avatar Circle */}
+                      <View className="h-11 w-11 items-center justify-center rounded-full bg-gray-200">
+                        <StyledIcons
+                          className="text-gray-600"
+                          name="person"
+                          size={20}
+                        />
+                      </View>
 
-              <View className="h-8 w-px bg-gray-200 mx-2" />
-
-              <View className="flex-1 items-start pl-2">
-                <Text className="text-xs font-medium text-gray-400">
-                  New clint
-                </Text>
-                <Text className="mt-1 font-bold text-lg text-gray-900">
-                  {group.newClientCount}
-                </Text>
-              </View>
-            </View>
-
-            {/* Appointments List */}
-            <View className="gap-5">
-              {group.items.map((item) => (
-                <View
-                  className="flex-row items-center justify-between"
-                  key={item.id}
-                >
-                  <View className="flex-row items-center gap-3">
-                    {/* Left Orange Accent Indicator Line */}
-                    <View className="h-10 w-1 rounded-full bg-[#FF9500]" />
-
-                    {/* User Avatar Circle */}
-                    <View className="h-11 w-11 items-center justify-center rounded-full bg-gray-200">
-                      <StyledIcons
-                        className="text-gray-600"
-                        name="person"
-                        size={20}
-                      />
+                      {/* Title & Subtitle */}
+                      <View>
+                        <Text className="font-bold text-base text-gray-900">
+                          {item.title}
+                        </Text>
+                        <Text className="text-xs font-medium text-gray-400 mt-0.5">
+                          {item.serviceName}
+                        </Text>
+                      </View>
                     </View>
 
-                    {/* Title & Subtitle */}
-                    <View>
+                    {/* Price & Duration */}
+                    <View className="items-end">
                       <Text className="font-bold text-base text-gray-900">
-                        {item.title}
+                        {item.amount}
                       </Text>
                       <Text className="text-xs font-medium text-gray-400 mt-0.5">
-                        {item.serviceName}
+                        {item.duration}
                       </Text>
                     </View>
                   </View>
-
-                  {/* Price & Duration */}
-                  <View className="items-end">
-                    <Text className="font-bold text-base text-gray-900">
-                      {item.amount}
-                    </Text>
-                    <Text className="text-xs font-medium text-gray-400 mt-0.5">
-                      {item.duration}
-                    </Text>
-                  </View>
-                </View>
-              ))}
+                ))}
+              </View>
             </View>
-          </View>
-        ))}
+          ))
+        )}
       </ScrollView>
     </Container>
   );

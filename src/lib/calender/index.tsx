@@ -2,17 +2,13 @@ import React, { useMemo, useState } from "react";
 import { View } from "react-native";
 import { CalendarGridTimeline } from "./calendar-grid";
 import { CalendarHeaderView } from "./calendar-header";
-import {
-  DEFAULT_APPOINTMENTS,
-  DEFAULT_BARBERS,
-  DEFAULT_DAYS,
-} from "./mock-data";
+import { DEFAULT_DAYS } from "./mock-data";
 import type { CalendarProps } from "./types";
 
 export function CustomCalendar({
   activeDateStr: propsActiveDateStr,
-  appointments = DEFAULT_APPOINTMENTS,
-  barbers = DEFAULT_BARBERS,
+  appointments = [],
+  barbers = [],
   children,
   columnWidth = 165,
   days = DEFAULT_DAYS,
