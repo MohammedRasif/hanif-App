@@ -1,11 +1,15 @@
-import CustomCalendar, {
-  DEFAULT_APPOINTMENTS,
-  DEFAULT_BARBERS,
-} from "@/lib/calender";
+import CustomCalendar from "@/lib/calender";
+import { transformBookingCalendarView } from "@/lib/calender/api-transformer";
 import type { Appointment } from "@/lib/calender/types";
+import { useGetProfileQuery } from "@/Redux/feature/auth";
+import {
+  formatCalendarDate,
+  useGetBookingCalendarViewQuery,
+  type BookingCalendarViewType,
+} from "@/Redux/feature/bookingCalendarApi";
 import { useToast } from "heroui-native";
-import React, { useState } from "react";
-import { View } from "react-native";
+import React, { useMemo, useState } from "react";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { AddReservationDialog } from "./add-reservation-dialog";
 import { AddTimeOffDialog } from "./add-time-off-dialog";
 import { BookingCalendarMenu } from "./booking-calendar-menu";
@@ -26,21 +30,47 @@ export interface BookingManagementCalendarProps {
   initialDateStr?: string;
   onBookingConfirmed?: (bookingData: any) => void;
   onTimeOffSaved?: (timeOffData: any) => void;
+  viewType?: BookingCalendarViewType;
 }
 
 export function BookingManagementCalendar({
   initialDateStr,
   onBookingConfirmed,
   onTimeOffSaved,
+  viewType = "admin",
 }: BookingManagementCalendarProps) {
   const { toast } = useToast();
 
   const [selectedDateStr, setSelectedDateStr] = useState(
-    initialDateStr || "2026-07-18",
+    initialDateStr || formatCalendarDate(),
   );
   const [currentViewMode, setCurrentViewMode] = useState<"calendar" | "list">(
     "calendar",
   );
+
+  // Active shop of the logged-in user drives the shop_id query param
+  const { data: profileResponse, isLoading: isProfileLoading } =
+    useGetProfileQuery();
+  const shopId = profileResponse?.data?.active_shop?.id;
+
+  // GET /v1/booking/?view_type=&shop_id=&date=&display_mode=calendar
+  const {
+    data: calendarResponse,
+    isError: isCalendarError,
+    isFetching: isCalendarFetching,
+    refetch: refetchCalendar,
+  } = useGetBookingCalendarViewQuery(
+    { date: selectedDateStr, shop_id: shopId ?? "", view_type: viewType },
+    { skip: !shopId },
+  );
+
+  const calendar = useMemo(
+    () => transformBookingCalendarView(calendarResponse?.data, selectedDateStr),
+    [calendarResponse?.data, selectedDateStr],
+  );
+
+  const isCalendarBusy = isProfileLoading || isCalendarFetching;
+  const isCalendarEmpty = !isCalendarBusy && calendar.barbers.length === 0;
 
   // Staff Filter & Working Hours Flow States
   const [isStaffFilterOpen, setIsStaffFilterOpen] = useState(false);
@@ -218,14 +248,51 @@ export function BookingManagementCalendar({
     <View className="flex-1 bg-white">
       <CustomCalendar
         activeDateStr={selectedDateStr}
-        appointments={DEFAULT_APPOINTMENTS}
-        barbers={DEFAULT_BARBERS}
+        appointments={calendar.appointments}
+        barbers={calendar.barbers}
+        blocks={calendar.blocks}
+        endHour={calendar.endHour}
         onPressAppointment={handlePressAppointment}
         onPressFilter={() => setIsStaffFilterOpen(true)}
         onPressListView={() => setCurrentViewMode("list")}
         onSelectDate={(day) => setSelectedDateStr(day.fullDateStr)}
+        startHour={calendar.startHour}
+        workingHoursLabel={calendar.workingHoursLabel}
       >
-        {/* Floating Menu Action Overlay */}
+        {/* Calendar Fetch States (overlaid so the date bar stays usable) */}
+        {isCalendarBusy && (
+          <View className="absolute top-0 bottom-0 left-0 right-0 items-center justify-center bg-white/70">
+            <ActivityIndicator color="#111827" size="large" />
+          </View>
+        )}
+
+        {isCalendarError && !isCalendarBusy && (
+          <View className="absolute top-0 bottom-0 left-0 right-0 items-center justify-center gap-3 bg-white/90 px-8">
+            <Text className="text-center font-semibold text-gray-900 text-sm">
+              Couldn&apos;t load the calendar
+            </Text>
+            <Pressable
+              className="rounded-full bg-black px-5 py-2.5 active:opacity-80"
+              onPress={() => refetchCalendar()}
+            >
+              <Text className="font-semibold text-white text-xs">
+                Try again
+              </Text>
+            </Pressable>
+          </View>
+        )}
+
+        {isCalendarEmpty && !isCalendarError && (
+          <View className="absolute top-0 bottom-0 left-0 right-0 items-center justify-center bg-white/90 px-8">
+            <Text className="text-center text-gray-400 text-sm">
+              {shopId
+                ? "No staff scheduled for this date."
+                : "No shop assigned to your account yet."}
+            </Text>
+          </View>
+        )}
+
+        {/* Floating Menu Action Overlay (kept above the state overlays) */}
         <BookingCalendarMenu
           onOpenReservationDialog={() => setIsStep1Open(true)}
           onOpenTimeOffDialog={() => setIsTimeOffDialogOpen(true)}

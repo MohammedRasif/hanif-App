@@ -59,7 +59,7 @@ export function CheckoutPageView({
         showsVerticalScrollIndicator={false}
       >
         {/* Customer Summary Card */}
-        <View className="mb-6 rounded-3xl border border-gray-100/80 bg-[#F9FAFB] p-5 shadow-2xs">
+        <View className="mb-6 rounded-3xl border border-gray-100/80 bg-main-bg-overlay p-5 shadow-2xs">
           <View className="mb-5 flex-row items-center gap-3.5">
             <View className="h-12 w-12 items-center justify-center rounded-full bg-gray-200">
               <StyledIcons className="text-gray-600" name="person" size={24} />
@@ -146,7 +146,7 @@ export function CheckoutPageView({
         {/* Notes Section */}
         <View className="mb-6">
           <Text className="mb-3 font-bold text-lg text-gray-900">Notes</Text>
-          <View className="rounded-2xl border border-gray-100/80 bg-[#F9FAFB] p-4.5">
+          <View className="rounded-2xl border border-gray-100/80 bg-main-bg-overlay p-4.5">
             <Text className="text-gray-600 text-sm leading-relaxed">
               {notesText}
             </Text>

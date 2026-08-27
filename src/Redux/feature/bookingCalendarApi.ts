@@ -1,15 +1,5 @@
 import { baseApi } from "./baseApi";
 
-/**
- * Calendar view of the booking module.
- *
- * GET /v1/booking/?view_type=admin&shop_id=7&date=2026-08-24&display_mode=calendar
- *
- * `display_mode` is always `calendar` for this endpoint — the same backend route
- * serves the list view through `bookingApi.getBookingData` with `display_mode=list`.
- */
-const CALENDAR_DISPLAY_MODE = "calendar";
-
 export type BookingCalendarViewType = "admin" | "staff";
 
 export type CalendarAppointmentStatus =
@@ -45,6 +35,7 @@ export interface BookingCalendarViewParams {
   shop_id: number | string;
   /** Defaults to `admin`. */
   view_type?: BookingCalendarViewType;
+  display_mode: "calendar" | "list";
 }
 
 export interface CalendarShop {
@@ -161,26 +152,21 @@ export const bookingCalendarApi = baseApi.injectEndpoints({
       BookingCalendarViewResponse,
       BookingCalendarViewParams
     >({
-      query: ({ date, shop_id, view_type = "admin" }) => {
+      query: ({
+        date,
+        shop_id,
+        view_type = "admin",
+        display_mode = "calendar",
+      }) => {
         const targetDate = date || formatCalendarDate();
         return (
           `v1/booking/?view_type=${encodeURIComponent(view_type)}` +
           `&shop_id=${encodeURIComponent(String(shop_id))}` +
           `&date=${encodeURIComponent(targetDate)}` +
-          `&display_mode=${CALENDAR_DISPLAY_MODE}`
+          `&display_mode=${display_mode}`
         );
       },
-      providesTags: (
-        _result,
-        _error,
-        { date, shop_id, view_type = "admin" },
-      ) => [
-        "Booking",
-        {
-          type: "Booking" as const,
-          id: `CALENDAR-${view_type}-${shop_id}-${date || formatCalendarDate()}`,
-        },
-      ],
+      providesTags: ["BookingCalendar"],
     }),
   }),
   overrideExisting: true,
