@@ -19,6 +19,9 @@ export function ScheduleManagementScreen({
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState<ScheduleSubPage>(initialPage);
   const [selectedStaffMember, setSelectedStaffMember] = useState<any>(null);
+  const [activeShifts, setActiveShifts] = useState<any[] | null>(null);
+  const [activeTimeOff, setActiveTimeOff] = useState<any[] | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>("2026-08-30");
   const [navigationHistory, setNavigationHistory] = useState<ScheduleSubPage[]>(
     [initialPage],
   );
@@ -60,20 +63,35 @@ export function ScheduleManagementScreen({
           onNavigateToAddStaffTimeOff={() =>
             handleNavigate("add-staff-time-off")
           }
-          onNavigateToBusinessHours={() => handleNavigate("business-hours")}
-          onNavigateToShift={() => handleNavigate("shift")}
-          onNavigateToTimeOff={() => handleNavigate("staff-time-off")}
+          onNavigateToBusinessHours={(dateStr) => {
+            if (dateStr) setSelectedDate(dateStr);
+            handleNavigate("business-hours");
+          }}
+          onNavigateToShift={(shiftsData) => {
+            if (shiftsData) setActiveShifts(shiftsData);
+            handleNavigate("shift");
+          }}
+          onNavigateToTimeOff={(timeOffData) => {
+            if (timeOffData) setActiveTimeOff(timeOffData);
+            handleNavigate("staff-time-off");
+          }}
         />
       ) : currentPage === "shift" ? (
-        <ShiftView onBack={handleBack} />
+        <ShiftView
+          liveShifts={activeShifts}
+          onBack={handleBack}
+          selectedDate={selectedDate}
+        />
       ) : currentPage === "staff-time-off" ? (
         <StaffTimeOffView
+          liveTimeOff={activeTimeOff}
           onAddNewTimeOff={() => handleNavigate("add-staff-time-off")}
           onBack={handleBack}
           onSelectStaff={(staff) => {
             setSelectedStaffMember(staff);
             handleNavigate("staff-time-off-detail");
           }}
+          selectedDate={selectedDate}
         />
       ) : currentPage === "staff-time-off-detail" ? (
         <StaffMemberTimeOffDetailView
@@ -81,7 +99,7 @@ export function ScheduleManagementScreen({
           staff={selectedStaffMember}
         />
       ) : currentPage === "business-hours" ? (
-        <BusinessHoursView onBack={handleBack} />
+        <BusinessHoursView onBack={handleBack} selectedDate={selectedDate} />
       ) : currentPage === "staff-working-hours" ? (
         <StaffWorkingHoursView onBack={handleBack} />
       ) : currentPage === "add-business-days-off" ? (

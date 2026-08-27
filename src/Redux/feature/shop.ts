@@ -336,6 +336,21 @@ export const shopApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Shop"],
     }),
+
+    // GET /v1/bookings/reviews/:id/ (Where :id is Shop ID)
+    getShopReviewDetails: builder.query<
+      {
+        success?: boolean;
+        details?: string;
+        code?: string;
+        status_code?: number;
+        data: any;
+      },
+      string | number
+    >({
+      query: (shopId) => `v1/bookings/reviews/${shopId}/`,
+      providesTags: ["Shop"],
+    }),
   }),
   overrideExisting: true,
 });
@@ -365,4 +380,5 @@ export const {
   useDeleteBarberMutation,
   useUpdateShopDetailsMutation,
   useUpdateShopGalleryMutation,
+  useGetShopReviewDetailsQuery,
 } = shopApi;

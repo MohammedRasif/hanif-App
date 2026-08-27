@@ -147,3 +147,75 @@ export interface StaffReportsData {
   total_revenue: number | string;
   history: StaffReportHistoryItem[];
 }
+
+export interface DashboardReportStaffBreakdown {
+  id: number | string;
+  name: string;
+  appointments: number;
+  revenue: number | string;
+  avatar?: string | null;
+}
+
+export interface DashboardReportData {
+  shop?: {
+    id: number | string;
+    name: string;
+  };
+  period: "daily" | "weekly" | "monthly" | string;
+  date_range?: {
+    start: string;
+    end: string;
+  };
+  total_revenue: number | string;
+  appointments: number;
+  staff_breakdown: DashboardReportStaffBreakdown[];
+}
+
+export interface OpeningCalendarShopHoursBreak {
+  start_time: string;
+  end_time: string;
+}
+
+export interface OpeningCalendarShopHours {
+  open_time: string;
+  close_time: string;
+  is_closed: boolean;
+  breaks?: OpeningCalendarShopHoursBreak[];
+}
+
+export interface OpeningCalendarStaffShiftTime {
+  start_time: string;
+  end_time: string;
+}
+
+export interface OpeningCalendarStaffShiftItem {
+  staff: {
+    id: number | string;
+    name: string;
+    image?: string | null;
+  };
+  shift_time: OpeningCalendarStaffShiftTime[];
+  duration_minutes: number;
+}
+
+export interface OpeningCalendarStaffTimeOffItem {
+  staff: {
+    id: number | string;
+    name: string;
+    image?: string | null;
+  };
+  start_date: string;
+  end_date: string;
+  reason?: string;
+}
+
+export interface OpeningCalendarData {
+  date: string;
+  shop?: {
+    id: number | string;
+    name: string;
+  };
+  shop_hours: OpeningCalendarShopHours;
+  staff_shifts: OpeningCalendarStaffShiftItem[];
+  staff_time_off: OpeningCalendarStaffTimeOffItem[];
+}

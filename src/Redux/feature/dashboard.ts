@@ -2,6 +2,8 @@ import { baseApi } from "./baseApi";
 import type {
   ClientsData,
   DashboardOverviewData,
+  DashboardReportData,
+  OpeningCalendarData,
   StaffOfferedService,
   StaffProfileSummaryData,
   StaffReportsData,
@@ -138,6 +140,138 @@ export const dashboardApi = baseApi.injectEndpoints({
       query: () => "v1/barbers/me/reports/",
       providesTags: ["Dashboard"],
     }),
+
+    // 8. Get Dashboard Reports: GET /v1/dashboard/reports/?period={daily|weekly|monthly}
+    getDashboardReports: builder.query<
+      { code?: string; data: DashboardReportData },
+      { period?: "daily" | "weekly" | "monthly" } | string | void
+    >({
+      query: (params) => {
+        const period =
+          typeof params === "string" ? params : params?.period || "daily";
+        return `v1/dashboard/reports/?period=${period}`;
+      },
+      providesTags: ["Dashboard"],
+    }),
+
+    // 9. Get Opening Calendar: GET /v1/schedule/opening-calendar/?shop={shop}&date={date}
+    getOpeningCalendar: builder.query<
+      {
+        status?: boolean;
+        code?: string;
+        details?: string;
+        data: OpeningCalendarData;
+      },
+      { shop?: string | number; date?: string } | void
+    >({
+      query: (params) => {
+        const queryParts: string[] = [];
+        if (params && params.shop) queryParts.push(`shop=${params.shop}`);
+        if (params && params.date) queryParts.push(`date=${params.date}`);
+        const queryString = queryParts.length ? `?${queryParts.join("&")}` : "";
+        return `v1/schedule/opening-calendar/${queryString}`;
+      },
+      providesTags: ["Dashboard", "Shop"],
+    }),
+
+    // 10. Update Business Hours Date: PUT /v1/schedule/business-hours/{shop_id}/date/
+    updateBusinessHoursDate: builder.mutation<
+      {
+        status?: boolean;
+        code?: string;
+        details?: string;
+        data?: any;
+      },
+      {
+        shopId: number | string;
+        date: string;
+        open_time: string;
+        close_time: string;
+        is_closed: boolean;
+        breaks?: Array<{ start_time: string; end_time: string }>;
+      }
+    >({
+      query: ({ shopId, ...body }) => ({
+        url: `v1/schedule/business-hours/${shopId}/date/`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Dashboard", "Shop"],
+    }),
+
+    // 11. Update Barber Schedule: PUT /v1/schedule/barber-schedule/
+    updateBarberSchedule: builder.mutation<
+      {
+        status?: boolean;
+        code?: string;
+        details?: string;
+        data?: any;
+      },
+      {
+        barber: number | string;
+        date: string;
+        breaks?: Array<{
+          start_time: string;
+          end_time: string;
+          title?: string;
+        }>;
+        time_off?: Array<{
+          start_date: string;
+          end_date: string;
+          is_full_day: boolean;
+          start_time?: string;
+          end_time?: string;
+          reason?: string;
+        }>;
+      }
+    >({
+      query: (body) => ({
+        url: "v1/schedule/barber-schedule/",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["Dashboard", "Shop"],
+    }),
+
+    // 12. Create Staff Time Off: POST /v1/schedule/time-off/
+    createStaffTimeOff: builder.mutation<
+      {
+        status?: boolean;
+        code?: string;
+        details?: string;
+        data?: any;
+      },
+      {
+        barber: number | string;
+        start_date: string;
+        end_date: string;
+        is_full_day: boolean;
+        start_time?: string;
+        end_time?: string;
+        reason?: string;
+      }
+    >({
+      query: (body) => ({
+        url: "v1/schedule/time-off/",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Dashboard", "Shop"],
+    }),
+
+    // 13. Get Shop Barbers / Staff: GET /v1/barbers/?shop_id={shopId}
+    getShopBarbers: builder.query<
+      {
+        status?: boolean;
+        code?: string;
+        details?: string;
+        data?: any[];
+      },
+      number | string
+    >({
+      query: (shopId) => `v1/barbers/?shop_id=${shopId}`,
+      providesTags: ["Shop"],
+    }),
   }),
   overrideExisting: true,
 });
@@ -154,4 +288,10 @@ export const {
   useGetStaffMeTimeOffQuery,
   useGetStaffMeReviewsQuery,
   useGetStaffMeReportsQuery,
+  useGetDashboardReportsQuery,
+  useGetOpeningCalendarQuery,
+  useUpdateBusinessHoursDateMutation,
+  useUpdateBarberScheduleMutation,
+  useCreateStaffTimeOffMutation,
+  useGetShopBarbersQuery,
 } = dashboardApi;

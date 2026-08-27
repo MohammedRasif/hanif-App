@@ -1,10 +1,17 @@
 import { StyledIcons } from "@/lib";
+import { useGetDashboardReportsQuery } from "@/Redux/feature/dashboard";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import React, { useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
 import { MOCK_REPORTS_DATA } from "./mock-data";
-import type { TimeFilter } from "./types";
+import type { StaffReportItem, TimeFilter } from "./types";
 
 interface ReportsScreenProps {
   onBack?: () => void;
@@ -14,7 +21,55 @@ export function ReportsScreen({ onBack }: ReportsScreenProps) {
   const router = useRouter();
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("daily");
 
-  const currentData = MOCK_REPORTS_DATA[timeFilter];
+  // 📡 GET /api/v1/dashboard/reports/?period={timeFilter}
+  const { data: reportsResponse, isLoading } = useGetDashboardReportsQuery(
+    { period: timeFilter },
+    { refetchOnMountOrArgChange: true },
+  );
+
+  const mockCurrentData = MOCK_REPORTS_DATA[timeFilter];
+  const reportData = reportsResponse?.data;
+
+  // Process revenue display
+  const totalRevenueDisplay = useMemo(() => {
+    if (reportData?.total_revenue !== undefined) {
+      const val = reportData.total_revenue;
+      if (typeof val === "number") {
+        return `$${val.toFixed(2)}`;
+      }
+      return String(val).startsWith("$") ? String(val) : `$${val}`;
+    }
+    return mockCurrentData.totalRevenue;
+  }, [reportData, mockCurrentData]);
+
+  // Process appointments count
+  const appointmentsDisplay = useMemo(() => {
+    if (reportData?.appointments !== undefined) {
+      return reportData.appointments;
+    }
+    return mockCurrentData.appointments;
+  }, [reportData, mockCurrentData]);
+
+  // Process staff breakdown list
+  const staffBreakdownList: StaffReportItem[] = useMemo(() => {
+    if (Array.isArray(reportData?.staff_breakdown)) {
+      return reportData.staff_breakdown.map((item: any) => ({
+        id: String(item.id),
+        name: item.name || "Staff Member",
+        appointmentsCount: item.appointments ?? 0,
+        revenue:
+          typeof item.revenue === "number"
+            ? `$${item.revenue.toFixed(2)}`
+            : String(item.revenue).startsWith("$")
+              ? String(item.revenue)
+              : `$${item.revenue}`,
+        avatarUrl:
+          item.avatar ||
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=250&auto=format&fit=crop",
+      }));
+    }
+    return mockCurrentData.staffBreakdown;
+  }, [reportData, mockCurrentData]);
 
   const handleBack = () => {
     if (onBack) {
@@ -71,7 +126,7 @@ export function ReportsScreen({ onBack }: ReportsScreenProps) {
           </Pressable>
         </View>
 
-        {/* Time Filter Pills */}
+        {/* Time Filter Pills (Daily, Weekly, Monthly) */}
         <View className="mb-5 flex-row gap-2.5">
           {(["daily", "weekly", "monthly"] as const).map((filter) => {
             const isSelected = timeFilter === filter;
@@ -79,7 +134,7 @@ export function ReportsScreen({ onBack }: ReportsScreenProps) {
               filter === "daily"
                 ? "Daily"
                 : filter === "weekly"
-                  ? "weekly"
+                  ? "Weekly"
                   : "Monthly";
 
             return (
@@ -106,81 +161,101 @@ export function ReportsScreen({ onBack }: ReportsScreenProps) {
           })}
         </View>
 
-        {/* Metric Cards Row */}
-        <View className="mb-6 flex-row gap-3.5">
-          {/* Total Revenue Card */}
-          <View className="flex-1 rounded-3xl bg-[#F8F9FA] p-4.5">
-            <View className="mb-2 flex-row items-center gap-2">
-              <View className="h-6 w-6 items-center justify-center rounded-full bg-blue-50">
-                <StyledIcons
-                  className="text-blue-500"
-                  name="trending-up"
-                  size={14}
-                />
-              </View>
-              <Text className="font-medium text-xs text-gray-500">
-                Total Revenue
-              </Text>
-            </View>
-            <Text className="font-bold text-2xl text-gray-900">
-              {currentData.totalRevenue}
+        {/* Loading Indicator */}
+        {isLoading ? (
+          <View className="py-12 items-center justify-center">
+            <ActivityIndicator color="#FF9500" size="small" />
+            <Text className="mt-2 text-xs text-gray-400">
+              Loading reports...
             </Text>
           </View>
-
-          {/* Appointments Card */}
-          <View className="flex-1 rounded-3xl bg-[#F8F9FA] p-4.5">
-            <View className="mb-2 flex-row items-center gap-2">
-              <View className="h-6 w-6 items-center justify-center rounded-full bg-emerald-50">
-                <StyledIcons
-                  className="text-emerald-500"
-                  name="calendar-outline"
-                  size={14}
-                />
-              </View>
-              <Text className="font-medium text-xs text-gray-500">
-                Appointments
-              </Text>
-            </View>
-            <Text className="font-bold text-2xl text-gray-900">
-              {currentData.appointments}
-            </Text>
-          </View>
-        </View>
-
-        {/* Staff Breakdown Section */}
-        <Text className="font-bold text-xl text-gray-900 mb-2">
-          Staff Breakdown
-        </Text>
-
-        <FlatList
-          contentContainerStyle={{ paddingBottom: 40 }}
-          data={currentData.staffBreakdown}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View className="flex-row items-center justify-between py-3.5 border-b border-gray-100">
-              <View className="flex-row items-center gap-3.5">
-                <Image
-                  className="h-12 w-12 rounded-full bg-gray-200"
-                  contentFit="cover"
-                  source={{ uri: item.avatarUrl }}
-                />
-                <View>
-                  <Text className="font-bold text-base text-gray-900">
-                    {item.name}
-                  </Text>
-                  <Text className="font-medium text-xs text-gray-400 mt-0.5">
-                    {item.appointmentsCount} appointment
+        ) : (
+          <>
+            {/* Metric Cards Row */}
+            <View className="mb-6 flex-row gap-3.5">
+              {/* Total Revenue Card */}
+              <View className="flex-1 rounded-3xl bg-[#F8F9FA] p-4.5">
+                <View className="mb-2 flex-row items-center gap-2">
+                  <View className="h-6 w-6 items-center justify-center rounded-full bg-blue-50">
+                    <StyledIcons
+                      className="text-blue-500"
+                      name="trending-up"
+                      size={14}
+                    />
+                  </View>
+                  <Text className="font-medium text-xs text-gray-500">
+                    Total Revenue
                   </Text>
                 </View>
+                <Text className="font-bold text-2xl text-gray-900">
+                  {totalRevenueDisplay}
+                </Text>
               </View>
 
-              <Text className="font-semibold text-base text-gray-900">
-                {item.revenue}
-              </Text>
+              {/* Appointments Card */}
+              <View className="flex-1 rounded-3xl bg-[#F8F9FA] p-4.5">
+                <View className="mb-2 flex-row items-center gap-2">
+                  <View className="h-6 w-6 items-center justify-center rounded-full bg-emerald-50">
+                    <StyledIcons
+                      className="text-emerald-500"
+                      name="calendar-outline"
+                      size={14}
+                    />
+                  </View>
+                  <Text className="font-medium text-xs text-gray-500">
+                    Appointments
+                  </Text>
+                </View>
+                <Text className="font-bold text-2xl text-gray-900">
+                  {appointmentsDisplay}
+                </Text>
+              </View>
             </View>
-          )}
-          showsVerticalScrollIndicator={false}
-        />
+
+            {/* Staff Breakdown Section */}
+            <Text className="font-bold text-xl text-gray-900 mb-2">
+              Staff Breakdown
+            </Text>
+
+            <FlatList
+              contentContainerStyle={{ paddingBottom: 40 }}
+              data={staffBreakdownList}
+              keyExtractor={(item) => item.id}
+              ListEmptyComponent={
+                <View className="py-12 items-center justify-center">
+                  <Text className="text-sm text-gray-400">
+                    No staff data available
+                  </Text>
+                </View>
+              }
+              renderItem={({ item }) => (
+                <View className="flex-row items-center justify-between py-3.5 border-b border-gray-100">
+                  <View className="flex-row items-center gap-3.5">
+                    <Image
+                      className="h-12 w-12 rounded-full bg-gray-200"
+                      contentFit="cover"
+                      source={{ uri: item.avatarUrl }}
+                    />
+                    <View>
+                      <Text className="font-bold text-base text-gray-900">
+                        {item.name}
+                      </Text>
+                      <Text className="font-medium text-xs text-gray-400 mt-0.5">
+                        {item.appointmentsCount} appointment
+                        {item.appointmentsCount !== 1 ? "s" : ""}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <Text className="font-semibold text-base text-gray-900">
+                    {item.revenue}
+                  </Text>
+                </View>
+              )}
+              showsVerticalScrollIndicator={false}
+            />
+          </>
+        )}
       </View>
     </View>
   );
