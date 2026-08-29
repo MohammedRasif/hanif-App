@@ -25,6 +25,8 @@ export const baseApi = createApi({
     "Dashboard",
     "Booking",
     "BookingCalendar",
+    "BookingDetails",
+    "Customer",
   ],
   endpoints: () => ({}),
 });

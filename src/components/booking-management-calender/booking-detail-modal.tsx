@@ -1,196 +1,417 @@
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
 import type { Appointment } from "@/lib/calender/types";
+import type { BookingDetailsData } from "@/Redux/feature/bookingCalendarApi";
 import { Image } from "expo-image";
 import { Dialog } from "heroui-native";
-import React, { useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import React, { useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import {
+  appointmentDurationMinutes,
+  formatClockLabel,
+  formatDurationLabel,
+  formatMoney,
+  formatShortDate,
+} from "./checkout-utils";
+
+const DEFAULT_AVATAR =
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80";
 
 type CheckoutPageViewProps = {
-  appointment: Appointment | null;
+  /** Grid card that opened the page — used for instant labels while loading. */
+  appointment?: Appointment | null;
+  booking?: BookingDetailsData | null;
+  isError?: boolean;
+  isLoading?: boolean;
+  isMutating?: boolean;
   onBack: () => void;
-  onCancelUnpaid?: () => void;
+  onCancelBooking?: () => void;
   onCompleteOrder?: () => void;
+  onEdit?: () => void;
   onOpenBookAgain?: () => void;
+  onRetry?: () => void;
 };
 
 export function CheckoutPageView({
   appointment,
+  booking,
+  isError = false,
+  isLoading = false,
+  isMutating = false,
   onBack,
-  onOpenBookAgain,
-  onCancelUnpaid,
+  onCancelBooking,
   onCompleteOrder,
+  onEdit,
+  onOpenBookAgain,
+  onRetry,
 }: CheckoutPageViewProps) {
-  if (!appointment) return null;
+  const appointments = booking?.appointments_details ?? [];
+  const firstAppointment = appointments[0];
 
-  const isPaid =
-    appointment.status === "completed" ||
-    (appointment as any).paymentStatus === "Paid" ||
-    (appointment as any).isPaid === true;
+  const paymentStatus = (booking?.payment_status ?? "").toLowerCase();
+  const bookingStatus = (booking?.status ?? "").toLowerCase();
+  const isPaid = paymentStatus === "paid";
+  const isCompleted = bookingStatus === "completed";
+  const isCancelled = bookingStatus === "cancelled";
+  const isEditable = !!booking && !isCompleted && !isCancelled;
 
-  const customerName = appointment.userName || "Aisha bakr";
-  const barberName = appointment.barberName || "Mike Johnson";
-  const timeText = appointment.timeDisplay || "12 july, 10:00 am";
-  const priceText = (appointment as any).price || "$12.00";
+  const customerName =
+    booking?.customer?.name || appointment?.userName || "Customer";
+
+  const timeText = firstAppointment
+    ? [
+        formatShortDate(firstAppointment.appointment_date),
+        formatClockLabel(firstAppointment.start_time),
+      ]
+        .filter(Boolean)
+        .join(", ")
+    : appointment?.timeDisplay || "—";
+
+  const priceText = booking
+    ? formatMoney(booking.total_amount)
+    : appointment?.price || "—";
+
+  // Every service row across every appointment, flattened for the bottom list
+  const serviceRows = useMemo(
+    () =>
+      appointments.flatMap((item) =>
+        item.services.map((service) => ({
+          ...service,
+          appointmentDate: item.appointment_date,
+        })),
+      ),
+    [appointments],
+  );
+
+  const totalMinutes = serviceRows.reduce(
+    (sum, service) => sum + (appointmentDurationMinutes(service) ?? 0),
+    0,
+  );
   const durationText =
-    (appointment as any).duration || `${appointment.durationMinutes || 40} min`;
-  const notesText =
-    (appointment as any).notes ||
-    "Low fade on sides. No product Low fade on sides. No product.Low fade on sides. No product..";
+    formatDurationLabel(totalMinutes) ||
+    formatDurationLabel(appointment?.durationMinutes) ||
+    "—";
+
+  const barber = booking?.barber ?? firstAppointment?.barber ?? null;
+  const barberName = barber?.name || appointment?.barberName || "Unassigned";
+  const barberRole =
+    booking?.barber?.specialty || booking?.barber?.role || "Barber";
+  const barberAvatar =
+    barber?.image || appointment?.barberAvatar || DEFAULT_AVATAR;
+
+  const paymentInfo = booking?.payment_info;
+  const discountAmount = booking?.discount_amount;
+
+  if (isError && !booking) {
+    return (
+      <Container className="flex-1 bg-white" isScrollable={false}>
+        <View className="flex-row items-center justify-between border-b border-gray-100 bg-white px-5 pt-12 pb-4">
+          <Pressable
+            className="h-10 w-10 items-center justify-center rounded-full active:bg-gray-100"
+            onPress={onBack}
+          >
+            <StyledIcons
+              className="text-gray-900"
+              name="arrow-back"
+              size={24}
+            />
+          </Pressable>
+          <Text className="font-bold text-gray-900 text-xl">Booking</Text>
+          <View className="w-10" />
+        </View>
+        <View className="flex-1 items-center justify-center gap-3 px-8">
+          <Text className="text-center font-semibold text-gray-900 text-sm">
+            Couldn&apos;t load this booking
+          </Text>
+          <Pressable
+            className="rounded-full bg-black px-5 py-2.5 active:opacity-80"
+            onPress={onRetry}
+          >
+            <Text className="font-semibold text-white text-xs">Try again</Text>
+          </Pressable>
+        </View>
+      </Container>
+    );
+  }
 
   return (
     <Container className="flex-1 bg-white" isScrollable={false}>
       {/* Top Page Header */}
-      <View className="flex-row items-center justify-between border-b border-gray-100 px-5 pt-12 pb-4 bg-white">
+      <View className="flex-row items-center justify-between border-b border-gray-100 bg-white px-5 pt-12 pb-4">
         <Pressable
           className="h-10 w-10 items-center justify-center rounded-full active:bg-gray-100"
           onPress={onBack}
         >
           <StyledIcons className="text-gray-900" name="arrow-back" size={24} />
         </Pressable>
-        <Text className="font-bold text-xl text-gray-900">Checkout</Text>
-        <View className="w-10" />
+        <Text className="font-bold text-gray-900 text-xl">
+          {booking?.booking_code || "Booking"}
+        </Text>
+        {isEditable ? (
+          <Pressable
+            className="h-10 w-10 items-center justify-center rounded-full active:bg-gray-100"
+            onPress={onEdit}
+          >
+            <StyledIcons
+              className="text-gray-900"
+              name="create-outline"
+              size={22}
+            />
+          </Pressable>
+        ) : (
+          <View className="w-10" />
+        )}
       </View>
 
-      {/* Main Page Scrollable Body */}
-      <ScrollView
-        className="flex-1 px-5 pt-4"
-        contentContainerStyle={{ paddingBottom: 24 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Customer Summary Card */}
-        <View className="mb-6 rounded-3xl border border-gray-100/80 bg-main-bg-overlay p-5 shadow-2xs">
-          <View className="mb-5 flex-row items-center gap-3.5">
-            <View className="h-12 w-12 items-center justify-center rounded-full bg-gray-200">
-              <StyledIcons className="text-gray-600" name="person" size={24} />
-            </View>
-            <Text className="font-bold text-2xl text-gray-900">
-              {customerName}
-            </Text>
-          </View>
-
-          <View className="gap-4">
-            {/* Row 1: Date & Time + Price */}
-            <View className="flex-row items-start justify-between">
-              <View>
-                <Text className="mb-1 font-medium text-xs text-gray-400">
-                  Date & time
-                </Text>
-                <Text className="font-bold text-base text-gray-900">
-                  {timeText}
-                </Text>
-              </View>
-              <View className="items-end">
-                <Text className="mb-1 font-medium text-xs text-gray-400">
-                  Price
-                </Text>
-                <Text className="font-bold text-base text-gray-900">
-                  {priceText}
-                </Text>
-              </View>
-            </View>
-
-            {/* Row 2: Duration + Payment */}
-            <View className="flex-row items-start justify-between">
-              <View>
-                <Text className="mb-1 font-medium text-xs text-gray-400">
-                  Duration
-                </Text>
-                <Text className="font-bold text-base text-gray-900">
-                  {durationText}
-                </Text>
-              </View>
-              <View className="items-end">
-                <Text className="mb-1 font-medium text-xs text-gray-400">
-                  Payment
-                </Text>
-                <Text className="font-bold text-base text-gray-900">
-                  {isPaid ? "Paid" : "Unpaid"}
-                </Text>
-              </View>
-            </View>
-          </View>
+      {isLoading && !booking ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator color="#111827" size="large" />
         </View>
-
-        {/* Staff Section */}
-        <View className="mb-6">
-          <Text className="mb-3 font-bold text-lg text-gray-900">Staff</Text>
-          <View className="flex-row items-center justify-between rounded-2xl border border-gray-100 bg-white p-4 shadow-xs">
-            <View className="flex-row items-center gap-3.5">
-              <Image
-                contentFit="cover"
-                source={{
-                  uri:
-                    (appointment as any).barberAvatar ||
-                    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-                }}
-                style={{ width: 46, height: 46, borderRadius: 23 }}
-              />
-              <View>
-                <Text className="font-bold text-base text-gray-900">
-                  {barberName}
-                </Text>
-                <Text className="text-gray-400 text-xs font-medium">
-                  Senior Barber
-                </Text>
-              </View>
-            </View>
-            <Pressable>
-              <Text className="font-semibold text-blue-500 text-sm">
-                Change
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-
-        {/* Notes Section */}
-        <View className="mb-6">
-          <Text className="mb-3 font-bold text-lg text-gray-900">Notes</Text>
-          <View className="rounded-2xl border border-gray-100/80 bg-main-bg-overlay p-4.5">
-            <Text className="text-gray-600 text-sm leading-relaxed">
-              {notesText}
-            </Text>
-          </View>
-        </View>
-
-        {/* Payments Section (Shown ONLY when Paid) */}
-        {isPaid && (
-          <View className="mb-6">
-            <Text className="mb-3 font-bold text-lg text-gray-900">
-              Payments
-            </Text>
-            <View className="flex-row items-center justify-between py-2">
-              <View className="flex-row items-center gap-3.5">
-                <View className="h-12 w-12 items-center justify-center rounded-full bg-gray-200/80">
+      ) : (
+        <ScrollView
+          className="flex-1 px-5 pt-4"
+          contentContainerStyle={{ paddingBottom: 24 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Customer Summary Card */}
+          <View className="mb-6 rounded-3xl border border-gray-100/80 bg-main-bg-overlay p-5 shadow-2xs">
+            <View className="mb-5 flex-row items-center gap-3.5">
+              {booking?.customer?.image ? (
+                <Image
+                  contentFit="cover"
+                  source={{ uri: booking.customer.image }}
+                  style={{ width: 48, height: 48, borderRadius: 24 }}
+                />
+              ) : (
+                <View className="h-12 w-12 items-center justify-center rounded-full bg-gray-200">
                   <StyledIcons
-                    className="text-gray-700"
-                    name="options-outline"
-                    size={22}
+                    className="text-gray-600"
+                    name="person"
+                    size={24}
                   />
                 </View>
-                <View>
-                  <Text className="font-bold text-lg text-gray-900">Today</Text>
-                  <Text className="text-gray-400 text-xs">6.37 am</Text>
-                </View>
+              )}
+              <View className="flex-1">
+                <Text
+                  className="font-bold text-2xl text-gray-900"
+                  numberOfLines={1}
+                >
+                  {customerName}
+                </Text>
+                {!!bookingStatus && (
+                  <Text className="mt-0.5 text-gray-400 text-xs capitalize">
+                    {bookingStatus.replace(/_/g, " ")}
+                  </Text>
+                )}
               </View>
-              <View className="items-end gap-1">
-                <View className="rounded-full bg-emerald-100 px-3 py-1">
-                  <Text className="font-semibold text-xs text-emerald-600">
-                    Paid
+            </View>
+
+            <View className="gap-4">
+              {/* Row 1: Date & Time + Price */}
+              <View className="flex-row items-start justify-between">
+                <View>
+                  <Text className="mb-1 font-medium text-gray-400 text-xs">
+                    Date & time
+                  </Text>
+                  <Text className="font-bold text-base text-gray-900">
+                    {timeText}
                   </Text>
                 </View>
-                <Text className="font-bold text-lg text-gray-900">$12</Text>
+                <View className="items-end">
+                  <Text className="mb-1 font-medium text-gray-400 text-xs">
+                    Price
+                  </Text>
+                  <Text className="font-bold text-base text-gray-900">
+                    {priceText}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Row 2: Duration + Payment */}
+              <View className="flex-row items-start justify-between">
+                <View>
+                  <Text className="mb-1 font-medium text-gray-400 text-xs">
+                    Duration
+                  </Text>
+                  <Text className="font-bold text-base text-gray-900">
+                    {durationText}
+                  </Text>
+                </View>
+                <View className="items-end">
+                  <Text className="mb-1 font-medium text-gray-400 text-xs">
+                    Payment
+                  </Text>
+                  <Text className="font-bold text-base text-gray-900">
+                    {isPaid ? "Paid" : "Unpaid"}
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
-        )}
-      </ScrollView>
+
+          {/* Staff Section */}
+          <View className="mb-6">
+            <Text className="mb-3 font-bold text-gray-900 text-lg">Staff</Text>
+            <View className="flex-row items-center justify-between rounded-2xl border border-gray-100 bg-white p-4 shadow-xs">
+              <View className="flex-row items-center gap-3.5">
+                <Image
+                  contentFit="cover"
+                  source={{ uri: barberAvatar }}
+                  style={{ width: 46, height: 46, borderRadius: 23 }}
+                />
+                <View>
+                  <Text className="font-bold text-base text-gray-900">
+                    {barberName}
+                  </Text>
+                  <Text className="font-medium text-gray-400 text-xs">
+                    {barberRole}
+                  </Text>
+                </View>
+              </View>
+              {isEditable && (
+                <Pressable onPress={onEdit}>
+                  <Text className="font-semibold text-blue-500 text-sm">
+                    Change
+                  </Text>
+                </Pressable>
+              )}
+            </View>
+          </View>
+
+          {/* Payments Section (only once a payment exists) */}
+          {!!paymentInfo?.payment_status && (
+            <View className="mb-6">
+              <Text className="mb-3 font-bold text-gray-900 text-lg">
+                Payments
+              </Text>
+              <View className="flex-row items-center justify-between py-2">
+                <View className="flex-row items-center gap-3.5">
+                  <View className="h-12 w-12 items-center justify-center rounded-full bg-gray-200/80">
+                    <StyledIcons
+                      className="text-gray-700"
+                      name="options-outline"
+                      size={22}
+                    />
+                  </View>
+                  <View>
+                    <Text className="font-bold text-gray-900 text-lg capitalize">
+                      {paymentInfo.payment_method || "Payment"}
+                    </Text>
+                    <Text className="text-gray-400 text-xs">
+                      {paymentInfo.payment_created_at
+                        ? new Date(
+                            paymentInfo.payment_created_at,
+                          ).toLocaleString()
+                        : "—"}
+                    </Text>
+                  </View>
+                </View>
+                <View className="items-end gap-1">
+                  <View
+                    className={`rounded-full px-3 py-1 ${
+                      isPaid ? "bg-emerald-100" : "bg-amber-100"
+                    }`}
+                  >
+                    <Text
+                      className={`font-semibold text-xs capitalize ${
+                        isPaid ? "text-emerald-600" : "text-amber-600"
+                      }`}
+                    >
+                      {paymentInfo.payment_status}
+                    </Text>
+                  </View>
+                  <Text className="font-bold text-gray-900 text-lg">
+                    {formatMoney(paymentInfo.amount)}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          )}
+
+          {/* Services Section — pinned to the very bottom of the details page */}
+          {serviceRows.length > 0 && (
+            <View className="mb-2">
+              <Text className="mb-3 font-bold text-gray-900 text-lg">
+                Services
+              </Text>
+              {serviceRows.map((service) => (
+                <View
+                  className="mb-2.5 flex-row items-center justify-between rounded-2xl border border-gray-100 bg-white p-4 shadow-xs"
+                  key={String(service.id)}
+                >
+                  <View className="flex-1 pr-3">
+                    <Text
+                      className="font-semibold text-base text-gray-900"
+                      numberOfLines={1}
+                    >
+                      {service.service_name}
+                    </Text>
+                    <Text className="mt-0.5 text-gray-400 text-xs">
+                      {formatClockLabel(service.start_time)} –{" "}
+                      {formatClockLabel(service.end_time)}
+                    </Text>
+                  </View>
+                  <View className="items-end">
+                    <Text className="font-bold text-base text-gray-900">
+                      {formatMoney(service.price)}
+                    </Text>
+                    <Text className="mt-0.5 text-gray-400 text-xs">
+                      {formatDurationLabel(appointmentDurationMinutes(service))}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+
+              {/* Totals */}
+              <View className="mt-2 gap-2 rounded-2xl border border-gray-100/80 bg-main-bg-overlay p-4">
+                {!!discountAmount && Number(discountAmount) > 0 && (
+                  <View className="flex-row items-center justify-between">
+                    <Text className="text-gray-500 text-sm">Discount</Text>
+                    <Text className="font-semibold text-gray-900 text-sm">
+                      -{formatMoney(discountAmount)}
+                    </Text>
+                  </View>
+                )}
+                {!!booking?.tip_amount && Number(booking.tip_amount) > 0 && (
+                  <View className="flex-row items-center justify-between">
+                    <Text className="text-gray-500 text-sm">Tip</Text>
+                    <Text className="font-semibold text-gray-900 text-sm">
+                      {formatMoney(booking.tip_amount)}
+                    </Text>
+                  </View>
+                )}
+                <View className="flex-row items-center justify-between">
+                  <Text className="font-semibold text-base text-gray-900">
+                    Total
+                  </Text>
+                  <Text className="font-bold text-gray-900 text-lg">
+                    {formatMoney(booking?.total_amount)}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          )}
+        </ScrollView>
+      )}
 
       {/* Pinned Bottom Page Action Bar */}
       <View className="border-t border-gray-100 bg-white px-5 pt-3 pb-8">
-        {isPaid ? (
+        {isCancelled ? (
+          <View className="h-14 w-full items-center justify-center rounded-2xl bg-gray-100">
+            <Text className="font-semibold text-base text-gray-500">
+              Booking cancelled
+            </Text>
+          </View>
+        ) : isCompleted ? (
           <Pressable
-            className="h-14 w-full items-center justify-center rounded-2xl bg-[#FF9500] active:bg-[#e08300] shadow-md"
+            className="h-14 w-full items-center justify-center rounded-2xl bg-[#FF9500] shadow-md active:bg-[#e08300]"
             onPress={onOpenBookAgain}
           >
             <Text className="font-bold text-base text-white">Book again</Text>
@@ -198,8 +419,11 @@ export function CheckoutPageView({
         ) : (
           <View className="flex-row items-center gap-3">
             <Pressable
-              className="h-14 flex-1 items-center justify-center rounded-2xl border border-[#FF3B30] bg-white active:bg-red-50"
-              onPress={onCancelUnpaid}
+              className={`h-14 flex-1 items-center justify-center rounded-2xl border border-[#FF3B30] bg-white active:bg-red-50 ${
+                isMutating ? "opacity-60" : ""
+              }`}
+              disabled={isMutating}
+              onPress={onCancelBooking}
             >
               <Text className="font-semibold text-[#FF3B30] text-base">
                 Cancel
@@ -207,9 +431,13 @@ export function CheckoutPageView({
             </Pressable>
 
             <Pressable
-              className="h-14 flex-1 items-center justify-center rounded-2xl bg-[#00C853] active:bg-[#00b048] shadow-md"
+              className={`h-14 flex-1 flex-row items-center justify-center gap-2 rounded-2xl bg-[#00C853] shadow-md active:bg-[#00b048] ${
+                isMutating ? "opacity-60" : ""
+              }`}
+              disabled={isMutating}
               onPress={onCompleteOrder}
             >
+              {isMutating && <ActivityIndicator color="#FFFFFF" size="small" />}
               <Text className="font-bold text-base text-white">
                 Complete order
               </Text>
