@@ -82,12 +82,17 @@ export function BookingManagementCalendar({
       shop_id: shopId ?? "",
       view_type: viewType,
     },
-    { skip: !shopId },
+    {
+      skip: !shopId,
+      refetchOnMountOrArgChange: true, // Always refetch when component mounts or args change
+    },
   );
 
-  const calendar = useMemo(
-    () => transformBookingCalendarView(calendarResponse?.data, selectedDateStr),
-    [calendarResponse?.data, selectedDateStr],
+  // REMOVED useMemo - directly transform the data
+  // This will always re-compute when calendarResponse?.data changes
+  const calendar = transformBookingCalendarView(
+    calendarResponse?.data,
+    selectedDateStr,
   );
 
   // Staff filter: `null` keeps every barber visible (the default)
@@ -142,6 +147,7 @@ export function BookingManagementCalendar({
     refetch: refetchBookingDetails,
   } = useGetBookingDetailsQuery(selectedBookingId ?? "", {
     skip: !(isCheckoutOpen && selectedBookingId),
+    refetchOnMountOrArgChange: true,
   });
 
   const booking = bookingDetailsResponse?.data;
@@ -187,6 +193,12 @@ export function BookingManagementCalendar({
     setIsCheckoutOpen(true);
     setIsPaymentPageOpen(false);
     setIsOrderCompleted(false);
+    if (appointment.bookingId) {
+      // Use a small delay to ensure the query is enabled
+      setTimeout(() => {
+        refetchBookingDetails();
+      }, 100);
+    }
   };
 
   const closeCheckout = () => {
@@ -229,10 +241,6 @@ export function BookingManagementCalendar({
         startTime,
         payment_method,
         customerName,
-        serviceName,
-        barberName,
-        price,
-        serviceDuration,
       } = finalData;
 
       // Ensure appointment_date is in YYYY-MM-DD format
@@ -258,10 +266,8 @@ export function BookingManagementCalendar({
       // Ensure start_time is in HH:MM:SS format
       let formattedStartTime = startTime || "09:00:00";
       if (formattedStartTime && formattedStartTime.split(":").length === 2) {
-        // If it's HH:MM format, add :00 for seconds
         formattedStartTime = `${formattedStartTime}:00`;
       } else if (formattedStartTime && !formattedStartTime.includes(":")) {
-        // Try to parse it as a time
         try {
           const parsedTime = new Date(`2000-01-01T${formattedStartTime}`);
           if (!isNaN(parsedTime.getTime())) {
@@ -280,8 +286,8 @@ export function BookingManagementCalendar({
         shop: Number(shopId),
         barber: Number(barberId),
         services: [Number(serviceId)],
-        appointment_date: formattedDate, // YYYY-MM-DD
-        start_time: formattedStartTime, // HH:MM:SS
+        appointment_date: formattedDate,
+        start_time: formattedStartTime,
         payment_method: payment_method || "cash",
         tip_amount: 0,
       };
@@ -301,12 +307,12 @@ export function BookingManagementCalendar({
         onBookingConfirmed?.(response.data);
         setIsStep3Open(false);
         setBookingAccumulator({});
-        // Refresh calendar to show new booking
-        refetchCalendar();
+
+        // Force refresh calendar data
+        await refetchCalendar();
       }
     } catch (error: any) {
       console.error("Failed to create booking:", error);
-      // Show more detailed error message
       const errorMessage =
         error?.data?.details ||
         error?.message ||
@@ -347,6 +353,7 @@ export function BookingManagementCalendar({
       });
       setIsCancelAlertOpen(false);
       closeCheckout();
+      await refetchCalendar();
     } catch (error) {
       toast.show({
         label: "Couldn't cancel",
@@ -370,13 +377,16 @@ export function BookingManagementCalendar({
       return;
     }
 
-    // PATCH /v1/bookings/{id}/ with status=completed (already-paid booking)
     try {
       await updateBooking({
         id: selectedBookingId,
         body: { status: "completed" },
       }).unwrap();
       setIsOrderCompleted(true);
+
+      // Force refetch both calendar and booking details
+      await refetchCalendar();
+      await refetchBookingDetails();
     } catch (error) {
       toast.show({
         label: "Couldn't complete order",
@@ -391,18 +401,6 @@ export function BookingManagementCalendar({
   const handleCheckoutSubmit = async (payload: CheckoutSubmitPayload) => {
     if (!selectedBookingId) return;
 
-    console.log(
-      "selected booking id:",
-      payload.discount.toFixed,
-      // {
-      //     discount: payload.discount.toFixed(2),
-      //     payment_method: payload.paymentMethod,
-      //     services: payload.serviceIds,
-      //     status: "completed",
-      //     tip_amount: payload.tipAmount.toFixed(2),
-      //   }
-    );
-
     try {
       await updateBooking({
         id: selectedBookingId,
@@ -416,6 +414,10 @@ export function BookingManagementCalendar({
       }).unwrap();
       setIsPaymentPageOpen(false);
       setIsOrderCompleted(true);
+
+      // Force refetch both calendar and booking details
+      await refetchCalendar();
+      await refetchBookingDetails();
     } catch (error) {
       toast.show({
         label: "Checkout failed",
@@ -445,6 +447,10 @@ export function BookingManagementCalendar({
         placement: "top",
       });
       setIsEditBookingOpen(false);
+
+      // Force refetch both calendar and booking details
+      await refetchCalendar();
+      await refetchBookingDetails();
     } catch (error) {
       toast.show({
         label: "Couldn't update booking",
@@ -530,7 +536,6 @@ export function BookingManagementCalendar({
           onRetry={() => refetchBookingDetails()}
         />
 
-        {/* Edit mode: date, time and staff (with barber search) */}
         {!!booking && (
           <BookingEditModal
             barbers={barbers}
@@ -543,7 +548,6 @@ export function BookingManagementCalendar({
           />
         )}
 
-        {/* Cancel booking confirmation */}
         <ConfirmAlertDialog
           cancelLabel="Keep booking"
           confirmLabel="Yes, cancel"
@@ -557,14 +561,12 @@ export function BookingManagementCalendar({
           tone="danger"
         />
 
-        {/* Book Again Step 1: Form Popup Dialog (Image 3) */}
         <BookAgainFormModal
           isOpen={isBookAgainFormOpen}
           onDone={handleDoneBookAgainForm}
           onOpenChange={setIsBookAgainFormOpen}
         />
 
-        {/* Book Again Step 2: Confirmation Summary Popup Dialog (Image 4) */}
         <BookAgainConfirmModal
           bookingData={bookAgainData}
           isOpen={isBookAgainConfirmOpen}
@@ -594,7 +596,7 @@ export function BookingManagementCalendar({
         startHour={calendar.startHour}
         workingHoursLabel={calendar.workingHoursLabel}
       >
-        {/* Calendar Fetch States (overlaid so the date bar stays usable) */}
+        {/* Calendar Fetch States */}
         {isCalendarBusy && (
           <View className="absolute top-0 bottom-0 left-0 right-0 items-center justify-center bg-white/70">
             <ActivityIndicator color="#111827" size="large" />
@@ -639,13 +641,10 @@ export function BookingManagementCalendar({
           </View>
         )}
 
-        {/* Floating Menu Action Overlay (kept above the state overlays) */}
         <BookingCalendarMenu
           onOpenReservationDialog={() => setIsStep1Open(true)}
-          // onOpenTimeOffDialog={() => setIsTimeOffDialogOpen(true)}
         />
 
-        {/* Staff Filter Bottom Sheet (Image 2) */}
         <StaffFilterBottomSheet
           barbers={barbers}
           isLoading={isBarbersFetching}
@@ -657,14 +656,12 @@ export function BookingManagementCalendar({
           workingBarberIds={calendarBarberIds}
         />
 
-        {/* Step 1: Customer Selection Modal */}
         <AddReservationDialog
           isOpen={isStep1Open}
           onOpenChange={setIsStep1Open}
           onSubmit={handleStep1Submit}
         />
 
-        {/* Step 2: Service & Barber Selection Modal */}
         <ConfirmAddReservationDialog
           customerData={bookingAccumulator}
           isOpen={isStep2Open}
@@ -674,10 +671,9 @@ export function BookingManagementCalendar({
           }}
           onOpenChange={setIsStep2Open}
           onSubmit={handleStep2Submit}
-          shopId={shopId} // Pass shopId here
+          shopId={shopId}
         />
 
-        {/* Step 3: Final Booking Summary Modal */}
         <FinalAddReservationDialog
           bookingData={bookingAccumulator}
           isOpen={isStep3Open}
@@ -690,7 +686,6 @@ export function BookingManagementCalendar({
           onOpenChange={setIsStep3Open}
         />
 
-        {/* HeroUI Native Time Off Modal */}
         <AddTimeOffDialog
           isOpen={isTimeOffDialogOpen}
           onOpenChange={setIsTimeOffDialogOpen}

@@ -471,15 +471,13 @@ export const bookingCalendarApi = baseApi.injectEndpoints({
           `&display_mode=${display_mode}`
         );
       },
-      providesTags: ["BookingCalendar"],
+      providesTags: ["Booking", "BookingCalendar"],
     }),
 
     // GET /v1/bookings/{id}/
     getBookingDetails: builder.query<BookingDetailsResponse, number | string>({
       query: (id) => `v1/bookings/${id}/`,
-      providesTags: (_result, _error, id) => [
-        { type: "BookingDetails", id: String(id) },
-      ],
+      providesTags: ["BookingDetails"],
     }),
 
     // GET /v1/barbers/?shop={shop id}
@@ -489,7 +487,7 @@ export const bookingCalendarApi = baseApi.injectEndpoints({
     >({
       query: ({ shop }) =>
         `v1/barbers/?shop=${encodeURIComponent(String(shop))}`,
-      providesTags: ["Shop"],
+      providesTags: ["Barbar"],
     }),
 
     // GET /v1/services/?barber={barber id}&shop={shop id}
@@ -504,7 +502,31 @@ export const bookingCalendarApi = baseApi.injectEndpoints({
         }
         return `v1/services/?${parts.join("&")}`;
       },
-      providesTags: ["Shop"],
+      providesTags: ["Service"],
+    }),
+
+    // POST /v1/bookings/create/
+    createBooking: builder.mutation<
+      CreateBookingResponse,
+      CreateBookingPayload
+    >({
+      query: (body) => ({
+        url: "v1/bookings/create/",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [
+        "BookingDetails",
+        "Booking",
+        "BookingCalendar",
+        "Customer",
+      ],
+
+      // (result, error, { shop }) => [
+      //   { type: "BookingCalendar", id: "LIST" },
+      //   { type: "Booking" },
+      //   { type: "Dashboard" },
+      // ],
     }),
 
     // PATCH /v1/bookings/{id}/ — edit staff/date/time, add tip & discount, complete
@@ -517,12 +539,19 @@ export const bookingCalendarApi = baseApi.injectEndpoints({
         method: "PATCH",
         body,
       }),
-      invalidatesTags: (_result, _error, { id }) => [
-        { type: "BookingDetails", id: String(id) },
-        "BookingCalendar",
+      invalidatesTags: [
+        "BookingDetails",
         "Booking",
-        "Dashboard",
+        "BookingCalendar",
+        "Customer",
       ],
+
+      // (_result, _error, { id }) => [
+      //   { type: "BookingDetails", id: String(id) },
+      //   { type: "BookingCalendar", id: "LIST" },
+      //   { type: "Booking" },
+      //   { type: "Dashboard" },
+      // ],
     }),
 
     // POST /v1/bookings/{id}/cancel/
@@ -534,28 +563,36 @@ export const bookingCalendarApi = baseApi.injectEndpoints({
         url: `v1/bookings/${id}/cancel/`,
         method: "POST",
       }),
-      invalidatesTags: (_result, _error, id) => [
-        { type: "BookingDetails", id: String(id) },
-        "BookingCalendar",
+      invalidatesTags: [
+        "BookingDetails",
         "Booking",
-        "Dashboard",
+        "BookingCalendar",
+        "Customer",
       ],
+      // (_result, _error, id) => [
+      //   { type: "BookingDetails", id: String(id) },
+      //   { type: "BookingCalendar", id: "LIST" },
+      //   { type: "Booking" },
+      //   { type: "Dashboard" },
+      // ],
     }),
 
-    /* ---------------------------------------------------------------------- */
-    /*  NEW APIs - Customers (Contacts)                                       */
-    /* ---------------------------------------------------------------------- */
-
-    // GET /v1/contact/list/?search=&page=&page_size=
+    // GET /v1/contact/list/
     getCustomers: builder.query<GetCustomersResponse, GetCustomersParams>({
-      query: ({ search = "", page = 1, page_size = 100 }) => {
+      query: ({ search = "", page = 1, page_size = 20 }) => {
         const params = new URLSearchParams();
         if (search) params.append("search", search);
         params.append("page", String(page));
         params.append("page_size", String(page_size));
         return `v1/contact/list/?${params.toString()}`;
       },
-      providesTags: ["Customer"],
+      providesTags: (result) => [
+        { type: "Customer", id: "LIST" },
+        ...(result?.data?.map((customer) => ({
+          type: "Customer" as const,
+          id: customer.id,
+        })) || []),
+      ],
     }),
 
     // POST /v1/contact/
@@ -568,24 +605,7 @@ export const bookingCalendarApi = baseApi.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Customer"],
-    }),
-
-    /* ---------------------------------------------------------------------- */
-    /*  NEW APIs - Create Booking                                             */
-    /* ---------------------------------------------------------------------- */
-
-    // POST /v1/bookings/create/
-    createBooking: builder.mutation<
-      CreateBookingResponse,
-      CreateBookingPayload
-    >({
-      query: (body) => ({
-        url: "v1/bookings/create/",
-        method: "POST",
-        body,
-      }),
-      invalidatesTags: ["Booking", "BookingCalendar", "Dashboard"],
+      invalidatesTags: ["Booking", "BookingCalendar"],
     }),
   }),
   overrideExisting: true,
@@ -601,7 +621,6 @@ export const {
   useLazyGetBookingDetailsQuery,
   useLazyGetBookingServicesQuery,
   useUpdateBookingByIdMutation,
-  // NEW hooks
   useGetCustomersQuery,
   useLazyGetCustomersQuery,
   useCreateCustomerMutation,

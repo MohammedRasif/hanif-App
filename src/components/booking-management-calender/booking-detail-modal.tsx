@@ -54,7 +54,9 @@ export function CheckoutPageView({
 }: CheckoutPageViewProps) {
   const appointments = booking?.appointments_details ?? [];
   const firstAppointment = appointments[0];
-
+  const componentKey = useMemo(() => {
+    return booking?.id ? `${booking.id}-${booking.updated_at}` : "loading";
+  }, [booking?.id, booking?.updated_at]);
   const paymentStatus = (booking?.payment_status ?? "").toLowerCase();
   const bookingStatus = (booking?.status ?? "").toLowerCase();
   const isPaid = paymentStatus === "paid";
@@ -111,7 +113,11 @@ export function CheckoutPageView({
 
   if (isError && !booking) {
     return (
-      <Container className="flex-1 bg-white" isScrollable={false}>
+      <Container
+        key={componentKey}
+        className="flex-1 bg-white"
+        isScrollable={false}
+      >
         <View className="flex-row items-center justify-between border-b border-gray-100 bg-white px-5 pt-12 pb-4">
           <Pressable
             className="h-10 w-10 items-center justify-center rounded-full active:bg-gray-100"
