@@ -174,7 +174,7 @@ export const dashboardApi = baseApi.injectEndpoints({
       providesTags: ["Dashboard", "Shop"],
     }),
 
-    // 10. Update Business Hours Date: PUT /v1/schedule/business-hours/{shop_id}/date/
+    // 10. Update Business Hours Date: PUT /v1/schedule/business-hours/{shop_id}/
     updateBusinessHoursDate: builder.mutation<
       {
         status?: boolean;
@@ -192,7 +192,7 @@ export const dashboardApi = baseApi.injectEndpoints({
       }
     >({
       query: ({ shopId, ...body }) => ({
-        url: `v1/schedule/business-hours/${shopId}/date/`,
+        url: `v1/schedule/business-hours/${shopId}/`,
         method: "PUT",
         body,
       }),
@@ -272,6 +272,29 @@ export const dashboardApi = baseApi.injectEndpoints({
       query: (shopId) => `v1/barbers/?shop_id=${shopId}`,
       providesTags: ["Shop"],
     }),
+    // 14. Create Business Days Off: POST /v1/schedule/business/off/
+    createBusinessOff: builder.mutation<
+      {
+        success?: boolean;
+        status?: boolean;
+        code?: string;
+        details?: string;
+        data?: any;
+      },
+      {
+        shop: number | string;
+        start_date: string;
+        end_date: string;
+        is_full_day?: boolean;
+      }
+    >({
+      query: (body) => ({
+        url: "v1/schedule/business/off/",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Dashboard", "Shop"],
+    }),
   }),
   overrideExisting: true,
 });
@@ -294,4 +317,5 @@ export const {
   useUpdateBarberScheduleMutation,
   useCreateStaffTimeOffMutation,
   useGetShopBarbersQuery,
+  useCreateBusinessOffMutation,
 } = dashboardApi;

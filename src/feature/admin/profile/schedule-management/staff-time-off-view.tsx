@@ -2,7 +2,7 @@ import triggerIcon from "@/assets/calender-trigger.png";
 import { StyledIcons } from "@/lib";
 import { useUpdateBarberScheduleMutation } from "@/Redux/feature/dashboard";
 import { Image } from "expo-image";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -66,13 +66,27 @@ const MOCK_REASON_OPTIONS = [
   "Other",
 ];
 
-const DATE_OPTIONS = [
-  "Today",
-  "Tomorrow",
-  "30 july 2026",
-  "Next Monday",
-  "Custom Date",
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
+
+function formatDateISO(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
 
 export function StaffTimeOffView({
   onBack,
@@ -125,21 +139,40 @@ export function StaffTimeOffView({
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const todayStr = useMemo(() => formatDateISO(new Date()), []);
+
   // Modal form states
   const [selectedStaff, setSelectedStaff] = useState("Isaac");
   const [selectedReason, setSelectedReason] = useState("Reason");
   const [isAllDay, setIsAllDay] = useState(true);
-  const [startDate, setStartDate] = useState("Today");
-  const [endDate, setEndDate] = useState("Today");
+  const [startDate, setStartDate] = useState(todayStr);
+  const [endDate, setEndDate] = useState(todayStr);
   const [isApproved, setIsApproved] = useState(false);
 
   // Pickers modal states
   const [isStaffPickerOpen, setIsStaffPickerOpen] = useState(false);
   const [isReasonPickerOpen, setIsReasonPickerOpen] = useState(false);
-  const [isStartDatePickerOpen, setIsStartDatePickerOpen] = useState(false);
-  const [isEndDatePickerOpen, setIsEndDatePickerOpen] = useState(false);
+
+  // Calendar Modal State
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [calendarTarget, setCalendarTarget] = useState<"start" | "end">(
+    "start",
+  );
+  const [calendarYear, setCalendarYear] = useState(new Date().getFullYear());
+  const [calendarMonthIndex, setCalendarMonthIndex] = useState(
+    new Date().getMonth(),
+  );
+
+  const [selectedStaffItem, setSelectedStaffItem] =
+    useState<StaffTimeOffItem | null>(null);
+
+  const handleOpenCalendar = (target: "start" | "end") => {
+    setCalendarTarget(target);
+    setIsCalendarOpen(true);
+  };
 
   const handleRowClick = (item: StaffTimeOffItem) => {
+    setSelectedStaffItem(item);
     if (onSelectStaff) {
       onSelectStaff(item);
     } else if (onSelectTimeOff) {
@@ -160,8 +193,8 @@ export function StaffTimeOffView({
 
   const handleSaveModal = async () => {
     setFeedbackMessage(null);
-    const targetDate = selectedDate || "2026-08-30";
-    const barberId = 8;
+    const targetDate = selectedDate || todayStr;
+    const barberId = Number(selectedStaffItem?.id || 8);
 
     const breaksPayload = [
       {
@@ -178,8 +211,8 @@ export function StaffTimeOffView({
 
     const timeOffPayload = [
       {
-        start_date: targetDate,
-        end_date: targetDate,
+        start_date: startDate,
+        end_date: endDate,
         is_full_day: isAllDay,
         start_time: isAllDay ? undefined : "17:00:00",
         end_time: isAllDay ? undefined : "18:00:00",
@@ -192,22 +225,16 @@ export function StaffTimeOffView({
       const payload = {
         barber: barberId,
         date: targetDate,
+        shift: {
+          start_time: "09:00:00",
+          end_time: "19:00:00",
+          is_off: false,
+        },
         breaks: breaksPayload,
         time_off: timeOffPayload,
       };
 
-      console.log(
-        "▶️ Hitting PUT /api/v1/schedule/barber-schedule/ Payload:",
-        JSON.stringify(payload, null, 2),
-      );
-
-      // 📡 PUT /api/v1/schedule/barber-schedule/
       const res = await updateBarberSchedule(payload).unwrap();
-
-      console.log(
-        "✅ Success Response PUT /api/v1/schedule/barber-schedule/:",
-        JSON.stringify(res, null, 2),
-      );
 
       setFeedbackMessage({
         type: "success",
@@ -226,6 +253,16 @@ export function StaffTimeOffView({
       setFeedbackMessage({ type: "error", text: errorText });
     }
   };
+
+  // Calendar days grid calculation
+  const daysInMonth = useMemo(
+    () => new Date(calendarYear, calendarMonthIndex + 1, 0).getDate(),
+    [calendarYear, calendarMonthIndex],
+  );
+  const firstDayOfWeek = useMemo(
+    () => new Date(calendarYear, calendarMonthIndex, 1).getDay(),
+    [calendarYear, calendarMonthIndex],
+  );
 
   return (
     <View className="flex-1 bg-white">
@@ -258,7 +295,7 @@ export function StaffTimeOffView({
           ListEmptyComponent={
             <View className="py-16 items-center justify-center">
               <Text className="font-medium text-sm text-gray-400">
-                No time off records for this date
+                No staff member time off for this date
               </Text>
             </View>
           }
@@ -267,14 +304,26 @@ export function StaffTimeOffView({
               className="mb-3.5 flex-row items-center justify-between rounded-3xl bg-[#F8F9FA] p-4.5 active:bg-gray-100"
               onPress={() => handleRowClick(item)}
             >
+              {/* Left Side: Avatar + Name + Subtitle */}
               <View className="flex-row items-center gap-3.5">
-                <Image
-                  className="h-12 w-12 rounded-full bg-gray-200"
-                  contentFit="cover"
-                  source={{ uri: item.avatarUrl }}
-                />
+                {item.avatarUrl ? (
+                  <Image
+                    className="h-12 w-12 rounded-full bg-gray-200"
+                    contentFit="cover"
+                    source={{ uri: item.avatarUrl }}
+                  />
+                ) : (
+                  <View className="h-12 w-12 items-center justify-center rounded-full bg-gray-200">
+                    <StyledIcons
+                      className="text-gray-900"
+                      name="person"
+                      size={22}
+                    />
+                  </View>
+                )}
+
                 <View>
-                  <Text className="font-bold text-base text-gray-900 capitalize">
+                  <Text className="font-bold text-base text-gray-900">
                     {item.name}
                   </Text>
                   <Text className="font-medium text-xs text-gray-400 mt-0.5">
@@ -283,6 +332,7 @@ export function StaffTimeOffView({
                 </View>
               </View>
 
+              {/* Right Side: Chevron */}
               <StyledIcons
                 className="text-gray-900"
                 name="chevron-forward"
@@ -296,7 +346,7 @@ export function StaffTimeOffView({
 
       {/* Floating Action Button (FAB) */}
       <Pressable
-        className="absolute bottom-8 right-6 h-14 w-14 items-center justify-center rounded-full bg-black shadow-xl active:scale-95 z-20 overflow-hidden"
+        className="absolute bottom-8 right-6 h-14 w-14 items-center justify-center rounded-full bg-black shadow-xl active:scale-95 overflow-hidden z-50"
         onPress={handleFabClick}
       >
         <Image
@@ -306,7 +356,7 @@ export function StaffTimeOffView({
         />
       </Pressable>
 
-      {/* Add Time Off Modal (Matching Image 2) */}
+      {/* Edit/Add Time Off Modal */}
       <Modal
         animationType="fade"
         onRequestClose={() => setIsModalOpen(false)}
@@ -324,7 +374,7 @@ export function StaffTimeOffView({
             showsVerticalScrollIndicator={false}
           >
             <View className="w-full rounded-4xl bg-white p-6 shadow-2xl my-6">
-              {/* Header Feedback Banner */}
+              {/* Feedback Banner */}
               {feedbackMessage && (
                 <View
                   className={`mb-4 rounded-2xl p-3 ${
@@ -345,64 +395,60 @@ export function StaffTimeOffView({
                 </View>
               )}
 
-              {/* Modal Title */}
-              <Text className="font-bold text-xl text-gray-900 text-center mb-5">
-                Add time off
+              {/* Modal Header Title */}
+              <Text className="font-bold text-2xl text-gray-900 mb-4">
+                Staff member time off
               </Text>
 
-              {/* Staff Card */}
-              <Pressable
-                className="mb-4 flex-row items-center gap-3.5 rounded-2xl bg-[#F8F9FA] p-3.5 active:bg-gray-100"
-                onPress={() => setIsStaffPickerOpen(true)}
-              >
-                <Image
-                  className="h-12 w-12 rounded-full bg-gray-200"
-                  contentFit="cover"
-                  source={{
-                    uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-                  }}
-                />
-
-                <View className="flex-1">
-                  <Text className="font-bold text-base text-gray-900">
+              {/* Staff Member Field */}
+              <View className="mb-4">
+                <Text className="mb-1.5 font-medium text-sm text-gray-700">
+                  Staff Member
+                </Text>
+                <Pressable
+                  className="h-13 w-full flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 active:bg-gray-50"
+                  onPress={() => setIsStaffPickerOpen(true)}
+                >
+                  <Text className="font-semibold text-sm text-gray-900">
                     {selectedStaff}
                   </Text>
-                  <Text className="font-medium text-xs text-gray-400 mt-0.5">
-                    manager
-                  </Text>
-                </View>
+                  <StyledIcons
+                    className="text-gray-500"
+                    name="chevron-down"
+                    size={18}
+                  />
+                </Pressable>
+              </View>
 
-                <StyledIcons
-                  className="text-gray-400"
-                  name="chevron-down"
-                  size={18}
-                />
-              </Pressable>
-
-              {/* Reason Dropdown */}
-              <Pressable
-                className="mb-4 h-13 w-full flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 active:bg-gray-50"
-                onPress={() => setIsReasonPickerOpen(true)}
-              >
-                <Text
-                  className={`font-semibold text-sm ${
-                    selectedReason === "Reason"
-                      ? "text-gray-500"
-                      : "text-gray-900"
-                  }`}
-                >
-                  {selectedReason}
+              {/* Reason Field */}
+              <View className="mb-5">
+                <Text className="mb-1.5 font-medium text-sm text-gray-700">
+                  Reason
                 </Text>
-                <StyledIcons
-                  className="text-gray-500"
-                  name="chevron-down"
-                  size={18}
-                />
-              </Pressable>
+                <Pressable
+                  className="h-13 w-full flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 active:bg-gray-50"
+                  onPress={() => setIsReasonPickerOpen(true)}
+                >
+                  <Text
+                    className={`font-semibold text-sm ${
+                      selectedReason === "Reason"
+                        ? "text-gray-400"
+                        : "text-gray-900"
+                    }`}
+                  >
+                    {selectedReason}
+                  </Text>
+                  <StyledIcons
+                    className="text-gray-500"
+                    name="chevron-down"
+                    size={18}
+                  />
+                </Pressable>
+              </View>
 
               {/* All Day Checkbox Row */}
               <Pressable
-                className="mb-4 flex-row items-center gap-3 active:opacity-80"
+                className="mb-5 flex-row items-center gap-3 active:opacity-80"
                 onPress={() => setIsAllDay(!isAllDay)}
               >
                 <View
@@ -423,54 +469,46 @@ export function StaffTimeOffView({
                 </Text>
               </Pressable>
 
-              {/* Thin Divider */}
-              <View className="mb-4 h-px w-full bg-gray-100" />
-
-              {/* Start Date & End Date Row */}
-              <View className="flex-row items-center justify-between gap-2.5 mb-4">
-                {/* Start Date */}
+              {/* Date Range Section - Opens Calendar Directly */}
+              <View className="mb-5 flex-row items-center justify-between gap-3">
                 <View className="flex-1">
                   <Text className="mb-1.5 font-medium text-sm text-gray-700">
                     Start date
                   </Text>
                   <Pressable
-                    className="h-13 w-full flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white px-3 active:bg-gray-50"
-                    onPress={() => setIsStartDatePickerOpen(true)}
+                    className="h-13 w-full flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 active:bg-gray-50"
+                    onPress={() => handleOpenCalendar("start")}
                   >
                     <Text className="font-semibold text-sm text-gray-900">
                       {startDate}
                     </Text>
                     <StyledIcons
                       className="text-gray-500"
-                      name="chevron-down"
-                      size={16}
+                      name="calendar"
+                      size={18}
                     />
                   </Pressable>
                 </View>
 
-                {/* End Date */}
                 <View className="flex-1">
                   <Text className="mb-1.5 font-medium text-sm text-gray-700">
                     End date
                   </Text>
                   <Pressable
-                    className="h-13 w-full flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white px-3 active:bg-gray-50"
-                    onPress={() => setIsEndDatePickerOpen(true)}
+                    className="h-13 w-full flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 active:bg-gray-50"
+                    onPress={() => handleOpenCalendar("end")}
                   >
                     <Text className="font-semibold text-sm text-gray-900">
                       {endDate}
                     </Text>
                     <StyledIcons
                       className="text-gray-500"
-                      name="chevron-down"
-                      size={16}
+                      name="calendar"
+                      size={18}
                     />
                   </Pressable>
                 </View>
               </View>
-
-              {/* Thin Divider */}
-              <View className="mb-4 h-px w-full bg-gray-100" />
 
               {/* Approved Checkbox Row */}
               <Pressable
@@ -502,7 +540,7 @@ export function StaffTimeOffView({
                 </View>
               </Pressable>
 
-              {/* Save Action Button */}
+              {/* Save Button */}
               <Pressable
                 className="h-14 w-full items-center justify-center rounded-2xl bg-[#FF9500] active:bg-[#e08300]"
                 disabled={isUpdating}
@@ -531,35 +569,28 @@ export function StaffTimeOffView({
             <Text className="mb-3 font-bold text-xl text-gray-900">
               Select Staff Member
             </Text>
-            {MOCK_STAFF_OPTIONS.map((st) => (
+            {MOCK_STAFF_OPTIONS.map((name) => (
               <Pressable
-                className={`py-3.5 px-3.5 mb-1.5 rounded-xl flex-row items-center justify-between ${
-                  selectedStaff === st
+                className={`py-3 px-4 mb-1.5 rounded-xl flex-row items-center justify-between ${
+                  selectedStaff === name
                     ? "bg-amber-500/10"
                     : "active:bg-gray-100"
                 }`}
-                key={st}
+                key={name}
                 onPress={() => {
-                  setSelectedStaff(st);
+                  setSelectedStaff(name);
                   setIsStaffPickerOpen(false);
                 }}
               >
                 <Text
                   className={`font-semibold text-base ${
-                    selectedStaff === st
+                    selectedStaff === name
                       ? "text-[#FF9500] font-bold"
                       : "text-gray-900"
                   }`}
                 >
-                  {st}
+                  {name}
                 </Text>
-                {selectedStaff === st && (
-                  <StyledIcons
-                    className="text-[#FF9500]"
-                    name="checkmark"
-                    size={18}
-                  />
-                )}
               </Pressable>
             ))}
           </View>
@@ -580,7 +611,7 @@ export function StaffTimeOffView({
             </Text>
             {MOCK_REASON_OPTIONS.map((r) => (
               <Pressable
-                className={`py-3.5 px-3.5 mb-1.5 rounded-xl flex-row items-center justify-between ${
+                className={`py-3 px-4 mb-1.5 rounded-xl flex-row items-center justify-between ${
                   selectedReason === r
                     ? "bg-amber-500/10"
                     : "active:bg-gray-100"
@@ -600,105 +631,119 @@ export function StaffTimeOffView({
                 >
                   {r}
                 </Text>
-                {selectedReason === r && (
-                  <StyledIcons
-                    className="text-[#FF9500]"
-                    name="checkmark"
-                    size={18}
-                  />
-                )}
               </Pressable>
             ))}
           </View>
         </View>
       </Modal>
 
-      {/* Start Date Picker Modal */}
+      {/* Calendar Modal for Date Selection */}
       <Modal
-        animationType="fade"
-        onRequestClose={() => setIsStartDatePickerOpen(false)}
+        animationType="slide"
+        onRequestClose={() => setIsCalendarOpen(false)}
         transparent
-        visible={isStartDatePickerOpen}
+        visible={isCalendarOpen}
       >
         <View className="flex-1 items-center justify-center bg-black/50 px-6">
-          <View className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl">
-            <Text className="mb-3 font-bold text-xl text-gray-900">
-              Select Start Date
-            </Text>
-            {DATE_OPTIONS.map((opt) => (
+          <View className="w-full max-w-sm rounded-3xl bg-white p-5 shadow-2xl">
+            {/* Header: Month / Year + Switcher */}
+            <View className="flex-row items-center justify-between mb-4">
               <Pressable
-                className={`py-3 px-4 mb-1.5 rounded-xl flex-row items-center justify-between ${
-                  startDate === opt ? "bg-amber-500/10" : "active:bg-gray-100"
-                }`}
-                key={opt}
+                className="p-2 rounded-full active:bg-gray-100"
                 onPress={() => {
-                  setStartDate(opt);
-                  setIsStartDatePickerOpen(false);
+                  if (calendarMonthIndex === 0) {
+                    setCalendarMonthIndex(11);
+                    setCalendarYear((y) => y - 1);
+                  } else {
+                    setCalendarMonthIndex((m) => m - 1);
+                  }
                 }}
               >
-                <Text
-                  className={`font-semibold text-base ${
-                    startDate === opt
-                      ? "text-[#FF9500] font-bold"
-                      : "text-gray-900"
-                  }`}
-                >
-                  {opt}
-                </Text>
-                {startDate === opt && (
-                  <StyledIcons
-                    className="text-[#FF9500]"
-                    name="checkmark"
-                    size={18}
-                  />
-                )}
+                <StyledIcons
+                  className="text-gray-900"
+                  name="chevron-back"
+                  size={20}
+                />
               </Pressable>
-            ))}
-          </View>
-        </View>
-      </Modal>
 
-      {/* End Date Picker Modal */}
-      <Modal
-        animationType="fade"
-        onRequestClose={() => setIsEndDatePickerOpen(false)}
-        transparent
-        visible={isEndDatePickerOpen}
-      >
-        <View className="flex-1 items-center justify-center bg-black/50 px-6">
-          <View className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl">
-            <Text className="mb-3 font-bold text-xl text-gray-900">
-              Select End Date
-            </Text>
-            {DATE_OPTIONS.map((opt) => (
+              <Text className="font-bold text-lg text-gray-900">
+                {MONTH_NAMES[calendarMonthIndex]} {calendarYear}
+              </Text>
+
               <Pressable
-                className={`py-3 px-4 mb-1.5 rounded-xl flex-row items-center justify-between ${
-                  endDate === opt ? "bg-amber-500/10" : "active:bg-gray-100"
-                }`}
-                key={opt}
+                className="p-2 rounded-full active:bg-gray-100"
                 onPress={() => {
-                  setEndDate(opt);
-                  setIsEndDatePickerOpen(false);
+                  if (calendarMonthIndex === 11) {
+                    setCalendarMonthIndex(0);
+                    setCalendarYear((y) => y + 1);
+                  } else {
+                    setCalendarMonthIndex((m) => m + 1);
+                  }
                 }}
               >
-                <Text
-                  className={`font-semibold text-base ${
-                    endDate === opt
-                      ? "text-[#FF9500] font-bold"
-                      : "text-gray-900"
-                  }`}
-                >
-                  {opt}
-                </Text>
-                {endDate === opt && (
-                  <StyledIcons
-                    className="text-[#FF9500]"
-                    name="checkmark"
-                    size={18}
-                  />
-                )}
+                <StyledIcons
+                  className="text-gray-900"
+                  name="chevron-forward"
+                  size={20}
+                />
               </Pressable>
-            ))}
+            </View>
+
+            {/* Days Grid */}
+            <View className="flex-row flex-wrap">
+              {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
+                <View
+                  className="w-[14.28%] items-center justify-center py-2"
+                  key={`day-head-${i}`}
+                >
+                  <Text className="font-semibold text-xs text-gray-400">
+                    {d}
+                  </Text>
+                </View>
+              ))}
+
+              {Array.from({ length: firstDayOfWeek }).map((_, i) => (
+                <View className="w-[14.28%] py-3" key={`blank-${i}`} />
+              ))}
+
+              {Array.from({ length: daysInMonth }).map((_, i) => {
+                const dayNum = i + 1;
+                const dateStr = `${calendarYear}-${String(
+                  calendarMonthIndex + 1,
+                ).padStart(2, "0")}-${String(dayNum).padStart(2, "0")}`;
+
+                const currentSelected =
+                  calendarTarget === "start" ? startDate : endDate;
+
+                const isSelected = currentSelected === dateStr;
+
+                return (
+                  <Pressable
+                    className="w-[14.28%] items-center justify-center py-2.5"
+                    key={`day-${dayNum}`}
+                    onPress={() => {
+                      if (calendarTarget === "start") setStartDate(dateStr);
+                      if (calendarTarget === "end") setEndDate(dateStr);
+                      setIsCalendarOpen(false);
+                    }}
+                  >
+                    <View
+                      className={`h-9 w-9 items-center justify-center rounded-full ${
+                        isSelected ? "bg-[#FF9500]" : "active:bg-gray-100"
+                      }`}
+                    >
+                      <Text
+                        className={`font-semibold text-sm ${
+                          isSelected ? "text-white font-bold" : "text-gray-900"
+                        }`}
+                      >
+                        {dayNum}
+                      </Text>
+                    </View>
+                  </Pressable>
+                );
+              })}
+            </View>
           </View>
         </View>
       </Modal>

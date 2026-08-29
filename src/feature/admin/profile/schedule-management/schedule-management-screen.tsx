@@ -21,7 +21,15 @@ export function ScheduleManagementScreen({
   const [selectedStaffMember, setSelectedStaffMember] = useState<any>(null);
   const [activeShifts, setActiveShifts] = useState<any[] | null>(null);
   const [activeTimeOff, setActiveTimeOff] = useState<any[] | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string>("2026-08-30");
+  const todayStr = React.useMemo(() => {
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, "0");
+    const d = String(today.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }, []);
+
+  const [selectedDate, setSelectedDate] = useState<string>(todayStr);
   const [navigationHistory, setNavigationHistory] = useState<ScheduleSubPage[]>(
     [initialPage],
   );
@@ -57,6 +65,7 @@ export function ScheduleManagementScreen({
       ) : currentPage === "opening-calendar" ? (
         <OpeningCalendarView
           onBack={handleBack}
+          onDateChange={(d) => setSelectedDate(d)}
           onNavigateToAddBusinessDaysOff={() =>
             handleNavigate("add-business-days-off")
           }
@@ -67,14 +76,17 @@ export function ScheduleManagementScreen({
             if (dateStr) setSelectedDate(dateStr);
             handleNavigate("business-hours");
           }}
-          onNavigateToShift={(shiftsData) => {
+          onNavigateToShift={(shiftsData, dateStr) => {
             if (shiftsData) setActiveShifts(shiftsData);
+            if (dateStr) setSelectedDate(dateStr);
             handleNavigate("shift");
           }}
-          onNavigateToTimeOff={(timeOffData) => {
+          onNavigateToTimeOff={(timeOffData, dateStr) => {
             if (timeOffData) setActiveTimeOff(timeOffData);
+            if (dateStr) setSelectedDate(dateStr);
             handleNavigate("staff-time-off");
           }}
+          selectedDate={selectedDate}
         />
       ) : currentPage === "shift" ? (
         <ShiftView

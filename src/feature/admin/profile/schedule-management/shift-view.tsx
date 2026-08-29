@@ -267,6 +267,11 @@ export function ShiftView({
       const payload = {
         barber: barberId,
         date: targetDate,
+        shift: {
+          start_time: convertTo24Hour(startTime),
+          end_time: convertTo24Hour(endTime),
+          is_off: !isShiftEnabled,
+        },
         breaks: breaksPayload,
         time_off: timeOffPayload,
       };
@@ -311,6 +316,10 @@ export function ShiftView({
         setFeedbackMessage(null);
       }, 1200);
     } catch (err: any) {
+      console.log(
+        "❌ Error Response PUT /api/v1/schedule/barber-schedule/:",
+        JSON.stringify(err, null, 2),
+      );
       const errorText =
         err?.data?.details ||
         err?.data?.message ||

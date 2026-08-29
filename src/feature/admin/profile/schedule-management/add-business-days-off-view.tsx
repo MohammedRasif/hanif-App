@@ -1,6 +1,6 @@
 import { StyledIcons } from "@/lib";
 import { getUserData } from "@/lib/storage";
-import { useUpdateBusinessHoursDateMutation } from "@/Redux/feature/dashboard";
+import { useCreateBusinessOffMutation } from "@/Redux/feature/dashboard";
 import React, { useMemo, useState } from "react";
 import { ActivityIndicator, Modal, Pressable, Text, View } from "react-native";
 
@@ -8,14 +8,6 @@ interface AddBusinessDaysOffViewProps {
   onBack: () => void;
   onSave?: (data: { duration: string; from: string; to: string }) => void;
 }
-
-const DATE_OPTIONS = [
-  "Today",
-  "Tomorrow",
-  "This Weekend",
-  "Next Monday",
-  "Custom Date",
-];
 
 const MONTH_NAMES = [
   "January",
@@ -39,41 +31,6 @@ function formatDateISO(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
-function parseOptionToDate(option: string, customDateStr?: string): Date {
-  const today = new Date();
-  if (option === "Today") return today;
-  if (option === "Tomorrow") {
-    const d = new Date(today);
-    d.setDate(d.getDate() + 1);
-    return d;
-  }
-  if (option === "This Weekend") {
-    const d = new Date(today);
-    const dayOfWeek = d.getDay();
-    const diff = dayOfWeek === 6 ? 0 : 6 - dayOfWeek;
-    d.setDate(d.getDate() + diff);
-    return d;
-  }
-  if (option === "Next Monday") {
-    const d = new Date(today);
-    const dayOfWeek = d.getDay();
-    const diff = (8 - dayOfWeek) % 7 || 7;
-    d.setDate(d.getDate() + diff);
-    return d;
-  }
-  if (option === "Custom Date" && customDateStr) {
-    const parts = customDateStr.split("-");
-    if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
-      return new Date(
-        parseInt(parts[0], 10),
-        parseInt(parts[1], 10) - 1,
-        parseInt(parts[2], 10),
-      );
-    }
-  }
-  return today;
-}
-
 export function AddBusinessDaysOffView({
   onBack,
   onSave,
@@ -81,11 +38,8 @@ export function AddBusinessDaysOffView({
   const userData = useMemo(() => getUserData(), []);
   const shopId = userData?.shops?.[0]?.id || 7;
 
-  const [updateBusinessHoursDate, { isLoading: isUpdating }] =
-    useUpdateBusinessHoursDateMutation();
-
-  const [fromDateOption, setFromDateOption] = useState("Today");
-  const [toDateOption, setToDateOption] = useState("Today");
+  const [createBusinessOff, { isLoading: isUpdating }] =
+    useCreateBusinessOffMutation();
 
   const [customFromDate, setCustomFromDate] = useState<string>(
     formatDateISO(new Date()),
@@ -93,9 +47,6 @@ export function AddBusinessDaysOffView({
   const [customToDate, setCustomToDate] = useState<string>(
     formatDateISO(new Date()),
   );
-
-  const [isFromPickerOpen, setIsFromPickerOpen] = useState(false);
-  const [isToPickerOpen, setIsToPickerOpen] = useState(false);
 
   // Custom Calendar Modal State
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -110,72 +61,56 @@ export function AddBusinessDaysOffView({
     text: string;
   } | null>(null);
 
-  const startDateObj = useMemo(
-    () => parseOptionToDate(fromDateOption, customFromDate),
-    [fromDateOption, customFromDate],
-  );
-  const endDateObj = useMemo(
-    () => parseOptionToDate(toDateOption, customToDate),
-    [toDateOption, customToDate],
-  );
-
-  const formattedFromStr = useMemo(
-    () => formatDateISO(startDateObj),
-    [startDateObj],
-  );
-  const formattedToStr = useMemo(() => formatDateISO(endDateObj), [endDateObj]);
-
   // Dynamic duration calculation
   const durationText = useMemo(() => {
-    const diffTime = Math.abs(endDateObj.getTime() - startDateObj.getTime());
+    const parseDate = (str: string) => {
+      const parts = str.split("-");
+      if (parts.length === 3 && parts[0] && parts[1] && parts[2]) {
+        return new Date(
+          parseInt(parts[0], 10),
+          parseInt(parts[1], 10) - 1,
+          parseInt(parts[2], 10),
+        );
+      }
+      return new Date();
+    };
+    const sObj = parseDate(customFromDate);
+    const eObj = parseDate(customToDate);
+    const diffTime = Math.abs(eObj.getTime() - sObj.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
     return diffDays === 1 ? "1 day" : `${diffDays} days`;
-  }, [startDateObj, endDateObj]);
+  }, [customFromDate, customToDate]);
 
-  const handleSelectFromOption = (opt: string) => {
-    setFromDateOption(opt);
-    setIsFromPickerOpen(false);
-    if (opt === "Custom Date") {
-      setCalendarTarget("from");
-      setIsCalendarOpen(true);
-    }
+  const handleOpenFromCalendar = () => {
+    setCalendarTarget("from");
+    setIsCalendarOpen(true);
   };
 
-  const handleSelectToOption = (opt: string) => {
-    setToDateOption(opt);
-    setIsToPickerOpen(false);
-    if (opt === "Custom Date") {
-      setCalendarTarget("to");
-      setIsCalendarOpen(true);
-    }
+  const handleOpenToCalendar = () => {
+    setCalendarTarget("to");
+    setIsCalendarOpen(true);
   };
 
   const handleSave = async () => {
     setFeedbackMessage(null);
     try {
       const payload = {
-        shopId,
-        date: formattedFromStr,
-        open_time: "10:00:00",
-        close_time: "18:00:00",
-        is_closed: true,
-        breaks: [],
+        shop: shopId,
+        start_date: customFromDate,
+        end_date: customToDate,
+        is_full_day: true,
       };
 
       console.log(
-        "▶️ Hitting PUT /api/v1/schedule/business-hours/" +
-          shopId +
-          "/date/ Payload:",
+        "▶️ Hitting POST /api/v1/schedule/business/off/ Payload:",
         JSON.stringify(payload, null, 2),
       );
 
-      // 📡 PUT /api/v1/schedule/business-hours/{shop_id}/date/
-      const res = await updateBusinessHoursDate(payload).unwrap();
+      // 📡 POST /api/v1/schedule/business/off/
+      const res = await createBusinessOff(payload).unwrap();
 
       console.log(
-        "✅ Success Response PUT /api/v1/schedule/business-hours/" +
-          shopId +
-          "/date/:",
+        "✅ Success Response POST /api/v1/schedule/business/off/:",
         JSON.stringify(res, null, 2),
       );
 
@@ -185,8 +120,8 @@ export function AddBusinessDaysOffView({
       });
 
       onSave?.({
-        from: formattedFromStr,
-        to: formattedToStr,
+        from: customFromDate,
+        to: customToDate,
         duration: durationText,
       });
 
@@ -194,6 +129,10 @@ export function AddBusinessDaysOffView({
         onBack();
       }, 1200);
     } catch (err: any) {
+      console.log(
+        "❌ Error Response POST /api/v1/schedule/business/off/:",
+        JSON.stringify(err, null, 2),
+      );
       const errorText =
         err?.data?.details ||
         err?.data?.message ||
@@ -259,36 +198,28 @@ export function AddBusinessDaysOffView({
 
       {/* Date Range Selection Row */}
       <View className="px-6 pt-4 flex-row items-center justify-between gap-2.5">
-        {/* From Date Dropdown */}
+        {/* From Date Button */}
         <Pressable
           className="h-13 flex-1 flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 active:bg-gray-50"
-          onPress={() => setIsFromPickerOpen(true)}
+          onPress={handleOpenFromCalendar}
         >
           <Text className="font-semibold text-sm text-gray-900">
-            {fromDateOption === "Custom Date" ? customFromDate : fromDateOption}
+            {customFromDate}
           </Text>
-          <StyledIcons
-            className="text-gray-500"
-            name="chevron-down"
-            size={18}
-          />
+          <StyledIcons className="text-gray-500" name="calendar" size={18} />
         </Pressable>
 
         <Text className="font-medium text-sm text-gray-600 px-1">to</Text>
 
-        {/* To Date Dropdown */}
+        {/* To Date Button */}
         <Pressable
           className="h-13 flex-1 flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 active:bg-gray-50"
-          onPress={() => setIsToPickerOpen(true)}
+          onPress={handleOpenToCalendar}
         >
           <Text className="font-semibold text-sm text-gray-900">
-            {toDateOption === "Custom Date" ? customToDate : toDateOption}
+            {customToDate}
           </Text>
-          <StyledIcons
-            className="text-gray-500"
-            name="chevron-down"
-            size={18}
-          />
+          <StyledIcons className="text-gray-500" name="calendar" size={18} />
         </Pressable>
       </View>
 
@@ -317,95 +248,7 @@ export function AddBusinessDaysOffView({
         </Pressable>
       </View>
 
-      {/* From Date Picker Modal */}
-      <Modal
-        animationType="fade"
-        onRequestClose={() => setIsFromPickerOpen(false)}
-        transparent
-        visible={isFromPickerOpen}
-      >
-        <View className="flex-1 items-center justify-center bg-black/50 px-6">
-          <View className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl">
-            <Text className="mb-3 font-bold text-xl text-gray-900">
-              Select Start Date
-            </Text>
-            {DATE_OPTIONS.map((opt) => (
-              <Pressable
-                className={`py-3 px-4 mb-1.5 rounded-xl flex-row items-center justify-between ${
-                  fromDateOption === opt
-                    ? "bg-amber-500/10"
-                    : "active:bg-gray-100"
-                }`}
-                key={opt}
-                onPress={() => handleSelectFromOption(opt)}
-              >
-                <Text
-                  className={`font-semibold text-base ${
-                    fromDateOption === opt
-                      ? "text-[#FF9500] font-bold"
-                      : "text-gray-900"
-                  }`}
-                >
-                  {opt}
-                </Text>
-                {fromDateOption === opt && (
-                  <StyledIcons
-                    className="text-[#FF9500]"
-                    name="checkmark"
-                    size={18}
-                  />
-                )}
-              </Pressable>
-            ))}
-          </View>
-        </View>
-      </Modal>
-
-      {/* To Date Picker Modal */}
-      <Modal
-        animationType="fade"
-        onRequestClose={() => setIsToPickerOpen(false)}
-        transparent
-        visible={isToPickerOpen}
-      >
-        <View className="flex-1 items-center justify-center bg-black/50 px-6">
-          <View className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl">
-            <Text className="mb-3 font-bold text-xl text-gray-900">
-              Select End Date
-            </Text>
-            {DATE_OPTIONS.map((opt) => (
-              <Pressable
-                className={`py-3 px-4 mb-1.5 rounded-xl flex-row items-center justify-between ${
-                  toDateOption === opt
-                    ? "bg-amber-500/10"
-                    : "active:bg-gray-100"
-                }`}
-                key={opt}
-                onPress={() => handleSelectToOption(opt)}
-              >
-                <Text
-                  className={`font-semibold text-base ${
-                    toDateOption === opt
-                      ? "text-[#FF9500] font-bold"
-                      : "text-gray-900"
-                  }`}
-                >
-                  {opt}
-                </Text>
-                {toDateOption === opt && (
-                  <StyledIcons
-                    className="text-[#FF9500]"
-                    name="checkmark"
-                    size={18}
-                  />
-                )}
-              </Pressable>
-            ))}
-          </View>
-        </View>
-      </Modal>
-
-      {/* Calendar Modal for Custom Date */}
+      {/* Calendar Modal for Date Selection */}
       <Modal
         animationType="slide"
         onRequestClose={() => setIsCalendarOpen(false)}
