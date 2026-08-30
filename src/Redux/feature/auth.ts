@@ -16,6 +16,17 @@ const rawBaseQuery = fetchBaseQuery({
   },
 });
 
+export interface ShopDetails {
+  id: number;
+  name: string;
+  slug: string;
+  location: string;
+  logo: string | null;
+  phone: string;
+  email: string;
+  payment_gateway_enabled: boolean;
+}
+
 export interface UserProfileData {
   id: string;
   email: string;
@@ -27,6 +38,7 @@ export interface UserProfileData {
   address: string;
   last_active_at?: string;
   date_joined?: string;
+  active_shop: ShopDetails;
 }
 
 export interface NotificationItem {

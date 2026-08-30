@@ -1,16 +1,22 @@
+import { formatCalendarDate } from "@/Redux/feature/bookingCalendarApi";
 import { Image } from "expo-image";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { StyledIcons } from "../styled-icons";
 import { CalendarAppointmentCard } from "./appointment-card";
-import type { Appointment, Barber } from "./types";
+import { minutesOfDay } from "./date-utils";
+import type { Appointment, Barber, CalendarBlock } from "./types";
 
 const TIME_AXIS_WIDTH = 56; // Fixed width for sticky left time column
 const BARBER_HEADER_HEIGHT = 52; // Fixed height for barber avatar header
+const MIN_CARD_HEIGHT = 48;
+const ONE_MINUTE_MS = 60_000;
 
 type Props = {
+  activeDateStr?: string;
   appointments: Appointment[];
   barbers: Barber[];
+  blocks?: CalendarBlock[];
   children?: React.ReactNode;
   columnWidth?: number;
   endHour?: number;
@@ -24,8 +30,10 @@ type Props = {
 };
 
 export function CalendarGridTimeline({
+  activeDateStr,
   appointments,
   barbers,
+  blocks = [],
   children,
   columnWidth = 165,
   endHour = 19,
@@ -51,10 +59,20 @@ export function CalendarGridTimeline({
     return list;
   }, [startHour, endHour]);
 
-  // Helper to calculate top position and height for an appointment
-  const getAppointmentLayout = (appt: Appointment) => {
-    const startDate = new Date(appt.startTime);
-    const endDate = new Date(appt.endTime);
+  // Ticks every minute so the current-time indicator keeps up with the clock
+  const [nowMinutes, setNowMinutes] = useState(() => minutesOfDay(new Date()));
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNowMinutes(minutesOfDay(new Date()));
+    }, ONE_MINUTE_MS);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Helper to calculate top position and height for any timeline range
+  const getRangeLayout = (startIso: string, endIso: string) => {
+    const startDate = new Date(startIso);
+    const endDate = new Date(endIso);
 
     const startMinutesFromStart =
       (startDate.getHours() - startHour) * 60 + startDate.getMinutes();
@@ -62,14 +80,24 @@ export function CalendarGridTimeline({
       (endDate.getTime() - startDate.getTime()) / (1000 * 60);
 
     const top = (startMinutesFromStart / 60) * hourHeight;
-    const height = Math.max((durationMinutes / 60) * hourHeight, 48); // Min height 48px
+    const height = Math.max(
+      (durationMinutes / 60) * hourHeight,
+      MIN_CARD_HEIGHT,
+    );
 
     return { top, height };
   };
 
-  // Fixed red line position matching 8:45 AM indicator
-  const redLineMinutes = (8 - startHour) * 60 + 45; // 8:45 AM
-  const redLineTop = (redLineMinutes / 60) * hourHeight;
+  // Red line follows the real clock, and only on the day actually being viewed
+  const gridStartMinutes = startHour * 60;
+  const gridEndMinutes = (endHour + 1) * 60;
+  const isViewingToday =
+    !activeDateStr || activeDateStr === formatCalendarDate();
+  const showCurrentTimeLine =
+    isViewingToday &&
+    nowMinutes >= gridStartMinutes &&
+    nowMinutes <= gridEndMinutes;
+  const currentTimeTop = ((nowMinutes - gridStartMinutes) / 60) * hourHeight;
 
   const totalGridWidth = barbers.length * columnWidth;
   const totalTimelineHeight = (endHour - startHour + 1) * hourHeight;
@@ -94,11 +122,11 @@ export function CalendarGridTimeline({
         >
           {hours.map((h, idx) => (
             <View
-              className="justify-between pt-1 pb-1 pr-2 items-end"
+              className="justify-between -pt-2 pb-1 pr-0.5 items-end"
               key={h.hourNum}
               style={{ height: hourHeight }}
             >
-              <Text className="font-bold text-gray-700 text-xs tracking-tight">
+              <Text className="font-semibold text-gray-700 text-xs tracking-tighter">
                 {h.label}
               </Text>
               {idx < hours.length - 1 && (
@@ -195,11 +223,48 @@ export function CalendarGridTimeline({
                     key={barber.id}
                     style={{ width: columnWidth }}
                   >
+                    {/* Breaks / time off: shop-wide blocks repeat in every column */}
+                    {blocks
+                      .filter(
+                        (block) =>
+                          block.barberId === null ||
+                          block.barberId === barber.id,
+                      )
+                      .map((block) => {
+                        const { top, height } = getRangeLayout(
+                          block.startTime,
+                          block.endTime,
+                        );
+                        return (
+                          <View
+                            className="absolute left-1 right-1 overflow-hidden rounded-2xl border border-gray-200 bg-gray-100 p-2.5"
+                            key={block.id}
+                            style={{ top, height }}
+                          >
+                            <Text
+                              className="font-bold text-gray-500 text-xs tracking-tight"
+                              numberOfLines={1}
+                            >
+                              {block.timeDisplay}
+                            </Text>
+                            <Text
+                              className="mt-0.5 text-[11px] text-gray-400"
+                              numberOfLines={2}
+                            >
+                              {block.label}
+                            </Text>
+                          </View>
+                        );
+                      })}
+
                     {/* Render Appointments belonging to this barber column */}
                     {appointments
                       .filter((a) => a.barberId === barber.id)
                       .map((appt) => {
-                        const { top, height } = getAppointmentLayout(appt);
+                        const { top, height } = getRangeLayout(
+                          appt.startTime,
+                          appt.endTime,
+                        );
                         return (
                           <View
                             className="absolute left-1 right-1 z-10"
@@ -224,18 +289,20 @@ export function CalendarGridTimeline({
                 ))}
               </View>
 
-              {/* Red Current Time Indicator Line (Matching mockup at 8:45 AM) */}
-              <View
-                className="absolute left-0 right-0 z-20 flex-row items-center pointer-events-none"
-                style={{
-                  top: redLineTop,
-                  width: totalGridWidth,
-                }}
-              >
-                <View className="w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[8px] border-l-red-500" />
-                <View className="flex-1 h-0.5 bg-red-500" />
-                <View className="w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[8px] border-r-red-500" />
-              </View>
+              {/* Red Current Time Indicator Line (live clock, today only) */}
+              {showCurrentTimeLine && (
+                <View
+                  className="absolute left-0 right-0 z-20 flex-row items-center pointer-events-none"
+                  style={{
+                    top: currentTimeTop,
+                    width: totalGridWidth,
+                  }}
+                >
+                  <View className="w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[8px] border-l-red-500" />
+                  <View className="flex-1 h-0.5 bg-red-500" />
+                  <View className="w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[8px] border-r-red-500" />
+                </View>
+              )}
             </View>
           </View>
         </ScrollView>
