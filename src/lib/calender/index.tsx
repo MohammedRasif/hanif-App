@@ -1,17 +1,19 @@
+import { formatCalendarDate } from "@/Redux/feature/bookingCalendarApi";
 import React, { useMemo, useState } from "react";
 import { View } from "react-native";
 import { CalendarGridTimeline } from "./calendar-grid";
 import { CalendarHeaderView } from "./calendar-header";
-import { DEFAULT_DAYS } from "./mock-data";
+import { buildWeekDays } from "./date-utils";
 import type { CalendarProps } from "./types";
 
 export function CustomCalendar({
   activeDateStr: propsActiveDateStr,
   appointments = [],
   barbers = [],
+  blocks = [],
   children,
   columnWidth = 165,
-  days = DEFAULT_DAYS,
+  days: propsDays,
   endHour = 19,
   hourHeight = 120,
   onPressAppointment,
@@ -25,9 +27,17 @@ export function CustomCalendar({
   startHour = 7,
   workingHoursLabel = "9.00 - 6.00 pm",
 }: CalendarProps) {
-  const [internalDateStr, setInternalDateStr] = useState("2026-07-18");
+  const [internalDateStr, setInternalDateStr] = useState(() =>
+    formatCalendarDate(),
+  );
 
   const activeDateStr = propsActiveDateStr || internalDateStr;
+
+  // Fall back to the real Mon–Sun week around the active date
+  const days = useMemo(
+    () => propsDays ?? buildWeekDays(activeDateStr),
+    [propsDays, activeDateStr],
+  );
 
   const handleSelectDate = (dayItem: any) => {
     setInternalDateStr(dayItem.fullDateStr);
@@ -55,8 +65,10 @@ export function CustomCalendar({
 
       {/* Main Sticky Grid & Timeline */}
       <CalendarGridTimeline
+        activeDateStr={activeDateStr}
         appointments={filteredAppointments}
         barbers={barbers}
+        blocks={blocks}
         columnWidth={columnWidth}
         endHour={endHour}
         hourHeight={hourHeight}
@@ -76,6 +88,7 @@ export function CustomCalendar({
 export * from "./appointment-card";
 export * from "./calendar-grid";
 export * from "./calendar-header";
+export * from "./date-utils";
 export * from "./mock-data";
 export * from "./types";
 export default CustomCalendar;

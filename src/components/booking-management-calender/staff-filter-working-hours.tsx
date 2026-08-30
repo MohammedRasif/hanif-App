@@ -1,9 +1,11 @@
 import { Container } from "@/components/container";
 import { StyledIcons } from "@/lib";
+import type { BookingBarber } from "@/Redux/feature/bookingCalendarApi";
 import { Image } from "expo-image";
 import { Dialog, useToast } from "heroui-native";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   Pressable,
   ScrollView,
   Switch,
@@ -11,6 +13,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { barberDisplayName } from "./booking-edit-modal";
 
 export interface StaffFilterItem {
   avatar?: string;
@@ -30,37 +33,6 @@ export interface DayWorkingHour {
   id: string;
   startTime: string;
 }
-
-const DEFAULT_STAFF_LIST: StaffFilterItem[] = [
-  {
-    id: "1",
-    name: "Isaac",
-    role: "manager",
-    checked: true,
-    avatar:
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-  },
-  {
-    id: "2",
-    name: "Isaac",
-    role: "manager",
-    checked: true,
-    avatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-  },
-  {
-    id: "3",
-    name: "isaac",
-    role: "Senior barber",
-    checked: false,
-  },
-  {
-    id: "4",
-    name: "isaac",
-    role: "Owner",
-    checked: false,
-  },
-];
 
 const DEFAULT_WORKING_DAYS: DayWorkingHour[] = [
   {
@@ -111,24 +83,70 @@ const DEFAULT_WORKING_DAYS: DayWorkingHour[] = [
   /* 1. Staff Member Filter Bottom Sheet / Dialog (Image 2) */
 }
 type StaffFilterBottomSheetProps = {
+  /** Every barber of the shop, from `GET /v1/barbers/?shop=`. */
+  barbers: BookingBarber[];
+  isLoading?: boolean;
   isOpen: boolean;
+  /** Emits the barber ids whose columns should stay on the calendar. */
+  onChangeSelected: (ids: string[]) => void;
   onOpenChange: (open: boolean) => void;
   onSelectStaffHours: (staff: StaffFilterItem) => void;
+  selectedIds: string[];
+  /** Ids that actually have a column on the active date. */
+  workingBarberIds?: string[];
 };
 
 export function StaffFilterBottomSheet({
+  barbers,
+  isLoading = false,
   isOpen,
+  onChangeSelected,
   onOpenChange,
   onSelectStaffHours,
+  selectedIds,
+  workingBarberIds = [],
 }: StaffFilterBottomSheetProps) {
-  const [filterMode, setFilterMode] = useState<"working" | "all">("working");
-  const [staffList, setStaffList] =
-    useState<StaffFilterItem[]>(DEFAULT_STAFF_LIST);
+  const allIds = useMemo(
+    () => barbers.map((barber) => String(barber.id)),
+    [barbers],
+  );
+
+  // Only staff scheduled for the active date can be narrowed down to
+  const workingIds = useMemo(() => {
+    const working = new Set(workingBarberIds.map(String));
+    return allIds.filter((id) => working.has(id));
+  }, [allIds, workingBarberIds]);
+
+  const staffList = useMemo<StaffFilterItem[]>(() => {
+    const selected = new Set(selectedIds.map(String));
+    return barbers.map((barber) => ({
+      avatar: barber.user_details?.image ?? undefined,
+      checked: selected.has(String(barber.id)),
+      id: String(barber.id),
+      name: barberDisplayName(barber),
+      role: barber.specialty || barber.role || "Barber",
+    }));
+  }, [barbers, selectedIds]);
+
+  const selectedCount = staffList.filter((staff) => staff.checked).length;
+  const isAllMode = allIds.length > 0 && selectedCount === allIds.length;
+  // const isWorkingMode =
+  //   !isAllMode &&
+  //   workingIds.length > 0 &&
+  //   selectedCount === workingIds.length &&
+  //   workingIds.every((id) =>
+  //     staffList.some((staff) => staff.id === id && staff.checked),
+  //   );
 
   const toggleStaffCheck = (id: string) => {
-    setStaffList((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, checked: !s.checked } : s)),
-    );
+    const selected = new Set(selectedIds.map(String));
+    if (selected.has(id)) {
+      selected.delete(id);
+    } else {
+      selected.add(id);
+    }
+    // Keep the API order so the columns never reshuffle
+    onChangeSelected(allIds.filter((item) => selected.has(item)));
   };
 
   return (
@@ -143,19 +161,19 @@ export function StaffFilterBottomSheet({
           <View className="mb-6 gap-3.5 px-1">
             <Pressable
               className="flex-row items-center gap-3"
-              onPress={() => setFilterMode("working")}
+              onPress={() => onChangeSelected(workingIds)}
             >
-              <View
+              {/* <View
                 className={`h-5 w-5 items-center justify-center rounded-full border ${
-                  filterMode === "working"
+                  isWorkingMode
                     ? "border-black bg-black"
                     : "border-gray-300 bg-white"
                 }`}
               >
-                {filterMode === "working" && (
+                {isWorkingMode && (
                   <View className="h-2 w-2 rounded-full bg-white" />
                 )}
-              </View>
+              </View> */}
               <Text className="font-bold text-base text-gray-900">
                 Working staff member
               </Text>
@@ -163,16 +181,16 @@ export function StaffFilterBottomSheet({
 
             <Pressable
               className="flex-row items-center gap-3"
-              onPress={() => setFilterMode("all")}
+              onPress={() => onChangeSelected(allIds)}
             >
               <View
                 className={`h-5 w-5 items-center justify-center rounded-full border ${
-                  filterMode === "all"
+                  isAllMode
                     ? "border-black bg-black"
                     : "border-gray-300 bg-white"
                 }`}
               >
-                {filterMode === "all" && (
+                {isAllMode && (
                   <View className="h-2 w-2 rounded-full bg-white" />
                 )}
               </View>
@@ -183,72 +201,89 @@ export function StaffFilterBottomSheet({
           </View>
 
           {/* Staff Member List Cards */}
-          <ScrollView
-            className="mb-2"
-            contentContainerStyle={{ gap: 12 }}
-            showsVerticalScrollIndicator={false}
-          >
-            {staffList.map((staff) => (
-              <Pressable
-                className="flex-row items-center justify-between rounded-3xl border border-gray-100/80 bg-[#F9FAFB] p-4 shadow-2xs active:bg-gray-100"
-                key={staff.id}
-                onPress={() => {
-                  onOpenChange(false);
-                  onSelectStaffHours(staff);
-                }}
-              >
-                <View className="flex-row items-center gap-3.5">
-                  <Pressable
-                    className={`h-6 w-6 items-center justify-center rounded-md border ${
-                      staff.checked
-                        ? "border-black bg-black"
-                        : "border-gray-300 bg-white"
-                    }`}
-                    onPress={() => toggleStaffCheck(staff.id)}
-                  >
-                    {staff.checked && (
-                      <StyledIcons
-                        className="text-white"
-                        name="checkmark"
-                        size={14}
+          {isLoading && staffList.length === 0 ? (
+            <View className="items-center py-10">
+              <ActivityIndicator color="#111827" size="small" />
+            </View>
+          ) : staffList.length === 0 ? (
+            <Text className="py-10 text-center text-gray-400 text-sm">
+              No staff added to this shop yet.
+            </Text>
+          ) : (
+            <ScrollView
+              className="mb-2 max-h-96"
+              contentContainerStyle={{ gap: 12 }}
+              showsVerticalScrollIndicator={false}
+            >
+              {staffList.map((staff) => (
+                <Pressable
+                  className="flex-row items-center justify-between rounded-3xl border border-gray-100/80 bg-[#F9FAFB] p-4 shadow-2xs active:bg-gray-100"
+                  key={staff.id}
+                  onPress={() => {
+                    onOpenChange(false);
+                    onSelectStaffHours(staff);
+                  }}
+                >
+                  <View className="flex-1 flex-row items-center gap-3.5">
+                    <Pressable
+                      className={`h-6 w-6 items-center justify-center rounded-md border ${
+                        staff.checked
+                          ? "border-black bg-black"
+                          : "border-gray-300 bg-white"
+                      }`}
+                      hitSlop={8}
+                      onPress={() => toggleStaffCheck(staff.id)}
+                    >
+                      {staff.checked && (
+                        <StyledIcons
+                          className="text-white"
+                          name="checkmark"
+                          size={14}
+                        />
+                      )}
+                    </Pressable>
+
+                    {staff.avatar ? (
+                      <Image
+                        contentFit="cover"
+                        source={{ uri: staff.avatar }}
+                        style={{ width: 44, height: 44, borderRadius: 22 }}
                       />
+                    ) : (
+                      <View className="h-11 w-11 items-center justify-center rounded-full bg-gray-200">
+                        <StyledIcons
+                          className="text-gray-600"
+                          name="person"
+                          size={22}
+                        />
+                      </View>
                     )}
-                  </Pressable>
 
-                  {staff.avatar ? (
-                    <Image
-                      contentFit="cover"
-                      source={{ uri: staff.avatar }}
-                      style={{ width: 44, height: 44, borderRadius: 22 }}
-                    />
-                  ) : (
-                    <View className="h-11 w-11 items-center justify-center rounded-full bg-gray-200">
-                      <StyledIcons
-                        className="text-gray-600"
-                        name="person"
-                        size={22}
-                      />
+                    <View className="flex-1">
+                      <Text
+                        className="font-bold text-base text-gray-900"
+                        numberOfLines={1}
+                      >
+                        {staff.name}
+                      </Text>
+                      <Text
+                        className="text-xs text-gray-400 font-medium"
+                        numberOfLines={1}
+                      >
+                        {staff.role}
+                      </Text>
                     </View>
-                  )}
-
-                  <View>
-                    <Text className="font-bold text-base text-gray-900">
-                      {staff.name}
-                    </Text>
-                    <Text className="text-xs text-gray-400 font-medium">
-                      {staff.role}
-                    </Text>
                   </View>
-                </View>
 
-                <StyledIcons
-                  className="text-gray-400"
-                  name="chevron-forward"
-                  size={20}
-                />
-              </Pressable>
-            ))}
-          </ScrollView>
+                  <StyledIcons
+                    className="text-gray-400"
+                    name="chevron-forward"
+                    size={20}
+                  />
+                </Pressable>
+              ))}
+            </ScrollView>
+          )}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog>
