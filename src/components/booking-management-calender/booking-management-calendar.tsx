@@ -1,5 +1,8 @@
 import CustomCalendar from "@/lib/calender";
-import { transformBookingCalendarView } from "@/lib/calender/api-transformer";
+import {
+  transformBookingCalendarView,
+  transformBookingListView,
+} from "@/lib/calender/api-transformer";
 import type { Appointment } from "@/lib/calender/types";
 import { getErrorMessage } from "@/lib/error-utils";
 import { useGetProfileQuery } from "@/Redux/feature/auth";
@@ -10,6 +13,7 @@ import {
   useGetBookingBarbersQuery,
   useGetBookingCalendarViewQuery,
   useGetBookingDetailsQuery,
+  useGetBookingListViewQuery,
   useUpdateBookingByIdMutation,
   type BookingCalendarViewType,
 } from "@/Redux/feature/bookingCalendarApi";
@@ -28,7 +32,7 @@ import {
   BookingEditModal,
   type BookingEditPayload,
 } from "./booking-edit-modal";
-import { BookingListView, DEFAULT_BOOKING_GROUPS } from "./booking-list-view";
+import { BookingListView, type BookingListItem } from "./booking-list-view";
 import {
   CheckoutPaymentPage,
   type CheckoutSubmitPayload,
@@ -95,11 +99,33 @@ export function BookingManagementCalendar({
     selectedDateStr,
   );
 
+  // GET /v1/booking/?...&display_mode=list — only while the list view is showing
+  const {
+    data: listResponse,
+    isError: isListError,
+    isFetching: isListFetching,
+    refetch: refetchList,
+  } = useGetBookingListViewQuery(
+    {
+      date: selectedDateStr,
+      shop_id: shopId ?? "",
+      view_type: viewType,
+    },
+    {
+      skip: !(shopId && currentViewMode === "list"),
+      refetchOnMountOrArgChange: true,
+    },
+  );
+
+  const listGroups = useMemo(
+    () => transformBookingListView(listResponse?.data),
+    [listResponse?.data],
+  );
+
   // Staff filter: `null` keeps every barber visible (the default)
   const [selectedBarberIds, setSelectedBarberIds] = useState<null | string[]>(
     null,
   );
-
   const visibleBarbers = useMemo(() => {
     if (selectedBarberIds === null) return calendar.barbers;
     const selected = new Set(selectedBarberIds);
@@ -207,6 +233,29 @@ export function BookingManagementCalendar({
     setIsEditBookingOpen(false);
     setIsOrderCompleted(false);
     setSelectedAppointment(null);
+  };
+
+  // Tapping a list-view row opens the same details page as a grid card
+  const handlePressListItem = (item: BookingListItem) => {
+    if (!item.bookingId) {
+      return;
+    }
+    handlePressAppointment({
+      barberAvatar: undefined,
+      barberId: item.barberId ?? "",
+      barberName: item.barberName ?? "",
+      bgColor: "#EBF5FF",
+      bookingId: item.bookingId,
+      cardType: "appointment",
+      durationMinutes: item.durationMinutes ?? 0,
+      endTime: "",
+      id: item.id,
+      price: item.amount,
+      serviceName: item.serviceName,
+      startTime: "",
+      timeDisplay: item.timeLabel ?? "",
+      userName: item.title,
+    });
   };
 
   // Handle Selecting Staff Member from Filter Bottom Sheet -> Open Working Hours Page
@@ -478,16 +527,6 @@ export function BookingManagementCalendar({
     onBookingConfirmed?.(bookAgainData);
   };
 
-  // Render Dashboard Appointments List View (Image 1) when active
-  if (currentViewMode === "list") {
-    return (
-      <BookingListView
-        groups={DEFAULT_BOOKING_GROUPS}
-        onSwitchToCalendar={() => setCurrentViewMode("calendar")}
-      />
-    );
-  }
-
   // Render Staff Working Hours Page (Image 3) when active
   if (isWorkingHoursPageOpen) {
     return (
@@ -578,6 +617,21 @@ export function BookingManagementCalendar({
           onOpenChange={setIsBookAgainConfirmOpen}
         />
       </View>
+    );
+  }
+
+  // Render Dashboard Appointments List View (Image 1) when active. Kept below the
+  // checkout returns so tapping a row opens the details page over the list.
+  if (currentViewMode === "list") {
+    return (
+      <BookingListView
+        groups={listGroups}
+        isError={isListError}
+        isLoading={isProfileLoading || isListFetching}
+        onPressItem={handlePressListItem}
+        onRetry={() => refetchList()}
+        onSwitchToCalendar={() => setCurrentViewMode("calendar")}
+      />
     );
   }
 

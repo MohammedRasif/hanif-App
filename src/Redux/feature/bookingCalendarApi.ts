@@ -146,6 +146,79 @@ export interface BookingCalendarViewResponse {
 }
 
 /* -------------------------------------------------------------------------- */
+/*  List view (`display_mode=list`)                                           */
+/* -------------------------------------------------------------------------- */
+
+/** One service row of a list-view booking. */
+export interface BookingListAppointmentDetail {
+  /** `YYYY-MM-DD` */
+  appointment_date: string;
+  barber: BookingAppointmentBarber | null;
+  barber_id: number | string;
+  /** `HH:MM:SS` */
+  end_time: string;
+  id: number | string;
+  service_id: number | string;
+  service_name: string;
+  /** `HH:MM:SS` */
+  start_time: string;
+}
+
+/**
+ * A booking as returned inside a list-view day. Leaner than `BookingDetailsData`:
+ * `customer` is the raw id (no name) and the services are flattened onto each row.
+ */
+export interface BookingListBooking {
+  appointments_details: BookingListAppointmentDetail[];
+  booking_code: string;
+  created_at: string;
+  /** Customer id only — the list payload carries no customer name. */
+  customer: string;
+  discount_amount: null | number | string;
+  id: number | string;
+  payment_method: null | string;
+  payment_status: BookingPaymentStatus | string;
+  shop: number | string;
+  shop_details: ShopDetails | null;
+  status: BookingStatus | string;
+  tip_amount: null | number | string;
+  total_amount: null | number | string;
+  updated_at: string;
+}
+
+/** One day section of the list view. */
+export interface BookingListViewDay {
+  appointment_count: number;
+  appointments: BookingListBooking[];
+  /** Pre-formatted by the API, e.g. `Wed, 26 August`. */
+  date: string;
+  new_client_count: number;
+  /** `HH:MM:SS` */
+  shop_end_time: null | string;
+  /** `HH:MM:SS` */
+  shop_start_time: null | string;
+  /** Day revenue. Note the backend's spelling of "amount". */
+  total_ammount: null | number;
+}
+
+export interface BookingListViewResponse {
+  code: string;
+  data: BookingListViewDay[];
+  details: string;
+  status_code: number;
+  success: boolean;
+}
+
+/** Same query params as the calendar view, minus the fixed `display_mode`. */
+export interface BookingListViewParams {
+  /** `YYYY-MM-DD`. Defaults to today when omitted. */
+  date?: string;
+  shop_id: number | string;
+  /** Defaults to `admin`. */
+  view_type?: BookingCalendarViewType;
+}
+
+/* -------------------------------------------------------------------------- */
 /*  Booking details, edit, cancel, staff & service pickers                    */
 /* -------------------------------------------------------------------------- */
 
@@ -480,6 +553,23 @@ export const bookingCalendarApi = baseApi.injectEndpoints({
       providesTags: ["BookingDetails"],
     }),
 
+    // GET /v1/booking/?view_type=&shop_id=&date=&display_mode=list
+    getBookingListView: builder.query<
+      BookingListViewResponse,
+      BookingListViewParams
+    >({
+      query: ({ date, shop_id, view_type = "admin" }) => {
+        const targetDate = date || formatCalendarDate();
+        return (
+          `v1/booking/?view_type=${encodeURIComponent(view_type)}` +
+          `&shop_id=${encodeURIComponent(String(shop_id))}` +
+          `&date=${encodeURIComponent(targetDate)}` +
+          `&display_mode=list`
+        );
+      },
+      providesTags: ["Booking", "BookingCalendar"],
+    }),
+
     // GET /v1/barbers/?shop={shop id}
     getBookingBarbers: builder.query<
       BookingBarbersResponse,
@@ -616,9 +706,11 @@ export const {
   useGetBookingBarbersQuery,
   useGetBookingCalendarViewQuery,
   useGetBookingDetailsQuery,
+  useGetBookingListViewQuery,
   useGetBookingServicesQuery,
   useLazyGetBookingCalendarViewQuery,
   useLazyGetBookingDetailsQuery,
+  useLazyGetBookingListViewQuery,
   useLazyGetBookingServicesQuery,
   useUpdateBookingByIdMutation,
   useGetCustomersQuery,

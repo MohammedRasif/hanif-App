@@ -4,6 +4,7 @@ import type {
 } from "@/Redux/feature/bookingApi";
 import type {
   BookingCalendarViewData,
+  BookingListViewDay,
   CalendarAppointmentStatus,
 } from "@/Redux/feature/bookingCalendarApi";
 import { formatCalendarDate } from "@/Redux/feature/bookingCalendarApi";
@@ -263,10 +264,126 @@ export function transformBookingCalendarView(
   };
 }
 
+/* -------------------------------------------------------------------------- */
+/*  List view (`display_mode=list`)                                           */
+/* -------------------------------------------------------------------------- */
+
+/** `Wed, 26 August` — the exact label format the list-view API returns. */
+function formatListDayLabel(date: Date): string {
+  const weekday = date.toLocaleDateString("en-US", { weekday: "short" });
+  const month = date.toLocaleDateString("en-US", { month: "long" });
+  return `${weekday}, ${`${date.getDate()}`.padStart(2, "0")} ${month}`;
+}
+
+/** `09:00:00` + `18:00:00` -> `9.00 - 6.00 pm`, matching the calendar header. */
+function buildShopHoursLabel(
+  startTime?: null | string,
+  endTime?: null | string,
+): string {
+  const open = timeToMinutes(startTime);
+  const close = timeToMinutes(endTime);
+  if (open === null || close === null) {
+    return "";
+  }
+  return `${minutesToClockLabel(open, false)} - ${minutesToClockLabel(close)}`;
+}
+
+function formatMoney(value?: null | number | string): string {
+  const amount = Number(value ?? 0);
+  return `$${(Number.isFinite(amount) ? amount : 0).toFixed(2)}`;
+}
+
+function formatListDuration(minutes: number): string {
+  if (minutes <= 0) {
+    return "—";
+  }
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  if (hours === 0) {
+    return `${mins} min`;
+  }
+  return mins === 0 ? `${hours} hr` : `${hours} hr ${mins} min`;
+}
+
+const PAYMENT_METHOD_LABELS: Record<string, string> = {
+  card: "Card",
+  cash: "Cash",
+  online: "Online",
+};
+
+/**
+ * Transforms the `display_mode=list` payload into the day sections the list view
+ * renders. The API pre-formats `date` (e.g. `Wed, 26 August`), so today's section
+ * is detected by rebuilding that same label locally.
+ */
+export function transformBookingListView(
+  days: BookingListViewDay[] = [],
+): BookingGroup[] {
+  const todayLabel = formatListDayLabel(new Date());
+
+  return days.map((day) => {
+    const items: BookingListItem[] = (day.appointments ?? []).map((booking) => {
+      const details = booking.appointments_details ?? [];
+      const first = details[0];
+      const last = details[details.length - 1];
+
+      // A booking can hold several services — bill the whole span as one row
+      const durationMinutes = details.reduce((total, detail) => {
+        const start = timeToMinutes(detail.start_time);
+        const end = timeToMinutes(detail.end_time);
+        if (start === null || end === null || end <= start) {
+          return total;
+        }
+        return total + (end - start);
+      }, 0);
+
+      const startMinutes = timeToMinutes(first?.start_time);
+      const endMinutes = timeToMinutes(last?.end_time);
+      const method = (booking.payment_method ?? "").toLowerCase();
+
+      return {
+        amount: formatMoney(booking.total_amount),
+        barberId:
+          first?.barber_id === undefined ? undefined : String(first.barber_id),
+        barberName: first?.barber?.name || undefined,
+        bookingId: booking.id,
+        duration: formatListDuration(durationMinutes),
+        durationMinutes,
+        id: String(booking.id),
+        paymentMethod:
+          PAYMENT_METHOD_LABELS[method] || booking.payment_method || "",
+        // The list payload carries the customer id only, never a name
+        serviceName:
+          details
+            .map((detail) => detail.service_name)
+            .filter(Boolean)
+            .join(", ") || "Service",
+        status: booking.status ? String(booking.status) : "",
+        timeLabel:
+          startMinutes === null || endMinutes === null
+            ? ""
+            : `${minutesToShortTime(startMinutes)} – ${minutesToShortTime(
+                endMinutes,
+              )}`,
+        title: booking.booking_code || `Booking #${booking.id}`,
+      };
+    });
+
+    return {
+      appointmentCount: day.appointment_count ?? items.length,
+      dateTitle: day.date === todayLabel ? "Today" : day.date || "",
+      isToday: day.date === todayLabel,
+      items,
+      newClientCount: day.new_client_count ?? 0,
+      totalValue: formatMoney(day.total_ammount),
+      workingHours: buildShopHoursLabel(day.shop_start_time, day.shop_end_time),
+    };
+  });
+}
+
 /**
  * Transforms Calendar API data into Barber[] and Appointment[] for CustomCalendar
- */
-export function transformCalendarApiData(
+ */ export function transformCalendarApiData(
   groups: ApiBarberGroup[] = [],
   dateStr?: string,
 ): { appointments: Appointment[]; barbers: Barber[] } {
@@ -376,6 +493,7 @@ export function transformListApiData(
   return [
     {
       dateTitle: "Today",
+      isToday: true,
       workingHours: "9.00 - 6.00 pm",
       totalValue: `$${metrics.total_value?.toFixed(2) || "0.00"}`,
       appointmentCount: metrics.appointment_count || 0,
