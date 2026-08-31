@@ -182,9 +182,14 @@ export function OpeningCalendarView({
       )}:00`;
     };
 
-    const payload = {
-      shopId,
-      date: selectedDateStr,
+    const dayOfWeek = selectedDateStr
+      ? new Date(selectedDateStr)
+          .toLocaleDateString("en-US", { weekday: "long" })
+          .toLowerCase()
+      : "saturday";
+
+    const scheduleItem = {
+      day_of_week: dayOfWeek,
       open_time: convertTo24H(modalOpenTime),
       close_time: convertTo24H(modalCloseTime),
       is_closed: !isClosedToggle,
@@ -196,6 +201,11 @@ export function OpeningCalendarView({
             },
           ]
         : [],
+    };
+
+    const payload = {
+      shopId,
+      schedules: [scheduleItem],
     };
 
     try {

@@ -137,7 +137,7 @@ function convertTo24Hour(timeStr?: string): string {
 
 export function BusinessHoursView({
   onBack,
-  selectedDate,
+  selectedDate: _selectedDate,
 }: BusinessHoursViewProps) {
   const userData = useMemo(() => getUserData(), []);
   const shopId = userData?.shops?.[0]?.id || 9;
@@ -278,16 +278,20 @@ export function BusinessHoursView({
         ]
       : [];
 
-    const targetDate = selectedDate || "2026-08-30";
+    const dayOfWeek = (selectedDayItem?.day || "saturday").toLowerCase();
 
     try {
-      const payload = {
-        shopId,
-        date: targetDate,
-        open_time: openTime24,
-        close_time: closeTime24,
+      const scheduleItem = {
+        day_of_week: dayOfWeek,
+        open_time: isDayEnabled ? openTime24 : "10:00:00",
+        close_time: isDayEnabled ? closeTime24 : "21:00:00",
         is_closed: !isDayEnabled,
         breaks: breaksPayload,
+      };
+
+      const payload = {
+        shopId,
+        schedules: [scheduleItem],
       };
 
       const res = await updateBusinessHours(payload).unwrap();

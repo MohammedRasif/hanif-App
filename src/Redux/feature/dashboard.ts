@@ -174,7 +174,7 @@ export const dashboardApi = baseApi.injectEndpoints({
       providesTags: ["Dashboard", "Shop"],
     }),
 
-    // 10. Update Business Hours Date: PUT /v1/schedule/business-hours/{shop_id}/
+    // 10. Update Business Hours: PUT /v1/schedule/business-hours/{shop_id}/
     updateBusinessHoursDate: builder.mutation<
       {
         status?: boolean;
@@ -184,17 +184,19 @@ export const dashboardApi = baseApi.injectEndpoints({
       },
       {
         shopId: number | string;
-        date: string;
-        open_time: string;
-        close_time: string;
-        is_closed: boolean;
-        breaks?: Array<{ start_time: string; end_time: string }>;
+        schedules: Array<{
+          day_of_week: string;
+          open_time: string;
+          close_time: string;
+          is_closed: boolean;
+          breaks?: Array<{ start_time: string; end_time: string }>;
+        }>;
       }
     >({
-      query: ({ shopId, ...body }) => ({
+      query: ({ shopId, schedules }) => ({
         url: `v1/schedule/business-hours/${shopId}/`,
         method: "PUT",
-        body,
+        body: schedules,
       }),
       invalidatesTags: ["Dashboard", "Shop"],
     }),
