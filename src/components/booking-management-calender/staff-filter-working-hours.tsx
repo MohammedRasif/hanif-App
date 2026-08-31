@@ -137,6 +137,8 @@ export function StaffFilterBottomSheet({
     role: barber.specialty || barber.role || "Barber",
   }));
 
+  console.log("staff List:", barbers);
+
   const selectedCount = staffList.filter((staff) => staff.checked).length;
 
   const isAllMode = allIds.length > 0 && selectedCount === allIds.length;

@@ -134,7 +134,7 @@ export const shopApi = baseApi.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Shop", "Dashboard"],
+      invalidatesTags: ["Shop", "Dashboard", "Profile", "User"],
     }),
 
     // Create New Shop: POST /v1/shops/

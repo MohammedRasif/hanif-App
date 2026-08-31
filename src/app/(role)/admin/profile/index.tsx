@@ -1,23 +1,13 @@
 import { type ProfileMenuItem, SharedProfileScreen } from "@/components/shared";
 import { getUserData } from "@/lib/storage";
-import { useGetProfileQuery } from "@/Redux/feature/auth";
-import { useGetShopDetailsQuery } from "@/Redux/feature/shop";
+// import { useGetProfileQuery } from "@/Redux/feature/auth";
+// import { useGetShopDetailsQuery } from "@/Redux/feature/shop";
 import { useRouter } from "expo-router";
-import React, { useMemo } from "react";
 
 export default function AdminProfileScreen() {
   const router = useRouter();
-  const userData = useMemo(() => getUserData(), []);
-  const shopId = userData?.shops?.[0]?.id || 9;
 
-  // 📡 GET /v1/shops/:id/
-  const { data: shopResponse } = useGetShopDetailsQuery(shopId);
-
-  // 📡 GET /v1/auth/profile/
-  const { data: profileResponse } = useGetProfileQuery();
-
-  const shopData = shopResponse?.data;
-  const profileData = profileResponse?.data;
+  const profileData = getUserData();
 
   const defaultCover =
     "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg";
@@ -26,13 +16,14 @@ export default function AdminProfileScreen() {
   const defaultUserAvatar =
     "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1757735711/images_nfasdv.png";
 
-  const coverImageUrl = shopData?.cover_image || defaultCover;
-  const avatarUrl = shopData?.logo || defaultLogo;
-  const locationTitle = shopData?.name
-    ? `${shopData.name}${shopData.location ? ` (${shopData.location})` : ""}`
-    : "Bong Bang Saloon";
+  const coverImageUrl = profileData?.active_shop?.cover_image || defaultCover;
+  const avatarUrl = profileData?.active_shop?.logo || defaultLogo;
+  const locationTitle =
+    profileData?.active_shop.name !== ""
+      ? `${profileData?.active_shop.name}`
+      : "No Shop Name";
 
-  const userName = profileData?.full_name || "James Carter";
+  const userName = profileData?.full_name || "No User name";
   const userSubtitle =
     profileData?.email ||
     (profileData?.role ? `Role: ${profileData.role}` : "Shop Manager");
@@ -103,9 +94,6 @@ export default function AdminProfileScreen() {
       coverImageUrl={coverImageUrl}
       locationTitle={locationTitle}
       menuItems={ADMIN_MENU_ITEMS}
-      onPressLocationDropdown={() => {
-        console.log("Location dropdown clicked");
-      }}
       onSignOut={() => router.replace("/auth/login")}
       userAvatarUrl={userAvatarUrl}
       userName={userName}

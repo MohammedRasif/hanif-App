@@ -25,9 +25,8 @@ export default function ShopScreen() {
   const { toast } = useToast();
 
   // Extract logged-in user's active shop ID
-  const userData = useMemo(() => getUserData(), []);
-  const userActiveShopId = userData?.shops?.[0]?.id;
-
+  const userData = getUserData();
+  const userActiveShopId = userData?.active_shop?.id;
   // 📡 RTK Query Hooks for Shops
   const {
     data: shopsResponse,
@@ -193,6 +192,7 @@ export default function ShopScreen() {
             keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) => {
               const isSelected = String(item.id) === String(selectedShopId);
+              console.log("isSelected:", isSelected);
               const logoUri = item.logo || item.cover_image;
 
               return (

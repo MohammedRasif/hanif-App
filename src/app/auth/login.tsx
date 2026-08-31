@@ -59,6 +59,9 @@ export default function LoginScreen() {
       if (res?.data?.user) {
         setUserData(res.data.user);
       }
+      if (res?.data?.user && res?.data?.active_shop) {
+        setUserData({ ...res.data.user, active_shop: res?.data?.active_shop });
+      }
 
       toast.show({
         label: "Welcome back!",

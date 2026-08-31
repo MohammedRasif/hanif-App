@@ -1,8 +1,14 @@
+// ClientListView.tsx
 import { CommonInput } from "@/components/shared";
 import { StyledIcons } from "@/lib";
-import { useGetClientsQuery } from "@/Redux/feature/dashboard";
+import {
+  useCreateCustomerMutation,
+  useGetCustomersQuery,
+  type Customer,
+} from "@/Redux/feature/bookingCalendarApi";
+import { Dialog } from "heroui-native";
 import { Image } from "expo-image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -11,6 +17,7 @@ import {
   View,
 } from "react-native";
 import type { ClientGroupItem, ClientItem } from "./client-types";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export interface ClientListViewProps {
   onPressAdd?: () => void;
@@ -27,6 +34,10 @@ export function ClientListView({
 }: ClientListViewProps) {
   const [activeTab, setActiveTab] = useState<"list" | "groups">("list");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+  // Debounce search query
+  const debouncedSearch = useDebounce(searchQuery, 500);
 
   const {
     data: clientsResponse,
@@ -34,7 +45,12 @@ export function ClientListView({
     isError,
     error,
     refetch,
-  } = useGetClientsQuery(searchQuery ? { search: searchQuery } : undefined);
+  } = useGetCustomersQuery(
+    debouncedSearch
+      ? { search: debouncedSearch, page: 1, page_size: 50 }
+      : { page: 1, page_size: 50 },
+    { refetchOnMountOrArgChange: true },
+  );
 
   const clientsData = clientsResponse?.data;
 
@@ -281,10 +297,199 @@ export function ClientListView({
       {/* Bottom Floating Black Add Button (+) */}
       <Pressable
         className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-black shadow-lg active:scale-95"
-        onPress={onPressAdd}
+        onPress={() => setIsCreateDialogOpen(true)}
       >
         <StyledIcons className="text-white" name="add" size={24} />
       </Pressable>
+
+      {/* Create Customer Dialog */}
+      <CreateCustomerDialog
+        isOpen={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+        onSuccess={() => {
+          refetch();
+          if (onPressAdd) onPressAdd();
+        }}
+      />
     </View>
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/* Create Customer Dialog Component                                           */
+/* -------------------------------------------------------------------------- */
+
+type CreateCustomerDialogProps = {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
+};
+
+function CreateCustomerDialog({
+  isOpen,
+  onOpenChange,
+  onSuccess,
+}: CreateCustomerDialogProps) {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [createCustomer] = useCreateCustomerMutation();
+
+  // Reset form when dialog closes
+  useEffect(() => {
+    if (!isOpen) {
+      setFullName("");
+      setEmail("");
+      setPhone("");
+      setIsLoading(false);
+    }
+  }, [isOpen]);
+
+  const handleCreate = async () => {
+    if (!fullName.trim()) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await createCustomer({
+        full_name: fullName.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+      }).unwrap();
+
+      if (response.success) {
+        onOpenChange(false);
+        onSuccess?.();
+        // Show success toast if you have a toast system
+        // toast.show({ label: "Customer created successfully!", variant: "success" });
+      }
+    } catch (error) {
+      console.error("Failed to create customer:", error);
+      // Show error toast if you have a toast system
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Dialog isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Dialog.Portal>
+        {/* Overlay without onPress to prevent closing on outside click */}
+        <Dialog.Overlay className="bg-black/60" />
+        <Dialog.Content
+          className="w-[92%] max-w-sm rounded-4xl bg-white p-6 shadow-2xl"
+          // Prevent closing on outside click
+          onStartShouldSetResponder={() => true}
+          onMoveShouldSetResponder={() => true}
+        >
+          {/* Header */}
+          <View className="mb-4 flex-row items-center justify-between">
+            <Dialog.Title className="font-bold text-2xl text-gray-900">
+              New Customer
+            </Dialog.Title>
+            <Pressable
+              className="h-9 w-9 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200"
+              onPress={() => onOpenChange(false)}
+            >
+              <StyledIcons className="text-gray-600" name="close" size={20} />
+            </Pressable>
+          </View>
+
+          <Text className="mb-5 text-gray-500 text-sm">
+            Add a new customer to your list
+          </Text>
+
+          {/* Form Fields */}
+          <View className="mb-6 gap-3.5">
+            {/* Full Name */}
+            <View>
+              <Text className="mb-1.5 font-medium text-sm text-gray-700">
+                Full Name *
+              </Text>
+              <View className="h-13 rounded-2xl border border-gray-200 bg-white px-4 justify-center">
+                <TextInput
+                  className="text-sm text-gray-900"
+                  onChangeText={setFullName}
+                  placeholder="Enter full name"
+                  placeholderTextColor="#9CA3AF"
+                  value={fullName}
+                />
+              </View>
+            </View>
+
+            {/* Email */}
+            <View>
+              <Text className="mb-1.5 font-medium text-sm text-gray-700">
+                Email
+              </Text>
+              <View className="h-13 rounded-2xl border border-gray-200 bg-white px-4 justify-center">
+                <TextInput
+                  autoCapitalize="none"
+                  className="text-sm text-gray-900"
+                  keyboardType="email-address"
+                  onChangeText={setEmail}
+                  placeholder="customer@email.com"
+                  placeholderTextColor="#9CA3AF"
+                  value={email}
+                />
+              </View>
+            </View>
+
+            {/* Phone Number */}
+            <View>
+              <Text className="mb-1.5 font-medium text-sm text-gray-700">
+                Phone Number
+              </Text>
+              <View className="h-13 rounded-2xl border border-gray-200 bg-white px-4 justify-center">
+                <TextInput
+                  className="text-sm text-gray-900"
+                  keyboardType="phone-pad"
+                  onChangeText={setPhone}
+                  placeholder="Enter phone number"
+                  placeholderTextColor="#9CA3AF"
+                  value={phone}
+                />
+              </View>
+            </View>
+          </View>
+
+          {/* Action Buttons */}
+          <View className="flex-row items-center gap-3 pt-2">
+            <Pressable
+              className="h-14 flex-1 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 active:bg-gray-100"
+              onPress={() => onOpenChange(false)}
+              disabled={isLoading}
+            >
+              <Text className="font-semibold text-base text-gray-700">
+                Cancel
+              </Text>
+            </Pressable>
+            <Pressable
+              className={`h-14 flex-1 items-center justify-center rounded-2xl ${
+                isLoading
+                  ? "bg-gray-400"
+                  : fullName.trim()
+                    ? "bg-[#FF9500] active:bg-[#e08300]"
+                    : "bg-gray-300"
+              }`}
+              onPress={handleCreate}
+              disabled={isLoading || !fullName.trim()}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#ffffff" size="small" />
+              ) : (
+                <Text className="font-bold text-base text-white">Create</Text>
+              )}
+            </Pressable>
+          </View>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog>
+  );
+}
+
+// Also need to import TextInput from react-native
+import { TextInput } from "react-native";
