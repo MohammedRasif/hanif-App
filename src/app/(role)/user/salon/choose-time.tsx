@@ -172,7 +172,7 @@ export default function ChooseTimeScreen() {
             />
           </Pressable>
           <Text className="flex-1 text-center pr-10 font-poppins-bold text-xl text-gray-900">
-            Choose a time
+            Choose a Time
           </Text>
         </View>
 
@@ -263,41 +263,51 @@ export default function ChooseTimeScreen() {
             </Text>
           </View>
         ) : (
-          <ScrollView
-            contentContainerStyle={{ gap: 13, paddingBottom: 60 }}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          >
-            {availableSlots.map((time) => {
-              const isSelected = selectedTime === time;
-              return (
-                <Pressable
-                  className={`rounded-full px-5 py-3 border ${
-                    isSelected
-                      ? "bg-black border-black"
-                      : "bg-gray-50 border-gray-100 active:bg-gray-100"
-                  }`}
-                  key={time}
-                  onPress={() => setSelectedTime(time)}
-                >
-                  <Text
-                    className={`font-poppins-semibold text-xs ${
-                      isSelected ? "text-white" : "text-gray-800"
-                    }`}
-                  >
-                    {formatDisplayTime(time)}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
+          <>
+            {availableSlots.length > 0 ? (
+              <ScrollView
+                contentContainerStyle={{ gap: 13, paddingBottom: 60 }}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+              >
+                {availableSlots.map((time) => {
+                  const isSelected = selectedTime === time;
+                  return (
+                    <Pressable
+                      className={`rounded-full max-h-11 px-5 py-3 border ${
+                        isSelected
+                          ? "bg-black border-black"
+                          : "bg-gray-50 border-gray-100 active:bg-gray-100"
+                      }`}
+                      key={time}
+                      onPress={() => setSelectedTime(time)}
+                    >
+                      <Text
+                        className={`font-poppins-semibold text-xs ${
+                          isSelected ? "text-white" : "text-gray-800"
+                        }`}
+                      >
+                        {formatDisplayTime(time)}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            ) : (
+              <View className="w-full mt-10 flex items-center">
+                <Text className="text-2xl text-orange-400 font-medium">
+                  No Available Time
+                </Text>
+              </View>
+            )}
+          </>
         )}
       </View>
 
       {/* Bottom Sticky Action Bar */}
       <View className="absolute bottom-0 left-0 right-0 border-t border-gray-100 bg-white px-6 py-4 flex-row items-center justify-end shadow-lg">
         <Pressable
-          className="w-full rounded-2xl bg-[#FE9A00] py-4 items-center active:opacity-90"
+          className="w-full rounded-2xl bg-main-primary py-4 items-center active:opacity-90"
           onPress={handleBookNow}
         >
           <Text className="font-poppins-semibold text-base text-white">

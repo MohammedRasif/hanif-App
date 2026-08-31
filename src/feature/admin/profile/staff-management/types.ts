@@ -8,7 +8,7 @@ export interface StaffMemberItem {
   name: string;
   phone: string;
   position?: string;
-  role: "manager" | "barber" | "Senior barber" | "Owner" | "Staff";
+  role: "admin" | "staff";
   services: string[];
 }
 

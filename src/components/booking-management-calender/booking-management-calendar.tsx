@@ -45,6 +45,7 @@ import {
   StaffFilterBottomSheet,
   StaffWorkingHoursPage,
 } from "./staff-filter-working-hours";
+import { getUserData } from "@/lib";
 
 export interface BookingManagementCalendarProps {
   initialDateStr?: string;
@@ -68,10 +69,13 @@ export function BookingManagementCalendar({
     "calendar",
   );
 
+  const user = getUserData();
+
+  console.log("the user:", user);
   // Active shop of the logged-in user drives the shop_id query param
   const { data: profileResponse, isLoading: isProfileLoading } =
     useGetProfileQuery();
-  const shopId = profileResponse?.data?.active_shop?.id;
+  const shopId = user.active_shop.id;
 
   // GET /v1/booking/?view_type=&shop_id=&date=&display_mode=calendar
   const {

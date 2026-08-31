@@ -44,7 +44,7 @@ export function AppointmentCard({
 
     return (
       <View
-        className={`rounded-full px-3.5 py-1 ${
+        className={`rounded-full px-3.5 py-1 mt-2 max-w-24 text-center ${
           isCancelled
             ? "bg-rose-50"
             : isCompleted
@@ -91,10 +91,9 @@ export function AppointmentCard({
             </View>
           </View>
         </View>
-
-        {getStatusBadge()}
       </View>
 
+      {getStatusBadge()}
       {/* Bottom Row: Service details & Date block */}
       <View className="mt-4 flex-row items-center justify-between">
         {/* Left: Service info and Optional 'Book Again' button */}
