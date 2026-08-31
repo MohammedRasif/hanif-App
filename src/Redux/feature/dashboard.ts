@@ -324,6 +324,56 @@ export const dashboardApi = baseApi.injectEndpoints({
       query: (shopId) => `v1/schedule/business-hours/${shopId}/`,
       providesTags: ["Shop"],
     }),
+
+    // 16. Get Staff Shifts: GET /v1/schedule/shifts/?barber={barberId}
+    getStaffShifts: builder.query<
+      {
+        success?: boolean;
+        details?: string;
+        code?: string;
+        status_code?: number;
+        data?: Array<{
+          id: number;
+          barber: number;
+          barber_name: string;
+          day_of_week: string;
+          shift_date: string | null;
+          start_time: string;
+          end_time: string;
+          is_active: boolean;
+        }>;
+      },
+      number | string
+    >({
+      query: (barberId) => `v1/schedule/shifts/?barber=${barberId}`,
+      providesTags: ["Shop"],
+    }),
+
+    // 17. Create / Update Staff Shift: POST /v1/schedule/shifts/
+    createStaffShift: builder.mutation<
+      {
+        success?: boolean;
+        status?: boolean;
+        details?: string;
+        code?: string;
+        data?: any;
+      },
+      {
+        barber: number | string;
+        day_of_week: string;
+        shift_date?: string | null;
+        start_time: string;
+        end_time: string;
+        is_active: boolean;
+      }
+    >({
+      query: (body) => ({
+        url: "v1/schedule/shifts/",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Dashboard", "Shop"],
+    }),
   }),
   overrideExisting: true,
 });
@@ -348,4 +398,6 @@ export const {
   useGetShopBarbersQuery,
   useCreateBusinessOffMutation,
   useGetBusinessHoursQuery,
+  useGetStaffShiftsQuery,
+  useCreateStaffShiftMutation,
 } = dashboardApi;
