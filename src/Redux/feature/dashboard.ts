@@ -269,7 +269,7 @@ export const dashboardApi = baseApi.injectEndpoints({
       },
       number | string
     >({
-      query: (shopId) => `v1/barbers/?shop_id=${shopId}`,
+      query: (shopId) => `v1/barbers/?shop_id=${shopId}/`,
       providesTags: ["Shop"],
     }),
     // 14. Create Business Days Off: POST /v1/schedule/business/off/
@@ -295,6 +295,33 @@ export const dashboardApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Dashboard", "Shop"],
     }),
+
+    // 15. Get Business Hours: GET /v1/schedule/business-hours/{shop_id}/
+    getBusinessHours: builder.query<
+      {
+        success?: boolean;
+        details?: string;
+        code?: string;
+        status_code?: number;
+        data?: Array<{
+          id: number;
+          shop: number;
+          day_of_week: string;
+          open_time: string | null;
+          close_time: string | null;
+          is_closed: boolean;
+          breaks?: Array<{
+            id: number;
+            start_time: string;
+            end_time: string;
+          }>;
+        }>;
+      },
+      number | string
+    >({
+      query: (shopId) => `v1/schedule/business-hours/${shopId}/`,
+      providesTags: ["Shop"],
+    }),
   }),
   overrideExisting: true,
 });
@@ -318,4 +345,5 @@ export const {
   useCreateStaffTimeOffMutation,
   useGetShopBarbersQuery,
   useCreateBusinessOffMutation,
+  useGetBusinessHoursQuery,
 } = dashboardApi;

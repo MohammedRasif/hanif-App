@@ -1,6 +1,9 @@
 import { StyledIcons } from "@/lib";
 import { getUserData } from "@/lib/storage";
-import { useUpdateBusinessHoursDateMutation } from "@/Redux/feature/dashboard";
+import {
+  useGetBusinessHoursQuery,
+  useUpdateBusinessHoursDateMutation,
+} from "@/Redux/feature/dashboard";
 import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -96,6 +99,19 @@ interface BusinessHoursViewProps {
   selectedDate?: string;
 }
 
+function formatDisplayTime(timeStr?: string | null): string {
+  if (!timeStr) return "";
+  const parts = timeStr.split(":");
+  if (parts.length < 2 || !parts[0]) return timeStr;
+  let hours = parseInt(parts[0], 10);
+  const minutes = parts[1];
+  const ampm = hours >= 12 ? "pm" : "am";
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  const strHours = hours < 10 ? `0${hours}` : `${hours}`;
+  return `${strHours}:${minutes} ${ampm}`;
+}
+
 function convertTo24Hour(timeStr?: string): string {
   if (!timeStr) return "09:00:00";
   const trimmed = timeStr.trim().toLowerCase();
@@ -124,13 +140,82 @@ export function BusinessHoursView({
   selectedDate,
 }: BusinessHoursViewProps) {
   const userData = useMemo(() => getUserData(), []);
-  const shopId = userData?.shops?.[0]?.id || 7;
+  const shopId = userData?.shops?.[0]?.id || 9;
+
+  // 📡 GET /v1/schedule/business-hours/{shopId}/
+  const { data: businessHoursResponse, isLoading } = useGetBusinessHoursQuery(
+    shopId,
+    { refetchOnMountOrArgChange: true },
+  );
 
   const [updateBusinessHours, { isLoading: isUpdating }] =
     useUpdateBusinessHoursDateMutation();
 
-  const [scheduleList, setScheduleList] =
-    useState<DayScheduleItem[]>(MOCK_BUSINESS_HOURS);
+  const scheduleList = useMemo<DayScheduleItem[]>(() => {
+    if (
+      Array.isArray(businessHoursResponse?.data) &&
+      businessHoursResponse.data.length > 0
+    ) {
+      const dayOrder = [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
+      ];
+
+      const itemsMap = new Map<string, DayScheduleItem>();
+      businessHoursResponse.data.forEach((item) => {
+        const dayKey = item.day_of_week?.toLowerCase();
+        const dayCapitalized =
+          item.day_of_week.charAt(0).toUpperCase() +
+          item.day_of_week.slice(1).toLowerCase();
+
+        const isClosed = item.is_closed || !item.open_time || !item.close_time;
+        const openFormatted = formatDisplayTime(item.open_time);
+        const closeFormatted = formatDisplayTime(item.close_time);
+        const hoursText = isClosed
+          ? "Closed"
+          : `${openFormatted} – ${closeFormatted}`;
+
+        let breakText: string | undefined;
+        if (Array.isArray(item.breaks) && item.breaks.length > 0) {
+          const firstBreak = item.breaks[0];
+          if (firstBreak?.start_time && firstBreak?.end_time) {
+            breakText = `Break: ${formatDisplayTime(
+              firstBreak.start_time,
+            )} - ${formatDisplayTime(firstBreak.end_time)}`;
+          }
+        }
+
+        itemsMap.set(dayKey, {
+          day: dayCapitalized,
+          hours: hoursText,
+          isClosed,
+          breakHours: breakText,
+        });
+      });
+
+      const sortedList: DayScheduleItem[] = [];
+      dayOrder.forEach((dKey) => {
+        if (itemsMap.has(dKey)) {
+          sortedList.push(itemsMap.get(dKey)!);
+        }
+      });
+
+      itemsMap.forEach((val, key) => {
+        if (!dayOrder.includes(key)) {
+          sortedList.push(val);
+        }
+      });
+
+      return sortedList;
+    }
+
+    return MOCK_BUSINESS_HOURS;
+  }, [businessHoursResponse]);
 
   const [selectedDayItem, setSelectedDayItem] =
     useState<DayScheduleItem | null>(null);
@@ -212,32 +297,6 @@ export function BusinessHoursView({
         text: res.details || "Shop date hours updated successfully.",
       });
 
-      if (selectedDayItem) {
-        setScheduleList((prev) =>
-          prev.map((item) => {
-            if (item.day === selectedDayItem.day) {
-              if (!isDayEnabled) {
-                return {
-                  ...item,
-                  hours: "Closed",
-                  isClosed: true,
-                  breakHours: undefined,
-                };
-              }
-              return {
-                ...item,
-                hours: `${startTime} – ${endTime}`,
-                isClosed: false,
-                breakHours: hasBreak
-                  ? `Break: ${breakStartTime} - ${breakEndTime}`
-                  : undefined,
-              };
-            }
-            return item;
-          }),
-        );
-      }
-
       setTimeout(() => {
         setIsModalOpen(false);
         setSelectedDayItem(null);
@@ -273,43 +332,49 @@ export function BusinessHoursView({
         <View className="w-10" />
       </View>
 
-      <ScrollView
-        className="flex-1 px-6 pt-2"
-        contentContainerStyle={{ paddingBottom: 40 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {scheduleList.map((item) => (
-          <Pressable
-            className="mb-3.5 flex-row items-center justify-between rounded-3xl bg-[#F8F9FA] p-4.5 active:bg-gray-100"
-            key={item.day}
-            onPress={() => handleOpenEditModal(item)}
-          >
-            <View>
-              <Text className="font-bold text-base text-gray-900">
-                {item.day}
-              </Text>
-              <Text
-                className={`font-medium text-xs mt-0.5 ${
-                  item.isClosed ? "text-gray-400" : "text-gray-500"
-                }`}
-              >
-                {item.hours}
-              </Text>
-              {item.breakHours && (
-                <Text className="font-medium text-xs text-gray-400 mt-0.5">
-                  {item.breakHours}
+      {isLoading ? (
+        <View className="py-16 items-center justify-center">
+          <ActivityIndicator color="#FF9500" size="large" />
+        </View>
+      ) : (
+        <ScrollView
+          className="flex-1 px-6 pt-2"
+          contentContainerStyle={{ paddingBottom: 40 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {scheduleList.map((item) => (
+            <Pressable
+              className="mb-3.5 flex-row items-center justify-between rounded-3xl bg-[#F8F9FA] p-4.5 active:bg-gray-100"
+              key={item.day}
+              onPress={() => handleOpenEditModal(item)}
+            >
+              <View>
+                <Text className="font-bold text-base text-gray-900">
+                  {item.day}
                 </Text>
-              )}
-            </View>
+                <Text
+                  className={`font-medium text-xs mt-0.5 ${
+                    item.isClosed ? "text-gray-400" : "text-gray-500"
+                  }`}
+                >
+                  {item.hours}
+                </Text>
+                {item.breakHours && (
+                  <Text className="font-medium text-xs text-gray-400 mt-0.5">
+                    {item.breakHours}
+                  </Text>
+                )}
+              </View>
 
-            <StyledIcons
-              className="text-gray-900"
-              name="chevron-forward"
-              size={18}
-            />
-          </Pressable>
-        ))}
-      </ScrollView>
+              <StyledIcons
+                className="text-gray-900"
+                name="chevron-forward"
+                size={18}
+              />
+            </Pressable>
+          ))}
+        </ScrollView>
+      )}
 
       <Modal
         animationType="fade"

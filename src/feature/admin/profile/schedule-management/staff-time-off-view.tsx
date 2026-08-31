@@ -1,6 +1,10 @@
 import triggerIcon from "@/assets/calender-trigger.png";
 import { StyledIcons } from "@/lib";
-import { useUpdateBarberScheduleMutation } from "@/Redux/feature/dashboard";
+import { getUserData } from "@/lib/storage";
+import {
+  useCreateStaffTimeOffMutation,
+  useGetOpeningCalendarQuery,
+} from "@/Redux/feature/dashboard";
 import { Image } from "expo-image";
 import React, { useMemo, useState } from "react";
 import {
@@ -16,11 +20,21 @@ import {
 } from "react-native";
 
 export interface StaffTimeOffItem {
-  avatarUrl?: string;
-  id: string;
+  avatarUrl?: string | null;
+  end_date?: string;
+  id: string | number;
   name: string;
+  reason?: string;
   role?: string;
-  subtitle: string;
+  start_date?: string;
+  subtitle?: string;
+  timeOffRecords?: Array<{
+    date: string;
+    end_date?: string;
+    id: string;
+    reason: string;
+    start_date?: string;
+  }>;
 }
 
 interface StaffTimeOffViewProps {
@@ -32,33 +46,8 @@ interface StaffTimeOffViewProps {
   selectedDate?: string;
 }
 
-const DEFAULT_STAFF_TIME_OFF_LIST: StaffTimeOffItem[] = [
-  {
-    id: "1",
-    name: "isaac",
-    role: "manager",
-    subtitle: "Today",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-  },
-  {
-    id: "2",
-    name: "isaac",
-    role: "manager",
-    subtitle: "Today",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
-  },
-];
-
-const MOCK_STAFF_OPTIONS = [
-  "Isaac",
-  "Alex (Senior barber)",
-  "Sarah (Stylist)",
-  "Jhon (barber)",
-];
-
 const MOCK_REASON_OPTIONS = [
+  "Personal appointment",
   "Sick day",
   "Vacation",
   "Personal emergency",
@@ -96,53 +85,117 @@ export function StaffTimeOffView({
   liveTimeOff,
   selectedDate,
 }: StaffTimeOffViewProps) {
-  const [updateBarberSchedule, { isLoading: isUpdating }] =
-    useUpdateBarberScheduleMutation();
+  const userData = useMemo(() => getUserData(), []);
+  const shopId = userData?.shops?.[0]?.id || 9;
+
+  const todayStr = useMemo(() => formatDateISO(new Date()), []);
+  const targetDateStr = selectedDate || todayStr;
+
+  // 📡 Query opening calendar API: GET /v1/schedule/opening-calendar/?shop={shopId}&date={targetDateStr}
+  const { data: calendarResponse, isLoading } = useGetOpeningCalendarQuery(
+    { shop: shopId, date: targetDateStr },
+    { refetchOnMountOrArgChange: true },
+  );
+
+  const [createStaffTimeOff, { isLoading: isCreating }] =
+    useCreateStaffTimeOffMutation();
 
   const [feedbackMessage, setFeedbackMessage] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
 
-  const initialTimeOffList = React.useMemo(() => {
-    if (liveTimeOff !== undefined && liveTimeOff !== null) {
-      if (Array.isArray(liveTimeOff) && liveTimeOff.length > 0) {
-        return liveTimeOff.map((item: any, idx: number) => {
-          const staffName = item.staff?.name || `Staff ${idx + 1}`;
-          const reasonStr = item.reason || "Time off";
-          const dateSub =
-            item.start_date === item.end_date
-              ? `${reasonStr} (${item.start_date})`
-              : `${reasonStr} (${item.start_date} - ${item.end_date})`;
-          return {
-            id: String(item.staff?.id || idx + 1),
-            name: staffName,
-            role: "Staff Member",
-            subtitle: dateSub,
-            avatarUrl:
-              item.staff?.image ||
-              "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-          };
-        });
-      }
-      return [];
+  const timeOffList = useMemo<StaffTimeOffItem[]>(() => {
+    const rawList = calendarResponse?.data?.staff_time_off || liveTimeOff || [];
+    if (Array.isArray(rawList) && rawList.length > 0) {
+      return rawList.map((item: any, idx: number) => {
+        const staff = item.staff || {};
+        const staffName = staff.name || `Staff ${idx + 1}`;
+        const staffRole = staff.role || "barber";
+        const reasonStr = item.reason || "Personal appointment";
+        const startDate = item.start_date || targetDateStr;
+        const endDate = item.end_date || targetDateStr;
+        const dateSub =
+          startDate === endDate ? startDate : `${startDate} - ${endDate}`;
+
+        return {
+          id: staff.id || idx + 1,
+          name: staffName,
+          role: staffRole,
+          subtitle: staffRole,
+          reason: reasonStr,
+          avatarUrl: staff.image || null,
+          start_date: startDate,
+          end_date: endDate,
+          timeOffRecords: [
+            {
+              id: `${staff.id}-${startDate}-${idx}`,
+              reason: reasonStr,
+              date: dateSub,
+              start_date: startDate,
+              end_date: endDate,
+            },
+          ],
+        };
+      });
     }
-    return DEFAULT_STAFF_TIME_OFF_LIST;
-  }, [liveTimeOff]);
+    return [];
+  }, [calendarResponse, liveTimeOff, targetDateStr]);
 
-  const [timeOffList, setTimeOffList] =
-    React.useState<StaffTimeOffItem[]>(initialTimeOffList);
+  const availableBarbers = useMemo(() => {
+    const list: Array<{ id: number | string; name: string }> = [];
+    const addedIds = new Set();
 
-  React.useEffect(() => {
-    setTimeOffList(initialTimeOffList);
-  }, [initialTimeOffList]);
+    if (Array.isArray(calendarResponse?.data?.staff_shifts)) {
+      calendarResponse.data.staff_shifts.forEach((s: any) => {
+        if (s.staff?.id && !addedIds.has(s.staff.id)) {
+          addedIds.add(s.staff.id);
+          list.push({ id: s.staff.id, name: s.staff.name });
+        }
+      });
+    }
+
+    if (Array.isArray(calendarResponse?.data?.staff_time_off)) {
+      calendarResponse.data.staff_time_off.forEach((t: any) => {
+        if (t.staff?.id && !addedIds.has(t.staff.id)) {
+          addedIds.add(t.staff.id);
+          list.push({ id: t.staff.id, name: t.staff.name });
+        }
+      });
+    }
+
+    if (list.length === 0) {
+      return [
+        { id: 14, name: "Rasif" },
+        { id: 13, name: "Passa" },
+        { id: 12, name: "Test Barber" },
+      ];
+    }
+
+    return list;
+  }, [calendarResponse]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const todayStr = useMemo(() => formatDateISO(new Date()), []);
+  // Modal form states for Add Time Off
+  const [selectedStaff, setSelectedStaff] = useState<string>(
+    availableBarbers[0]?.name || "Passa",
+  );
+  const [selectedBarberId, setSelectedBarberId] = useState<number | string>(
+    availableBarbers[0]?.id || 13,
+  );
 
-  // Modal form states
-  const [selectedStaff, setSelectedStaff] = useState("Isaac");
+  React.useEffect(() => {
+    if (
+      availableBarbers.length > 0 &&
+      availableBarbers[0] &&
+      !selectedBarberId
+    ) {
+      setSelectedBarberId(availableBarbers[0].id);
+      setSelectedStaff(availableBarbers[0].name);
+    }
+  }, [availableBarbers, selectedBarberId]);
+
   const [selectedReason, setSelectedReason] = useState("Reason");
   const [isAllDay, setIsAllDay] = useState(true);
   const [startDate, setStartDate] = useState(todayStr);
@@ -163,82 +216,49 @@ export function StaffTimeOffView({
     new Date().getMonth(),
   );
 
-  const [selectedStaffItem, setSelectedStaffItem] =
-    useState<StaffTimeOffItem | null>(null);
-
   const handleOpenCalendar = (target: "start" | "end") => {
     setCalendarTarget(target);
     setIsCalendarOpen(true);
   };
 
   const handleRowClick = (item: StaffTimeOffItem) => {
-    setSelectedStaffItem(item);
     if (onSelectStaff) {
       onSelectStaff(item);
     } else if (onSelectTimeOff) {
       onSelectTimeOff(item);
     }
-    setSelectedStaff(item.name || "Isaac");
-    setFeedbackMessage(null);
-    setIsModalOpen(true);
   };
 
   const handleFabClick = () => {
     if (onAddNewTimeOff) {
       onAddNewTimeOff();
+    } else {
+      setSelectedReason("Reason");
+      setStartDate(todayStr);
+      setEndDate(todayStr);
+      setIsAllDay(true);
+      setFeedbackMessage(null);
+      setIsModalOpen(true);
     }
-    setFeedbackMessage(null);
-    setIsModalOpen(true);
   };
 
   const handleSaveModal = async () => {
     setFeedbackMessage(null);
-    const targetDate = selectedDate || todayStr;
-    const barberId = Number(selectedStaffItem?.id || 8);
-
-    const breaksPayload = [
-      {
-        start_time: "13:00:00",
-        end_time: "13:30:00",
-        title: "Lunch Break",
-      },
-      {
-        start_time: "16:00:00",
-        end_time: "16:15:00",
-        title: "Short Break",
-      },
-    ];
-
-    const timeOffPayload = [
-      {
+    try {
+      const payload = {
+        barber: Number(selectedBarberId),
         start_date: startDate,
         end_date: endDate,
         is_full_day: isAllDay,
-        start_time: isAllDay ? undefined : "17:00:00",
-        end_time: isAllDay ? undefined : "18:00:00",
         reason:
           selectedReason !== "Reason" ? selectedReason : "Personal appointment",
-      },
-    ];
-
-    try {
-      const payload = {
-        barber: barberId,
-        date: targetDate,
-        shift: {
-          start_time: "09:00:00",
-          end_time: "19:00:00",
-          is_off: false,
-        },
-        breaks: breaksPayload,
-        time_off: timeOffPayload,
       };
 
-      const res = await updateBarberSchedule(payload).unwrap();
+      const res = await createStaffTimeOff(payload).unwrap();
 
       setFeedbackMessage({
         type: "success",
-        text: res.details || "Barber schedule time off updated successfully.",
+        text: res.details || "Staff member time off added successfully.",
       });
 
       setTimeout(() => {
@@ -249,7 +269,7 @@ export function StaffTimeOffView({
       const errorText =
         err?.data?.details ||
         err?.data?.message ||
-        "Failed to update time off schedule.";
+        "Failed to create staff time off.";
       setFeedbackMessage({ type: "error", text: errorText });
     }
   };
@@ -280,7 +300,7 @@ export function StaffTimeOffView({
         </Pressable>
 
         <Text className="font-bold text-xl text-gray-900 tracking-tight">
-          Time off Today
+          Staff member time off
         </Text>
 
         <View className="w-10" />
@@ -288,60 +308,66 @@ export function StaffTimeOffView({
 
       {/* Main List */}
       <View className="flex-1 px-6 pt-2">
-        <FlatList
-          contentContainerStyle={{ paddingBottom: 100 }}
-          data={timeOffList}
-          keyExtractor={(item) => item.id}
-          ListEmptyComponent={
-            <View className="py-16 items-center justify-center">
-              <Text className="font-medium text-sm text-gray-400">
-                No staff member time off for this date
-              </Text>
-            </View>
-          }
-          renderItem={({ item }) => (
-            <Pressable
-              className="mb-3.5 flex-row items-center justify-between rounded-3xl bg-[#F8F9FA] p-4.5 active:bg-gray-100"
-              onPress={() => handleRowClick(item)}
-            >
-              {/* Left Side: Avatar + Name + Subtitle */}
-              <View className="flex-row items-center gap-3.5">
-                {item.avatarUrl ? (
-                  <Image
-                    className="h-12 w-12 rounded-full bg-gray-200"
-                    contentFit="cover"
-                    source={{ uri: item.avatarUrl }}
-                  />
-                ) : (
-                  <View className="h-12 w-12 items-center justify-center rounded-full bg-gray-200">
-                    <StyledIcons
-                      className="text-gray-900"
-                      name="person"
-                      size={22}
-                    />
-                  </View>
-                )}
-
-                <View>
-                  <Text className="font-bold text-base text-gray-900">
-                    {item.name}
-                  </Text>
-                  <Text className="font-medium text-xs text-gray-400 mt-0.5">
-                    {item.subtitle}
-                  </Text>
-                </View>
+        {isLoading ? (
+          <View className="py-16 items-center justify-center">
+            <ActivityIndicator color="#FF9500" size="large" />
+          </View>
+        ) : (
+          <FlatList
+            contentContainerStyle={{ paddingBottom: 100 }}
+            data={timeOffList}
+            keyExtractor={(item, index) => `${item.id}-${index}`}
+            ListEmptyComponent={
+              <View className="py-16 items-center justify-center">
+                <Text className="font-medium text-sm text-gray-400">
+                  No staff member time off found
+                </Text>
               </View>
+            }
+            renderItem={({ item }) => (
+              <Pressable
+                className="mb-3.5 flex-row items-center justify-between rounded-3xl bg-[#F8F9FA] p-4.5 active:bg-gray-100"
+                onPress={() => handleRowClick(item)}
+              >
+                {/* Left Side: Avatar + Name + Subtitle/Role */}
+                <View className="flex-row items-center gap-3.5">
+                  {item.avatarUrl ? (
+                    <Image
+                      className="h-12 w-12 rounded-full bg-gray-200"
+                      contentFit="cover"
+                      source={{ uri: item.avatarUrl }}
+                    />
+                  ) : (
+                    <View className="h-12 w-12 items-center justify-center rounded-full bg-gray-200">
+                      <StyledIcons
+                        className="text-gray-900"
+                        name="person"
+                        size={22}
+                      />
+                    </View>
+                  )}
 
-              {/* Right Side: Chevron */}
-              <StyledIcons
-                className="text-gray-900"
-                name="chevron-forward"
-                size={18}
-              />
-            </Pressable>
-          )}
-          showsVerticalScrollIndicator={false}
-        />
+                  <View>
+                    <Text className="font-bold text-base text-gray-900">
+                      {item.name}
+                    </Text>
+                    <Text className="font-medium text-xs text-gray-400 mt-0.5">
+                      {item.role || item.subtitle || "barber"}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Right Side: Chevron */}
+                <StyledIcons
+                  className="text-gray-900"
+                  name="chevron-forward"
+                  size={18}
+                />
+              </Pressable>
+            )}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
       </View>
 
       {/* Floating Action Button (FAB) */}
@@ -469,7 +495,7 @@ export function StaffTimeOffView({
                 </Text>
               </Pressable>
 
-              {/* Date Range Section - Opens Calendar Directly */}
+              {/* Date Range Section */}
               <View className="mb-5 flex-row items-center justify-between gap-3">
                 <View className="flex-1">
                   <Text className="mb-1.5 font-medium text-sm text-gray-700">
@@ -543,10 +569,10 @@ export function StaffTimeOffView({
               {/* Save Button */}
               <Pressable
                 className="h-14 w-full items-center justify-center rounded-2xl bg-[#FF9500] active:bg-[#e08300]"
-                disabled={isUpdating}
+                disabled={isCreating}
                 onPress={handleSaveModal}
               >
-                {isUpdating ? (
+                {isCreating ? (
                   <ActivityIndicator color="#FFFFFF" size="small" />
                 ) : (
                   <Text className="font-bold text-base text-white">Save</Text>
@@ -569,27 +595,28 @@ export function StaffTimeOffView({
             <Text className="mb-3 font-bold text-xl text-gray-900">
               Select Staff Member
             </Text>
-            {MOCK_STAFF_OPTIONS.map((name) => (
+            {availableBarbers.map((b) => (
               <Pressable
                 className={`py-3 px-4 mb-1.5 rounded-xl flex-row items-center justify-between ${
-                  selectedStaff === name
+                  selectedBarberId === b.id
                     ? "bg-amber-500/10"
                     : "active:bg-gray-100"
                 }`}
-                key={name}
+                key={b.id}
                 onPress={() => {
-                  setSelectedStaff(name);
+                  setSelectedStaff(b.name);
+                  setSelectedBarberId(b.id);
                   setIsStaffPickerOpen(false);
                 }}
               >
                 <Text
                   className={`font-semibold text-base ${
-                    selectedStaff === name
+                    selectedBarberId === b.id
                       ? "text-[#FF9500] font-bold"
                       : "text-gray-900"
                   }`}
                 >
-                  {name}
+                  {b.name}
                 </Text>
               </Pressable>
             ))}

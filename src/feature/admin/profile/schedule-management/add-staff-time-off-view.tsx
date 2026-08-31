@@ -1,8 +1,8 @@
 import { StyledIcons } from "@/lib";
 import { getUserData } from "@/lib/storage";
 import {
+  useCreateStaffTimeOffMutation,
   useGetShopBarbersQuery,
-  useUpdateBarberScheduleMutation,
 } from "@/Redux/feature/dashboard";
 import React, { useMemo, useState } from "react";
 import {
@@ -69,27 +69,6 @@ function formatDateISO(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
-function convertTo24Hour(timeStr: string): string {
-  if (!timeStr) return "09:00:00";
-  const trimmed = timeStr.trim().toLowerCase();
-  const isPm = trimmed.includes("pm");
-  const isAm = trimmed.includes("am");
-  const clean = trimmed.replace(/(am|pm)/g, "").trim();
-  const parts = clean.split(":");
-  if (parts.length === 0 || !parts[0]) return "09:00:00";
-
-  let hours = parseInt(parts[0], 10) || 0;
-  const minutes = parseInt(parts[1] || "0", 10) || 0;
-
-  if (isPm && hours < 12) hours += 12;
-  if (isAm && hours === 12) hours = 0;
-
-  const hStr = String(hours).padStart(2, "0");
-  const mStr = String(minutes).padStart(2, "0");
-
-  return `${hStr}:${mStr}:00`;
-}
-
 export function AddStaffTimeOffView({
   onBack,
   onSave,
@@ -109,9 +88,9 @@ export function AddStaffTimeOffView({
     ];
   }, [barbersResponse]);
 
-  // 📡 PUT /v1/schedule/barber-schedule/
-  const [updateBarberSchedule, { isLoading: isCreating }] =
-    useUpdateBarberScheduleMutation();
+  // 📡 POST /v1/schedule/time-off/
+  const [createStaffTimeOff, { isLoading: isCreating }] =
+    useCreateStaffTimeOffMutation();
 
   // Form State
   const [selectedBarberId, setSelectedBarberId] = useState<number | string>(
@@ -179,50 +158,24 @@ export function AddStaffTimeOffView({
 
     const payload = {
       barber: barberId,
-      date: sDateStr,
-      shift: {
-        start_time: "09:00:00",
-        end_time: "19:00:00",
-        is_off: false,
-      },
-      breaks: [
-        {
-          start_time: "13:00:00",
-          end_time: "13:30:00",
-          title: "Lunch Break",
-        },
-        {
-          start_time: "16:00:00",
-          end_time: "16:15:00",
-          title: "Short Break",
-        },
-      ],
-      time_off: [
-        {
-          start_date: sDateStr,
-          end_date: eDateStr,
-          is_full_day: isAllDay,
-          start_time: isAllDay ? undefined : convertTo24Hour(startTime),
-          end_time: isAllDay ? undefined : convertTo24Hour(endTime),
-          reason:
-            selectedReason !== "Reason"
-              ? selectedReason
-              : "Personal appointment",
-        },
-      ],
+      start_date: sDateStr,
+      end_date: eDateStr,
+      is_full_day: isAllDay,
+      reason:
+        selectedReason !== "Reason" ? selectedReason : "Personal appointment",
     };
 
     try {
       console.log(
-        "▶️ Hitting PUT /api/v1/schedule/barber-schedule/ Payload:",
+        "▶️ Hitting POST /v1/schedule/time-off/ Payload:",
         JSON.stringify(payload, null, 2),
       );
 
-      // 📡 PUT /api/v1/schedule/barber-schedule/
-      const res = await updateBarberSchedule(payload).unwrap();
+      // 📡 POST /v1/schedule/time-off/
+      const res = await createStaffTimeOff(payload).unwrap();
 
       console.log(
-        "✅ Success Response PUT /api/v1/schedule/barber-schedule/:",
+        "✅ Success Response POST /v1/schedule/time-off/:",
         JSON.stringify(res, null, 2),
       );
 
@@ -238,7 +191,7 @@ export function AddStaffTimeOffView({
       }, 1200);
     } catch (err: any) {
       console.log(
-        "❌ Error Response PUT /api/v1/schedule/barber-schedule/:",
+        "❌ Error Response POST /v1/schedule/time-off/:",
         JSON.stringify(err, null, 2),
       );
       const errorText =

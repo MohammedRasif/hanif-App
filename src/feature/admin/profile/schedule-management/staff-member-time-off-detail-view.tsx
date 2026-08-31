@@ -1,7 +1,9 @@
 import { StyledIcons } from "@/lib";
+import { useCreateStaffTimeOffMutation } from "@/Redux/feature/dashboard";
 import { Image } from "expo-image";
 import React, { useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   KeyboardAvoidingView,
   Modal,
@@ -14,34 +16,28 @@ import {
 
 export interface TimeOffRecord {
   date: string;
+  end_date?: string;
   id: string;
   reason: string;
+  start_date?: string;
 }
 
 export interface StaffMemberTimeOffDetailProps {
   onBack: () => void;
   staff?: {
-    avatarUrl?: string;
-    id: string;
+    avatarUrl?: string | null;
+    end_date?: string;
+    id: string | number;
     name: string;
+    reason?: string;
     role?: string;
+    start_date?: string;
+    timeOffRecords?: TimeOffRecord[];
   };
 }
 
-const DEFAULT_TIME_OFF_RECORDS: TimeOffRecord[] = [
-  {
-    id: "1",
-    reason: "Sick day",
-    date: "10 march 2026",
-  },
-  {
-    id: "2",
-    reason: "Vacation",
-    date: "10 march 2026",
-  },
-];
-
 const MOCK_REASON_OPTIONS = [
+  "Personal appointment",
   "Sick day",
   "Vacation",
   "Personal emergency",
@@ -71,22 +67,95 @@ function formatDateISO(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
+function formatDisplayDate(dateStr?: string): string {
+  if (!dateStr) return "";
+  if (dateStr.includes(" - ")) {
+    const [start, end] = dateStr.split(" - ");
+    return `${formatDisplayDate(start)} - ${formatDisplayDate(end)}`;
+  }
+  const parts = dateStr.split("-");
+  if (parts.length === 3) {
+    const year = parts[0];
+    const monthIdx = parseInt(parts[1] || "1", 10) - 1;
+    const dayStr = String(parseInt(parts[2] || "1", 10)).padStart(2, "0");
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    if (monthIdx >= 0 && monthIdx < 12) {
+      return `${dayStr} ${monthNames[monthIdx]} ${year}`;
+    }
+  }
+  return dateStr;
+}
+
 export function StaffMemberTimeOffDetailView({
   onBack,
   staff = {
-    id: "1",
-    name: "Isaac",
-    role: "manager",
+    id: 13,
+    name: "Passa",
+    role: "barber",
   },
 }: StaffMemberTimeOffDetailProps) {
-  const [records, setRecords] = useState<TimeOffRecord[]>(
-    DEFAULT_TIME_OFF_RECORDS,
-  );
+  const initialRecords = useMemo<TimeOffRecord[]>(() => {
+    if (
+      Array.isArray(staff.timeOffRecords) &&
+      staff.timeOffRecords.length > 0
+    ) {
+      return staff.timeOffRecords;
+    }
+    if (staff.reason || staff.start_date) {
+      const sDate = staff.start_date || formatDateISO(new Date());
+      const eDate = staff.end_date || sDate;
+      const dateStr = sDate === eDate ? sDate : `${sDate} - ${eDate}`;
+      return [
+        {
+          id: `init-${staff.id}`,
+          reason: staff.reason || "Personal appointment",
+          date: dateStr,
+          start_date: sDate,
+          end_date: eDate,
+        },
+      ];
+    }
+    return [
+      {
+        id: "1",
+        reason: "Personal appointment",
+        date: formatDateISO(new Date()),
+      },
+    ];
+  }, [staff]);
+
+  const [records, setRecords] = useState<TimeOffRecord[]>(initialRecords);
+
+  React.useEffect(() => {
+    setRecords(initialRecords);
+  }, [initialRecords]);
+
+  const [createStaffTimeOff, { isLoading: isCreating }] =
+    useCreateStaffTimeOffMutation();
+
+  const [feedbackMessage, setFeedbackMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const todayStr = useMemo(() => formatDateISO(new Date()), []);
 
-  // Modal form states
+  // Modal form states (reset to empty when opening)
   const [selectedReason, setSelectedReason] = useState("Reason");
   const [isAllDay, setIsAllDay] = useState(true);
   const [startDate, setStartDate] = useState(todayStr);
@@ -106,23 +175,66 @@ export function StaffMemberTimeOffDetailView({
     new Date().getMonth(),
   );
 
+  const handleOpenAddModal = () => {
+    // Reset all form fields so no pre-filled data remains when opening modal
+    setSelectedReason("Reason");
+    setIsAllDay(true);
+    setStartDate(todayStr);
+    setEndDate(todayStr);
+    setIsApproved(false);
+    setFeedbackMessage(null);
+    setIsModalOpen(true);
+  };
+
   const handleOpenCalendar = (target: "start" | "end") => {
     setCalendarTarget(target);
     setIsCalendarOpen(true);
   };
 
-  const handleSaveModal = () => {
-    if (selectedReason !== "Reason") {
-      setRecords((prev) => [
-        {
-          id: String(Date.now()),
-          date: startDate,
-          reason: selectedReason,
-        },
-        ...prev,
-      ]);
+  const handleSaveModal = async () => {
+    setFeedbackMessage(null);
+    const reasonText =
+      selectedReason !== "Reason" ? selectedReason : "Personal appointment";
+    const barberId =
+      typeof staff.id === "number" ? staff.id : Number(staff.id) || staff.id;
+
+    try {
+      const payload = {
+        barber: barberId,
+        start_date: startDate,
+        end_date: endDate,
+        is_full_day: isAllDay,
+        reason: reasonText,
+      };
+
+      const res = await createStaffTimeOff(payload).unwrap();
+
+      const newRecord: TimeOffRecord = {
+        id: String(Date.now()),
+        reason: reasonText,
+        date: startDate === endDate ? startDate : `${startDate} - ${endDate}`,
+        start_date: startDate,
+        end_date: endDate,
+      };
+
+      setRecords((prev) => [newRecord, ...prev]);
+
+      setFeedbackMessage({
+        type: "success",
+        text: res.details || "Staff time off added successfully.",
+      });
+
+      setTimeout(() => {
+        setIsModalOpen(false);
+        setFeedbackMessage(null);
+      }, 1200);
+    } catch (err: any) {
+      const errorText =
+        err?.data?.details ||
+        err?.data?.message ||
+        "Failed to add staff time off.";
+      setFeedbackMessage({ type: "error", text: errorText });
     }
-    setIsModalOpen(false);
   };
 
   // Calendar days grid calculation
@@ -177,7 +289,7 @@ export function StaffMemberTimeOffDetailView({
               {staff.name}
             </Text>
             <Text className="font-medium text-sm text-gray-400 mt-0.5">
-              {staff.role || "Staff Member"}
+              {staff.role || "barber"}
             </Text>
           </View>
         </View>
@@ -188,7 +300,7 @@ export function StaffMemberTimeOffDetailView({
         <Text className="font-bold text-lg text-gray-900">Time off</Text>
         <Pressable
           className="rounded-full bg-black px-4 py-2 active:bg-gray-800"
-          onPress={() => setIsModalOpen(true)}
+          onPress={handleOpenAddModal}
         >
           <Text className="font-semibold text-xs text-white">Add time off</Text>
         </Pressable>
@@ -199,7 +311,7 @@ export function StaffMemberTimeOffDetailView({
         <FlatList
           contentContainerStyle={{ paddingBottom: 40 }}
           data={records}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, idx) => `${item.id}-${idx}`}
           ListEmptyComponent={
             <View className="py-16 items-center justify-center">
               <Text className="font-medium text-sm text-gray-400">
@@ -213,7 +325,7 @@ export function StaffMemberTimeOffDetailView({
                 {item.reason}
               </Text>
               <Text className="font-medium text-sm text-gray-500">
-                {item.date}
+                {formatDisplayDate(item.date)}
               </Text>
             </View>
           )}
@@ -239,6 +351,27 @@ export function StaffMemberTimeOffDetailView({
             showsVerticalScrollIndicator={false}
           >
             <View className="w-full rounded-4xl bg-white p-6 shadow-2xl my-6">
+              {/* Feedback Banner */}
+              {feedbackMessage && (
+                <View
+                  className={`mb-4 rounded-2xl p-3 ${
+                    feedbackMessage.type === "success"
+                      ? "bg-emerald-50 border border-emerald-200"
+                      : "bg-red-50 border border-red-200"
+                  }`}
+                >
+                  <Text
+                    className={`text-xs font-semibold text-center ${
+                      feedbackMessage.type === "success"
+                        ? "text-emerald-700"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {feedbackMessage.text}
+                  </Text>
+                </View>
+              )}
+
               {/* Modal Title */}
               <Text className="font-bold text-xl text-gray-900 text-center mb-5">
                 Add time off
@@ -267,7 +400,7 @@ export function StaffMemberTimeOffDetailView({
                     {staff.name}
                   </Text>
                   <Text className="font-medium text-xs text-gray-400 mt-0.5">
-                    {staff.role || "Staff Member"}
+                    {staff.role || "barber"}
                   </Text>
                 </View>
               </View>
@@ -319,7 +452,7 @@ export function StaffMemberTimeOffDetailView({
               {/* Thin Divider */}
               <View className="mb-4 h-px w-full bg-gray-100" />
 
-              {/* Start Date & End Date Row - Opens Calendar Directly */}
+              {/* Start Date & End Date Row */}
               <View className="flex-row items-center justify-between gap-2.5 mb-4">
                 {/* Start Date */}
                 <View className="flex-1">
@@ -398,9 +531,14 @@ export function StaffMemberTimeOffDetailView({
               {/* Save Action Button */}
               <Pressable
                 className="h-14 w-full items-center justify-center rounded-2xl bg-[#FF9500] active:bg-[#e08300]"
+                disabled={isCreating}
                 onPress={handleSaveModal}
               >
-                <Text className="font-bold text-base text-white">Save</Text>
+                {isCreating ? (
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                ) : (
+                  <Text className="font-bold text-base text-white">Save</Text>
+                )}
               </Pressable>
             </View>
           </ScrollView>
