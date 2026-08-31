@@ -55,13 +55,7 @@ export const MOCK_STAFF_MEMBERS: StaffMemberItem[] = [
   },
 ];
 
-export const MOCK_ROLES = [
-  "Staff",
-  "manager",
-  "barber",
-  "Senior barber",
-  "Owner",
-];
+export const MOCK_ROLES = ["Staff", "Manager"];
 
 export const MOCK_SERVICES_LIST = [
   "Face wash",

@@ -89,7 +89,7 @@ export function StaffFormView({
   const [name, setName] = useState(isEditMode ? staff?.name || "" : "");
   const [email, setEmail] = useState(isEditMode ? staff?.email || "" : "");
   const [role, setRole] = useState<StaffMemberItem["role"]>(
-    isEditMode ? staff?.role || "Staff" : "Staff",
+    isEditMode ? staff?.role || "staff" : "staff",
   );
   const [calendarAccess, setCalendarAccess] = useState(
     isEditMode ? (staff?.calendarAccess ?? true) : true,
@@ -247,10 +247,11 @@ export function StaffFormView({
           client_details_access: clientDetailsAccess,
           services: [1],
         };
+        console.log("The payloads:", createPayload);
 
-        console.log(`========================================`);
-        console.log(`[API CALL HIT]: POST /v1/barbers/`);
-        console.log(`[PAYLOAD SENT]:`, JSON.stringify(createPayload, null, 2));
+        // console.log(`========================================`);
+        // console.log(`[API CALL HIT]: POST /v1/barbers/`);
+        // console.log(`[PAYLOAD SENT]:`, JSON.stringify(createPayload, null, 2));
 
         // ➕ POST /v1/barbers/
         const res = await createBarberApi(createPayload).unwrap();

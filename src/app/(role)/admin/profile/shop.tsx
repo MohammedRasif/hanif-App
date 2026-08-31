@@ -37,6 +37,8 @@ export default function ShopScreen() {
   const [selectShopApi] = useSelectShopMutation();
   const [createShopApi, { isLoading: isCreating }] = useCreateShopMutation();
 
+  console.log("the user::", shopsResponse);
+
   const shopsList = shopsResponse?.data || [];
 
   const [selectedShopId, setSelectedShopId] = useState<number | string | null>(
@@ -64,6 +66,8 @@ export default function ShopScreen() {
       const selectedShopObj = shopsList.find(
         (s) => String(s.id) === String(id),
       );
+
+      console.log("the user::", selectedShopObj);
       const updatedShops = selectedShopObj
         ? [
             selectedShopObj,
@@ -73,6 +77,7 @@ export default function ShopScreen() {
           ]
         : [{ id, name: "Active Shop" }];
       setUserData({ ...userData, shops: updatedShops });
+      setUserData({ ...userData, active_shop: selectedShopObj });
     }
 
     try {

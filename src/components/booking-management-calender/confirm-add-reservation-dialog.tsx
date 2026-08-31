@@ -1,5 +1,3 @@
-// confirm-add-reservation-dialog.tsx - With dropdown selectors
-import { CommonInput } from "@/components/shared";
 import { StyledIcons } from "@/lib";
 import {
   useGetBookingBarbersQuery,
@@ -499,9 +497,9 @@ export function ConfirmAddReservationDialog({
             <View className="h-1.5 flex-1 rounded-full bg-gray-200" />
           </View>
 
-          <Text className="mb-3 font-semibold text-gray-700 text-sm">
+          {/* <Text className="mb-3 font-semibold text-gray-700 text-sm">
             Step 2 of 3: Service Details
-          </Text>
+          </Text> */}
 
           {/* Customer info summary */}
           {customerData?.fullName && (

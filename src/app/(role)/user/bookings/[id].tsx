@@ -75,6 +75,10 @@ export default function BookingDetailsScreen() {
     } as Href);
   };
 
+  const handleBack = () => {
+    router.back();
+  };
+
   return (
     <Container className="bg-white" isScrollable={true}>
       <Stack.Screen options={{ headerShown: false }} />
@@ -175,29 +179,43 @@ export default function BookingDetailsScreen() {
         {/* Bottom Action Buttons */}
         <View className="mt-8 flex-row items-center gap-4">
           {/* Cancel Booking Button */}
-          <Pressable
-            className="flex-1 items-center justify-center rounded-2xl border border-red-300 bg-white py-3.5 active:bg-red-50 flex-row gap-2"
-            disabled={isCancelling}
-            onPress={handleCancelBooking}
-          >
-            {isCancelling ? (
-              <ActivityIndicator color="#EF4444" size="small" />
-            ) : (
-              <Text className="font-poppins-semibold text-base text-red-500">
-                Cancel booking
-              </Text>
-            )}
-          </Pressable>
+
+          {booking?.status !== "cancelled" && (
+            <Pressable
+              className="flex-1 items-center justify-center rounded-2xl border border-red-300 bg-white py-3.5 active:bg-red-50 flex-row gap-2"
+              disabled={isCancelling}
+              onPress={handleCancelBooking}
+            >
+              {isCancelling ? (
+                <ActivityIndicator color="#EF4444" size="small" />
+              ) : (
+                <Text className="font-poppins-semibold text-base text-red-500">
+                  Cancel booking
+                </Text>
+              )}
+            </Pressable>
+          )}
 
           {/* Change Button */}
-          <Pressable
-            className="flex-1 items-center justify-center rounded-2xl border border-gray-200 bg-[#fafafa] py-3.5 active:bg-gray-100"
-            onPress={handleChangeBooking}
-          >
-            <Text className="font-poppins-semibold text-base text-slate-700">
-              Change
-            </Text>
-          </Pressable>
+          {booking?.status !== "cancelled" ? (
+            <Pressable
+              className="flex-1 items-center justify-center rounded-2xl border border-gray-200 bg-[#fafafa] py-3.5 active:bg-gray-100"
+              onPress={handleChangeBooking}
+            >
+              <Text className="font-poppins-semibold text-base text-slate-700">
+                Change
+              </Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              className="flex-1 items-center justify-center rounded-2xl border border-gray-200 bg-[#fafafa] py-3.5 active:bg-gray-100"
+              onPress={handleBack}
+            >
+              <Text className="font-poppins-semibold text-base text-slate-700">
+                Back
+              </Text>
+            </Pressable>
+          )}
         </View>
       </View>
     </Container>

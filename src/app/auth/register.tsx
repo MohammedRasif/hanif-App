@@ -21,7 +21,7 @@ const registerSchema = z
     phoneNumber: z
       .string()
       .min(6, "Phone number must be at least 6 characters"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string().min(1, "Please confirm your password"),
     agree: z.boolean().refine((val) => val === true, {
       message: "You must agree to the terms and conditions",

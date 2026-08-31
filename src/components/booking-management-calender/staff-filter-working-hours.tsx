@@ -3,7 +3,7 @@ import { StyledIcons } from "@/lib";
 import type { BookingBarber } from "@/Redux/feature/bookingCalendarApi";
 import { Image } from "expo-image";
 import { Dialog, useToast } from "heroui-native";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -79,19 +79,27 @@ const DEFAULT_WORKING_DAYS: DayWorkingHour[] = [
   },
 ];
 
-{
-  /* 1. Staff Member Filter Bottom Sheet / Dialog (Image 2) */
-}
+/* -------------------------------------------------------------------------- */
+/* 1. Staff Member Filter Bottom Sheet                                       */
+/* -------------------------------------------------------------------------- */
+
 type StaffFilterBottomSheetProps = {
-  /** Every barber of the shop, from `GET /v1/barbers/?shop=`. */
+  /** Every barber of the shop, from GET /v1/barbers/?shop=. */
   barbers: BookingBarber[];
+
   isLoading?: boolean;
+
   isOpen: boolean;
+
   /** Emits the barber ids whose columns should stay on the calendar. */
   onChangeSelected: (ids: string[]) => void;
+
   onOpenChange: (open: boolean) => void;
+
   onSelectStaffHours: (staff: StaffFilterItem) => void;
+
   selectedIds: string[];
+
   /** Ids that actually have a column on the active date. */
   workingBarberIds?: string[];
 };
@@ -106,46 +114,43 @@ export function StaffFilterBottomSheet({
   selectedIds,
   workingBarberIds = [],
 }: StaffFilterBottomSheetProps) {
-  const allIds = useMemo(
-    () => barbers.map((barber) => String(barber.id)),
-    [barbers],
-  );
+  /*
+   * No useMemo here intentionally.
+   *
+   * The barber list comes directly from useGetBookingBarbersQuery.
+   * We don't need to memoize these small transformations.
+   */
 
-  // Only staff scheduled for the active date can be narrowed down to
-  const workingIds = useMemo(() => {
-    const working = new Set(workingBarberIds.map(String));
-    return allIds.filter((id) => working.has(id));
-  }, [allIds, workingBarberIds]);
+  const allIds = barbers.map((barber) => String(barber.id));
 
-  const staffList = useMemo<StaffFilterItem[]>(() => {
-    const selected = new Set(selectedIds.map(String));
-    return barbers.map((barber) => ({
-      avatar: barber.user_details?.image ?? undefined,
-      checked: selected.has(String(barber.id)),
-      id: String(barber.id),
-      name: barberDisplayName(barber),
-      role: barber.specialty || barber.role || "Barber",
-    }));
-  }, [barbers, selectedIds]);
+  const working = new Set(workingBarberIds.map(String));
+
+  const workingIds = allIds.filter((id) => working.has(id));
+
+  const selected = new Set(selectedIds.map(String));
+
+  const staffList: StaffFilterItem[] = barbers.map((barber) => ({
+    avatar: barber.user_details?.image ?? undefined,
+    checked: selected.has(String(barber.id)),
+    id: String(barber.id),
+    name: barberDisplayName(barber),
+    role: barber.specialty || barber.role || "Barber",
+  }));
 
   const selectedCount = staffList.filter((staff) => staff.checked).length;
+
   const isAllMode = allIds.length > 0 && selectedCount === allIds.length;
-  // const isWorkingMode =
-  //   !isAllMode &&
-  //   workingIds.length > 0 &&
-  //   selectedCount === workingIds.length &&
-  //   workingIds.every((id) =>
-  //     staffList.some((staff) => staff.id === id && staff.checked),
-  //   );
 
   const toggleStaffCheck = (id: string) => {
     const selected = new Set(selectedIds.map(String));
+
     if (selected.has(id)) {
       selected.delete(id);
     } else {
       selected.add(id);
     }
-    // Keep the API order so the columns never reshuffle
+
+    // Keep the API order so the columns never reshuffle.
     onChangeSelected(allIds.filter((item) => selected.has(item)));
   };
 
@@ -153,32 +158,24 @@ export function StaffFilterBottomSheet({
     <Dialog isOpen={isOpen} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="bg-black/60" />
+
         <Dialog.Content className="w-full max-w-md rounded-t-4xl bg-white p-6 shadow-2xl self-end mb-0 pb-8">
           {/* Handle bar */}
           <View className="mb-5 h-1.5 w-12 self-center rounded-full bg-gray-200" />
 
-          {/* Top Options: Working staff member vs Select All */}
+          {/* Top Options */}
           <View className="mb-6 gap-3.5 px-1">
+            {/* Working staff member */}
             <Pressable
               className="flex-row items-center gap-3"
               onPress={() => onChangeSelected(workingIds)}
             >
-              {/* <View
-                className={`h-5 w-5 items-center justify-center rounded-full border ${
-                  isWorkingMode
-                    ? "border-black bg-black"
-                    : "border-gray-300 bg-white"
-                }`}
-              >
-                {isWorkingMode && (
-                  <View className="h-2 w-2 rounded-full bg-white" />
-                )}
-              </View> */}
               <Text className="font-bold text-base text-gray-900">
                 Working staff member
               </Text>
             </Pressable>
 
+            {/* Select All */}
             <Pressable
               className="flex-row items-center gap-3"
               onPress={() => onChangeSelected(allIds)}
@@ -194,13 +191,14 @@ export function StaffFilterBottomSheet({
                   <View className="h-2 w-2 rounded-full bg-white" />
                 )}
               </View>
+
               <Text className="font-medium text-base text-gray-700">
                 Select All
               </Text>
             </Pressable>
           </View>
 
-          {/* Staff Member List Cards */}
+          {/* Staff Member List */}
           {isLoading && staffList.length === 0 ? (
             <View className="items-center py-10">
               <ActivityIndicator color="#111827" size="small" />
@@ -225,6 +223,7 @@ export function StaffFilterBottomSheet({
                   }}
                 >
                   <View className="flex-1 flex-row items-center gap-3.5">
+                    {/* Checkbox */}
                     <Pressable
                       className={`h-6 w-6 items-center justify-center rounded-md border ${
                         staff.checked
@@ -243,11 +242,16 @@ export function StaffFilterBottomSheet({
                       )}
                     </Pressable>
 
+                    {/* Avatar */}
                     {staff.avatar ? (
                       <Image
                         contentFit="cover"
                         source={{ uri: staff.avatar }}
-                        style={{ width: 44, height: 44, borderRadius: 22 }}
+                        style={{
+                          width: 44,
+                          height: 44,
+                          borderRadius: 22,
+                        }}
                       />
                     ) : (
                       <View className="h-11 w-11 items-center justify-center rounded-full bg-gray-200">
@@ -259,6 +263,7 @@ export function StaffFilterBottomSheet({
                       </View>
                     )}
 
+                    {/* Staff Information */}
                     <View className="flex-1">
                       <Text
                         className="font-bold text-base text-gray-900"
@@ -266,6 +271,7 @@ export function StaffFilterBottomSheet({
                       >
                         {staff.name}
                       </Text>
+
                       <Text
                         className="text-xs text-gray-400 font-medium"
                         numberOfLines={1}
@@ -290,9 +296,10 @@ export function StaffFilterBottomSheet({
   );
 }
 
-{
-  /* 2. Staff Working Hours Full-Screen Page (Image 3) */
-}
+/* -------------------------------------------------------------------------- */
+/* 2. Staff Working Hours Full-Screen Page                                    */
+/* -------------------------------------------------------------------------- */
+
 type StaffWorkingHoursPageProps = {
   onBack: () => void;
   onSaveAll: () => void;
@@ -305,14 +312,17 @@ export function StaffWorkingHoursPage({
   staffName = "Isaac",
 }: StaffWorkingHoursPageProps) {
   const { toast } = useToast();
+
   const [workingDays, setWorkingDays] =
     useState<DayWorkingHour[]>(DEFAULT_WORKING_DAYS);
+
   const [editingDay, setEditingDay] = useState<DayWorkingHour | null>(null);
 
   const handleUpdateDay = (updatedDay: DayWorkingHour) => {
     setWorkingDays((prev) =>
-      prev.map((d) => (d.id === updatedDay.id ? updatedDay : d)),
+      prev.map((day) => (day.id === updatedDay.id ? updatedDay : day)),
     );
+
     setEditingDay(null);
   };
 
@@ -323,12 +333,13 @@ export function StaffWorkingHoursPage({
       variant: "success",
       placement: "top",
     });
+
     onSaveAll();
   };
 
   return (
     <Container className="flex-1 bg-white" isScrollable={false}>
-      {/* Top Header */}
+      {/* Header */}
       <View className="flex-row items-center justify-between border-b border-gray-100 px-5 pt-12 pb-4 bg-white">
         <Pressable
           className="h-10 w-10 items-center justify-center rounded-full active:bg-gray-100"
@@ -336,14 +347,18 @@ export function StaffWorkingHoursPage({
         >
           <StyledIcons className="text-gray-900" name="arrow-back" size={24} />
         </Pressable>
+
         <Text className="font-bold text-xl text-gray-900">Working hours</Text>
+
         <View className="w-10" />
       </View>
 
       {/* Days List */}
       <ScrollView
         className="flex-1 px-5 pt-6"
-        contentContainerStyle={{ paddingBottom: 24 }}
+        contentContainerStyle={{
+          paddingBottom: 24,
+        }}
         showsVerticalScrollIndicator={false}
       >
         <View className="gap-6">
@@ -364,12 +379,14 @@ export function StaffWorkingHoursPage({
                       ? `${day.startTime} - ${day.endTime}`
                       : "Not working"}
                   </Text>
+
                   {day.enabled && day.hasBreak && day.breakStartTime && (
                     <Text className="text-xs text-gray-400 mt-0.5 font-medium">
-                      Break: {day.breakStartTime} -{day.breakEndTime}
+                      Break: {day.breakStartTime} - {day.breakEndTime}
                     </Text>
                   )}
                 </View>
+
                 <StyledIcons
                   className="text-gray-400"
                   name="chevron-forward"
@@ -381,7 +398,7 @@ export function StaffWorkingHoursPage({
         </View>
       </ScrollView>
 
-      {/* Pinned Bottom Save Button */}
+      {/* Save Button */}
       <View className="border-t border-gray-100 bg-white px-5 pt-3 pb-8">
         <Pressable
           className="h-14 w-full items-center justify-center rounded-2xl bg-[#FF9500] active:bg-[#e08300] shadow-md"
@@ -391,13 +408,15 @@ export function StaffWorkingHoursPage({
         </Pressable>
       </View>
 
-      {/* Edit Day Working Hours Popup Dialog (Image 4) */}
+      {/* Edit Day Dialog */}
       {editingDay && (
         <EditDayHoursDialog
           dayData={editingDay}
           isOpen={Boolean(editingDay)}
           onOpenChange={(open) => {
-            if (!open) setEditingDay(null);
+            if (!open) {
+              setEditingDay(null);
+            }
           }}
           onSave={handleUpdateDay}
         />
@@ -406,9 +425,10 @@ export function StaffWorkingHoursPage({
   );
 }
 
-{
-  /* 3. Edit Day Working Hours Dialog (Image 4) */
-}
+/* -------------------------------------------------------------------------- */
+/* 3. Edit Day Working Hours Dialog                                           */
+/* -------------------------------------------------------------------------- */
+
 type EditDayHoursDialogProps = {
   dayData: DayWorkingHour;
   isOpen: boolean;
@@ -423,12 +443,17 @@ export function EditDayHoursDialog({
   onSave,
 }: EditDayHoursDialogProps) {
   const [enabled, setEnabled] = useState(dayData.enabled);
+
   const [startTime, setStartTime] = useState(dayData.startTime || "10:50 am");
+
   const [endTime, setEndTime] = useState(dayData.endTime || "05:30 pm");
+
   const [hasBreak, setHasBreak] = useState(dayData.hasBreak);
+
   const [breakStartTime, setBreakStartTime] = useState(
     dayData.breakStartTime || "02:00 pm",
   );
+
   const [breakEndTime, setBreakEndTime] = useState(
     dayData.breakEndTime || "03:00 pm",
   );
@@ -449,25 +474,31 @@ export function EditDayHoursDialog({
     <Dialog isOpen={isOpen} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="bg-black/60" />
+
         <Dialog.Content className="w-[94%] max-w-sm rounded-4xl bg-white p-6 shadow-2xl">
           {/* Day Title & Enable Switch */}
           <View className="mb-6 flex-row items-center justify-between">
             <Dialog.Title className="font-bold text-2xl text-gray-900 tracking-tight">
               {dayData.dayName}
             </Dialog.Title>
+
             <View className="flex-row items-center gap-2">
               <Switch
-                trackColor={{ false: "#E5E7EB", true: "#00C853" }}
+                trackColor={{
+                  false: "#E5E7EB",
+                  true: "#00C853",
+                }}
                 value={enabled}
                 onValueChange={setEnabled}
               />
+
               <Text className="font-medium text-xs text-gray-500">Enable</Text>
             </View>
           </View>
 
+          {/* Working Hours */}
           {enabled && (
             <View className="mb-6 gap-5">
-              {/* Working Hours Time Inputs: [ 10:50 am ] to [ 05:30 pm ] */}
               <View className="flex-row items-center justify-between gap-3">
                 <View className="flex-1 h-13 justify-center rounded-2xl border border-gray-200 bg-white px-4">
                   <TextInput
@@ -490,7 +521,7 @@ export function EditDayHoursDialog({
                 </View>
               </View>
 
-              {/* Break Section */}
+              {/* Break */}
               <View>
                 <Text className="mb-2 font-bold text-base text-gray-900">
                   Break
@@ -506,6 +537,7 @@ export function EditDayHoursDialog({
                       name="add"
                       size={18}
                     />
+
                     <Text className="font-semibold text-sm text-gray-800">
                       Add break
                     </Text>
@@ -552,7 +584,7 @@ export function EditDayHoursDialog({
             </View>
           )}
 
-          {/* Save Button */}
+          {/* Save */}
           <Pressable
             className="h-14 w-full items-center justify-center rounded-2xl bg-[#FF9500] active:bg-[#e08300] shadow-md"
             onPress={handleSave}

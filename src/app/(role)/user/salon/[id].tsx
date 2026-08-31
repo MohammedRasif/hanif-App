@@ -109,7 +109,9 @@ export default function SalonDetailScreen() {
                     size={18}
                   />
                   <Text className="font-poppins-bold text-base text-gray-900">
-                    4.9
+                    {shopDetails?.google_review_link === null
+                      ? "0.0"
+                      : shopDetails?.google_review_link}
                   </Text>
                   <Text className="font-poppins text-sm text-gray-400">
                     (reviews)
