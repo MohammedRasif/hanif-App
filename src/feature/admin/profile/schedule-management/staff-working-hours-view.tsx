@@ -149,6 +149,7 @@ export function StaffWorkingHoursView({
     data: shiftsResponse,
     isLoading: isLoadingShifts,
     isFetching: isFetchingShifts,
+    isError: isErrorShifts,
   } = useGetStaffShiftsQuery(selectedBarberId, {
     skip: !selectedBarberId,
     refetchOnMountOrArgChange: true,
@@ -181,7 +182,11 @@ export function StaffWorkingHoursView({
   } | null>(null);
 
   const shiftsList = useMemo<ShiftDisplayItem[]>(() => {
-    if (Array.isArray(shiftsResponse?.data) && shiftsResponse.data.length > 0) {
+    if (
+      !isErrorShifts &&
+      Array.isArray(shiftsResponse?.data) &&
+      shiftsResponse.data.length > 0
+    ) {
       const dayOrder = [
         "monday",
         "tuesday",
@@ -237,7 +242,7 @@ export function StaffWorkingHoursView({
       return sortedList;
     }
     return [];
-  }, [shiftsResponse]);
+  }, [shiftsResponse, isErrorShifts]);
 
   const handleOpenEditModal = (item: ShiftDisplayItem) => {
     setSelectedShiftItem(item);

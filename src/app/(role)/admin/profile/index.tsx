@@ -1,9 +1,42 @@
-import { SharedProfileScreen, type ProfileMenuItem } from "@/components/shared";
+import { type ProfileMenuItem, SharedProfileScreen } from "@/components/shared";
+import { getUserData } from "@/lib/storage";
+import { useGetProfileQuery } from "@/Redux/feature/auth";
+import { useGetShopDetailsQuery } from "@/Redux/feature/shop";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useMemo } from "react";
 
 export default function AdminProfileScreen() {
   const router = useRouter();
+  const userData = useMemo(() => getUserData(), []);
+  const shopId = userData?.shops?.[0]?.id || 9;
+
+  // 📡 GET /v1/shops/:id/
+  const { data: shopResponse } = useGetShopDetailsQuery(shopId);
+
+  // 📡 GET /v1/auth/profile/
+  const { data: profileResponse } = useGetProfileQuery();
+
+  const shopData = shopResponse?.data;
+  const profileData = profileResponse?.data;
+
+  const defaultCover =
+    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg";
+  const defaultLogo =
+    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1757735711/images_nfasdv.png";
+  const defaultUserAvatar =
+    "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1757735711/images_nfasdv.png";
+
+  const coverImageUrl = shopData?.cover_image || defaultCover;
+  const avatarUrl = shopData?.logo || defaultLogo;
+  const locationTitle = shopData?.name
+    ? `${shopData.name}${shopData.location ? ` (${shopData.location})` : ""}`
+    : "Bong Bang Saloon";
+
+  const userName = profileData?.full_name || "James Carter";
+  const userSubtitle =
+    profileData?.email ||
+    (profileData?.role ? `Role: ${profileData.role}` : "Shop Manager");
+  const userAvatarUrl = profileData?.image || defaultUserAvatar;
 
   const ADMIN_MENU_ITEMS: ProfileMenuItem[] = [
     {
@@ -66,17 +99,17 @@ export default function AdminProfileScreen() {
 
   return (
     <SharedProfileScreen
-      avatarUrl="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=300"
-      coverImageUrl="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=800"
-      locationTitle="Jazz barber (Hampdenpark)"
+      avatarUrl={avatarUrl}
+      coverImageUrl={coverImageUrl}
+      locationTitle={locationTitle}
       menuItems={ADMIN_MENU_ITEMS}
       onPressLocationDropdown={() => {
         console.log("Location dropdown clicked");
       }}
       onSignOut={() => router.replace("/auth/login")}
-      userAvatarUrl="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150"
-      userName="James Carter"
-      userSubtitle="Shop Manager · Carter's BarberPro"
+      userAvatarUrl={userAvatarUrl}
+      userName={userName}
+      userSubtitle={userSubtitle}
     />
   );
 }
