@@ -11,7 +11,7 @@ export function StaffManagementScreen({ onBack }: StaffManagementProps) {
   const router = useRouter();
 
   const userData = useMemo(() => getUserData(), []);
-  const shopId = userData?.shops?.[0]?.id || 1;
+  const shopId = userData?.active_shop.id;
 
   // 📡 GET /v1/barbers/?shop_id={shop_id}
   const {

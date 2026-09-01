@@ -55,7 +55,7 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
   const { toast } = useToast();
 
   const userData = useMemo(() => getUserData(), []);
-  const shopId = userData?.shops?.[0]?.id || 1;
+  const shopId = userData?.active_shop.id;
 
   // 📡 RTK Query Hooks for Shop Details and Gallery
   const {
