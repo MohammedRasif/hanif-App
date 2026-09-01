@@ -68,7 +68,7 @@ export function StaffFormView({
   const isEditMode = Boolean(staff && staff.id);
 
   const userData = useMemo(() => getUserData(), []);
-  const shopId = userData?.shops?.[0]?.id || 1;
+  const shopId = userData?.active_shop.id;
 
   // 📡 RTK Query Mutations
   const [createBarberApi, { isLoading: isCreating }] =
