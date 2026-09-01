@@ -18,7 +18,6 @@ export interface SharedProfileScreenProps {
   coverImageUrl?: string;
   locationTitle?: string;
   menuItems: ProfileMenuItem[];
-  onPressLocationDropdown?: () => void;
   onSignOut?: () => void;
   userAvatarUrl?: string;
   userName?: string;
@@ -26,13 +25,12 @@ export interface SharedProfileScreenProps {
 }
 
 export function SharedProfileScreen({
-  coverImageUrl = "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=800",
-  avatarUrl = "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=300",
+  coverImageUrl = "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg",
+  avatarUrl = "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1757735711/images_nfasdv.png",
   locationTitle = "Jazz barber (Hampdenpark)",
-  onPressLocationDropdown,
   userName = "James Carter",
   userSubtitle = "Shop Manager · Carter's BarberPro",
-  userAvatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+  userAvatarUrl = "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1757735711/images_nfasdv.png",
   menuItems = [],
   onSignOut,
 }: SharedProfileScreenProps) {
@@ -68,18 +66,15 @@ export function SharedProfileScreen({
 
         {/* Location Dropdown Pill */}
         <View className="items-center mb-6">
-          <Pressable
-            className="flex-row items-center gap-1.5 rounded-full border border-gray-200 bg-white px-5 py-2.5 shadow-xs active:bg-gray-50"
-            onPress={onPressLocationDropdown}
-          >
+          <Pressable className="flex-row items-center gap-1.5 rounded-full border border-gray-200 bg-white px-5 py-2.5 shadow-xs active:bg-gray-50">
             <Text className="font-poppins-bold text-sm text-gray-900">
               {locationTitle}
             </Text>
-            <StyledIcons
+            {/* <StyledIcons
               className="text-gray-600"
               name="chevron-down"
               size={16}
-            />
+            /> */}
           </Pressable>
         </View>
 

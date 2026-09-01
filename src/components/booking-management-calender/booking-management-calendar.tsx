@@ -77,6 +77,8 @@ export function BookingManagementCalendar({
     useGetProfileQuery();
   const shopId = user.active_shop.id;
 
+  console.log("shop Id:", shopId);
+
   // GET /v1/booking/?view_type=&shop_id=&date=&display_mode=calendar
   const {
     data: calendarResponse,

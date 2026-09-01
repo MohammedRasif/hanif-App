@@ -82,6 +82,27 @@ export default function PersonalSettingScreen() {
             size={18}
           />
         </Pressable>
+        <Pressable
+          className="flex-row items-center justify-between py-4 border-b border-gray-100/80 active:bg-gray-50/50"
+          onPress={() => {
+            router.push("/(role)/admin/profile/personal-settings");
+          }}
+        >
+          <View className="flex-row items-center gap-3.5">
+            <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-50/80">
+              <StyledIcons className="text-gray-700" name="person" size={20} />
+            </View>
+            <Text className="font-poppins-semibold text-base text-gray-900">
+              Personal Settings
+            </Text>
+          </View>
+
+          <StyledIcons
+            className="text-gray-400"
+            name="chevron-forward"
+            size={18}
+          />
+        </Pressable>
       </View>
     </Container>
   );

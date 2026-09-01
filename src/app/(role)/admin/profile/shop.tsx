@@ -25,9 +25,8 @@ export default function ShopScreen() {
   const { toast } = useToast();
 
   // Extract logged-in user's active shop ID
-  const userData = useMemo(() => getUserData(), []);
-  const userActiveShopId = userData?.shops?.[0]?.id;
-
+  const userData = getUserData();
+  const userActiveShopId = userData?.active_shop?.id;
   // 📡 RTK Query Hooks for Shops
   const {
     data: shopsResponse,
@@ -37,7 +36,7 @@ export default function ShopScreen() {
   const [selectShopApi] = useSelectShopMutation();
   const [createShopApi, { isLoading: isCreating }] = useCreateShopMutation();
 
-  console.log("the user::", shopsResponse);
+  console.log("the shop:", shopsResponse);
 
   const shopsList = shopsResponse?.data || [];
 
@@ -59,6 +58,8 @@ export default function ShopScreen() {
 
   // Select Shop -> POST /v1/shops/select/
   const handleSelectShop = async (id: number | string) => {
+    console.log("before userData:", userData);
+
     setSelectedShopId(id);
 
     // Update active shop in user session storage
@@ -76,6 +77,7 @@ export default function ShopScreen() {
             ),
           ]
         : [{ id, name: "Active Shop" }];
+      console.log("selected userData:", selectedShopObj);
       setUserData({ ...userData, shops: updatedShops });
       setUserData({ ...userData, active_shop: selectedShopObj });
     }
@@ -97,6 +99,7 @@ export default function ShopScreen() {
         placement: "top",
       });
     }
+    console.log("after userData:", userData);
   };
 
   // Add Shop -> POST /v1/shops/ { name, location }
@@ -193,6 +196,7 @@ export default function ShopScreen() {
             keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) => {
               const isSelected = String(item.id) === String(selectedShopId);
+              console.log("isSelected:", isSelected);
               const logoUri = item.logo || item.cover_image;
 
               return (
