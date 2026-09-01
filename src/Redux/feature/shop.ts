@@ -48,7 +48,7 @@ export const shopApi = baseApi.injectEndpoints({
       { success: boolean; data: GalleryItem[] },
       string | number
     >({
-      query: (shopId) => `v1/shops/gallery/${shopId}`,
+      query: (shopId) => `v1/shops/gallery/?shop=${shopId}`,
       providesTags: ["Shop"],
     }),
 
@@ -326,14 +326,28 @@ export const shopApi = baseApi.injectEndpoints({
 
     // Update Shop Gallery Image: PUT /v1/shops/gallery/:id/
     updateShopGallery: builder.mutation<
-      { code?: string; data?: any; details?: string; success?: boolean },
-      { id: number | string; data: FormData | Record<string, any> }
+      {
+        code?: string;
+        data?: any;
+        details?: string;
+        success?: boolean;
+      },
+      {
+        id: number | string;
+        data: FormData | Record<string, any>;
+      }
     >({
-      query: ({ id, data }) => ({
-        url: `v1/shops/gallery/${id}/`,
-        method: "PUT",
-        body: data,
-      }),
+      query: ({ id, data }) => {
+        console.log(
+          `[RTK QUERY HIT] PUT v1/shops/gallery/${id}/ Body:`,
+          JSON.stringify(data, null, 2),
+        );
+        return {
+          url: `v1/shops/gallery/${id}/`,
+          method: "PUT",
+          body: data,
+        };
+      },
       invalidatesTags: ["Shop"],
     }),
   }),
