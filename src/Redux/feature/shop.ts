@@ -246,8 +246,8 @@ export const shopApi = baseApi.injectEndpoints({
       number | string
     >({
       query: (shopId) => {
-        console.log(`[RTK QUERY HIT] GET v1/barbers/?shop_id=${shopId}`);
-        return `v1/barbers/?shop_id=${shopId}`;
+        console.log(`[RTK QUERY HIT] GET v1/barbers/?shop=${shopId}`);
+        return `v1/barbers/?shop=${shopId}`;
       },
       providesTags: ["Shop"],
     }),

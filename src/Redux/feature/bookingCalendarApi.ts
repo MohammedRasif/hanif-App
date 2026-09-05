@@ -393,7 +393,7 @@ export interface BookingBarbersResponse {
 
 export interface BookingServiceOption {
   duration_minutes: number;
-  id: number | string;
+  id: number;
   name: string;
   price: number | string;
 }
