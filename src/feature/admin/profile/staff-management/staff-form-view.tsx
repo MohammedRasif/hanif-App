@@ -1,3 +1,4 @@
+// StaffFormView.tsx - Updated with real services data
 import { StyledIcons } from "@/lib";
 import { getUserData } from "@/lib/storage";
 import {
@@ -19,12 +20,9 @@ import {
   TextInput,
   View,
 } from "react-native";
-import {
-  MOCK_COUNTRY_CODES,
-  MOCK_ROLES,
-  MOCK_SERVICES_LIST,
-} from "./mock-data";
+import { MOCK_COUNTRY_CODES, MOCK_ROLES } from "./mock-data";
 import type { StaffMemberItem } from "./types";
+import { useGetBookingServicesQuery } from "@/Redux/feature/bookingCalendarApi";
 
 const DEFAULT_PROFILE_IMAGE =
   "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1757735711/images_nfasdv.png";
@@ -68,7 +66,7 @@ export function StaffFormView({
   const isEditMode = Boolean(staff && staff.id);
 
   const userData = useMemo(() => getUserData(), []);
-  const shopId = userData?.shops?.[0]?.id || 1;
+  const shopId = userData?.active_shop.id;
 
   // 📡 RTK Query Mutations
   const [createBarberApi, { isLoading: isCreating }] =
@@ -77,6 +75,21 @@ export function StaffFormView({
     useUpdateBarberMutation();
   const [deleteBarberApi, { isLoading: isDeleting }] =
     useDeleteBarberMutation();
+
+  // Get services from API
+  const { data: servicesData, isLoading: isLoadingServices } =
+    useGetBookingServicesQuery({ shop: shopId });
+
+  // Extract services list from API response
+  const servicesList = useMemo(() => {
+    if (servicesData?.data && Array.isArray(servicesData.data)) {
+      return servicesData.data.map((service: any) => ({
+        id: service.id,
+        name: service.name,
+      }));
+    }
+    return [];
+  }, [servicesData]);
 
   const isSubmitting = isCreating || isUpdating || isDeleting;
 
@@ -104,11 +117,8 @@ export function StaffFormView({
   const [position, setPosition] = useState(
     isEditMode ? staff?.position || "" : "",
   );
-  const [selectedServices, setSelectedServices] = useState<string[]>(
-    isEditMode ? staff?.services || [] : [],
-  );
-  const [currentServiceSelect, setCurrentServiceSelect] = useState(
-    MOCK_SERVICES_LIST[0],
+  const [selectedServiceIds, setSelectedServiceIds] = useState<number[]>(
+    isEditMode ? staff?.services?.map((s: any) => Number(s.id || s)) || [] : [],
   );
 
   // Modals for selection
@@ -152,15 +162,21 @@ export function StaffFormView({
     }
   };
 
-  const handleAddService = (srv?: string) => {
-    const target = srv || currentServiceSelect;
-    if (target && !selectedServices.includes(target)) {
-      setSelectedServices((prev) => [...prev, target]);
+  const handleAddService = (serviceId: number) => {
+    if (!selectedServiceIds.includes(serviceId)) {
+      setSelectedServiceIds((prev) => [...prev, serviceId]);
     }
+    setIsServicePickerOpen(false);
   };
 
-  const handleRemoveService = (serviceName: string) => {
-    setSelectedServices((prev) => prev.filter((s) => s !== serviceName));
+  const handleRemoveService = (serviceId: number) => {
+    setSelectedServiceIds((prev) => prev.filter((id) => id !== serviceId));
+  };
+
+  // Get service name by id
+  const getServiceName = (id: number) => {
+    const service = servicesList.find((s) => s.id === id);
+    return service?.name || `Service ${id}`;
   };
 
   // Submit Handler: POST /v1/barbers/ or PATCH /v1/barbers/:id/
@@ -192,6 +208,7 @@ export function StaffFormView({
             email: email.trim(),
             phone: phone.trim(),
           },
+          services: selectedServiceIds, // Send service IDs
         };
 
         console.log(`========================================`);
@@ -230,7 +247,7 @@ export function StaffFormView({
           countryCode,
           phone: phone.trim(),
           position: position.trim(),
-          services: selectedServices,
+          services: selectedServiceIds.map((id) => getServiceName(id)),
           avatarUrl: staff.avatarUrl,
         });
       } else {
@@ -245,13 +262,9 @@ export function StaffFormView({
           role: role.toLowerCase(),
           calendar_access: calendarAccess,
           client_details_access: clientDetailsAccess,
-          services: [1],
+          services: selectedServiceIds.length > 0 ? selectedServiceIds : [1], // Send service IDs
         };
         console.log("The payloads:", createPayload);
-
-        // console.log(`========================================`);
-        // console.log(`[API CALL HIT]: POST /v1/barbers/`);
-        // console.log(`[PAYLOAD SENT]:`, JSON.stringify(createPayload, null, 2));
 
         // ➕ POST /v1/barbers/
         const res = await createBarberApi(createPayload).unwrap();
@@ -282,7 +295,7 @@ export function StaffFormView({
           countryCode,
           phone: phone.trim(),
           position: position.trim(),
-          services: selectedServices,
+          services: selectedServiceIds.map((id) => getServiceName(id)),
         });
       }
     } catch (err: any) {
@@ -314,7 +327,7 @@ export function StaffFormView({
         countryCode,
         phone: phone.trim(),
         position: position.trim(),
-        services: selectedServices,
+        services: selectedServiceIds.map((id) => getServiceName(id)),
       });
     }
   };
@@ -377,7 +390,7 @@ export function StaffFormView({
         showsVerticalScrollIndicator={false}
       >
         {/* Avatar & Upload Button */}
-        <View className="mb-5 flex-row items-center gap-3.5 pt-2">
+        {/* <View className="mb-5 flex-row items-center gap-3.5 pt-2">
           <Pressable onPress={handlePickAvatar} className="active:opacity-80">
             <Image
               className="h-14 w-14 rounded-full bg-gray-200"
@@ -399,7 +412,7 @@ export function StaffFormView({
               upload picture
             </Text>
           </Pressable>
-        </View>
+        </View> */}
 
         {/* Field 1: Name */}
         <View className="mb-4">
@@ -534,9 +547,12 @@ export function StaffFormView({
             <Pressable
               className="h-13 flex-1 flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white px-4 active:bg-gray-50"
               onPress={() => setIsServicePickerOpen(true)}
+              disabled={isLoadingServices}
             >
               <Text className="text-sm text-gray-500">
-                + Select services for this staff member
+                {isLoadingServices
+                  ? "Loading services..."
+                  : "+ Select services for this staff member"}
               </Text>
               <StyledIcons
                 className="text-gray-500"
@@ -547,18 +563,18 @@ export function StaffFormView({
           </View>
 
           <View className="flex-row flex-wrap gap-2.5 mt-3">
-            {selectedServices.map((serviceName) => (
+            {selectedServiceIds.map((serviceId) => (
               <View
                 className="flex-row items-center gap-2 rounded-full bg-gray-100/90 px-4 py-2.5"
-                key={serviceName}
+                key={serviceId}
               >
                 <Text className="font-medium text-sm text-gray-800">
-                  {serviceName}
+                  {getServiceName(serviceId)}
                 </Text>
                 <Pressable
                   className="p-0.5 active:opacity-60"
                   hitSlop={8}
-                  onPress={() => handleRemoveService(serviceName)}
+                  onPress={() => handleRemoveService(serviceId)}
                 >
                   <StyledIcons
                     className="text-gray-600"
@@ -720,28 +736,39 @@ export function StaffFormView({
             <Text className="mb-3 font-bold text-xl text-gray-900">
               Select Service
             </Text>
-            {MOCK_SERVICES_LIST.map((srv) => (
-              <Pressable
-                className="py-3 px-3.5 mb-1.5 rounded-xl flex-row items-center justify-between active:bg-gray-100"
-                key={srv}
-                onPress={() => {
-                  setCurrentServiceSelect(srv);
-                  handleAddService(srv);
-                  setIsServicePickerOpen(false);
-                }}
-              >
-                <Text className="font-medium text-base text-gray-900">
-                  {srv}
+            {isLoadingServices ? (
+              <View className="py-8 items-center justify-center">
+                <ActivityIndicator color="#FF9500" size="large" />
+                <Text className="mt-2 text-gray-500 text-sm">
+                  Loading services...
                 </Text>
-                {selectedServices.includes(srv) && (
-                  <StyledIcons
-                    className="text-gray-400"
-                    name="checkmark"
-                    size={18}
-                  />
-                )}
-              </Pressable>
-            ))}
+              </View>
+            ) : servicesList.length === 0 ? (
+              <View className="py-8 items-center">
+                <Text className="text-gray-500 text-sm">
+                  No services available
+                </Text>
+              </View>
+            ) : (
+              servicesList.map((service) => (
+                <Pressable
+                  className="py-3 px-3.5 mb-1.5 rounded-xl flex-row items-center justify-between active:bg-gray-100"
+                  key={service.id}
+                  onPress={() => handleAddService(service.id)}
+                >
+                  <Text className="font-medium text-base text-gray-900">
+                    {service.name}
+                  </Text>
+                  {selectedServiceIds.includes(service.id) && (
+                    <StyledIcons
+                      className="text-[#FF9500]"
+                      name="checkmark"
+                      size={18}
+                    />
+                  )}
+                </Pressable>
+              ))
+            )}
           </View>
         </View>
       </Modal>

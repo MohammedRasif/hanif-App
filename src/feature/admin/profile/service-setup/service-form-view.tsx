@@ -37,7 +37,7 @@ export function ServiceFormView({
   const isEditMode = Boolean(service && service.id);
 
   const userData = useMemo(() => getUserData(), []);
-  const shopId = userData?.shops?.[0]?.id || 1;
+  const shopId = userData?.active_shop.id;
 
   // 📡 RTK Query Hooks
   const { data: categoriesResponse } = useGetCategoriesByShopQuery(shopId);

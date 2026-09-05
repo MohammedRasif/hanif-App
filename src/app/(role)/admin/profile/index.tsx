@@ -1,13 +1,37 @@
 import { type ProfileMenuItem, SharedProfileScreen } from "@/components/shared";
 import { getUserData } from "@/lib/storage";
-// import { useGetProfileQuery } from "@/Redux/feature/auth";
-// import { useGetShopDetailsQuery } from "@/Redux/feature/shop";
+import { useFocusEffect } from "expo-router";
 import { useRouter } from "expo-router";
+import React, { useCallback, useState } from "react";
 
 export default function AdminProfileScreen() {
   const router = useRouter();
+  const [profileData, setProfileData] = useState<any>(null);
 
-  const profileData = getUserData();
+  // Function to load profile data from storage
+  const loadProfileData = useCallback(() => {
+    const data = getUserData();
+    console.log("profileData:", data);
+    setProfileData(data);
+  }, []);
+
+  // Load data on initial mount
+  React.useEffect(() => {
+    loadProfileData();
+  }, [loadProfileData]);
+
+  // Reload data when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      loadProfileData();
+    }, [loadProfileData]),
+  );
+
+  // Listen for storage changes (optional - for real-time updates)
+  React.useEffect(() => {
+    // If you have a storage event listener, you can use it here
+    // For now, we'll rely on focus effect
+  }, []);
 
   const defaultCover =
     "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg";
@@ -19,8 +43,8 @@ export default function AdminProfileScreen() {
   const coverImageUrl = profileData?.active_shop?.cover_image || defaultCover;
   const avatarUrl = profileData?.active_shop?.logo || defaultLogo;
   const locationTitle =
-    profileData?.active_shop.name !== ""
-      ? `${profileData?.active_shop.name}`
+    profileData?.active_shop?.name !== ""
+      ? `${profileData?.active_shop?.name}`
       : "No Shop Name";
 
   const userName = profileData?.full_name || "No User name";

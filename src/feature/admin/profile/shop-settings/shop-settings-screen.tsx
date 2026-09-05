@@ -1,5 +1,6 @@
+// src/components/shop/ShopSettingsScreen.tsx
 import { StyledIcons } from "@/lib";
-import { getUserData } from "@/lib/storage";
+import { getUserData, setUserData } from "@/lib/storage";
 import {
   useGetShopDetailsQuery,
   useGetShopGalleryQuery,
@@ -10,7 +11,7 @@ import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useToast } from "heroui-native";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Modal,
@@ -28,34 +29,13 @@ const DEFAULT_PROFILE_IMAGE =
 const DEFAULT_COVER_IMAGE =
   "https://res.cloudinary.com/dfsu0cuvb/image/upload/v1751196563/b170870007dfa419295d949814474ab2_t_qm2pcq.jpg";
 
-function formatImageUrl(
-  url?: string | null,
-  fallback: string = DEFAULT_PROFILE_IMAGE,
-): string {
-  if (!url || typeof url !== "string" || !url.trim()) {
-    return fallback;
-  }
-  const cleanUrl = url.trim();
-  if (
-    cleanUrl.startsWith("http://") ||
-    cleanUrl.startsWith("https://") ||
-    cleanUrl.startsWith("file://") ||
-    cleanUrl.startsWith("content://")
-  ) {
-    return cleanUrl;
-  }
-  const apiHost = (
-    process.env.EXPO_PUBLIC_API_URL || "http://10.10.29.119:8200/api"
-  ).replace(/\/api\/?$/, "");
-  return `${apiHost.replace(/\/$/, "")}/${cleanUrl.replace(/^\//, "")}`;
-}
-
 export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
   const router = useRouter();
   const { toast } = useToast();
 
-  const userData = useMemo(() => getUserData(), []);
-  const shopId = userData?.shops?.[0]?.id || 1;
+  // Get userData from storage
+  const userData = getUserData();
+  const shopId = userData?.active_shop?.id;
 
   // 📡 RTK Query Hooks for Shop Details and Gallery
   const {
@@ -73,49 +53,6 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
 
   const [isUploadingImage, setIsUploadingImage] = useState(false);
 
-  const apiShopData = shopDetailsResponse?.data;
-  const apiGalleryData = galleryResponse?.data as any;
-
-  // Transform Shop Data from API with strict fallbacks
-  const shopData: ShopSettingsData = useMemo(() => {
-    if (apiShopData) {
-      const rawGallery: string[] = Array.isArray(apiGalleryData)
-        ? apiGalleryData.map((g: any) => g.image || g.url)
-        : apiGalleryData?.image
-          ? [apiGalleryData.image]
-          : [];
-
-      const galleryList = rawGallery.map((img) =>
-        formatImageUrl(img, DEFAULT_COVER_IMAGE),
-      );
-
-      return {
-        shopName: apiShopData.name || "My Barber Shop",
-        location: apiShopData.location || "Banani, Dhaka",
-        aboutUs: apiShopData.about_us || "Professional grooming services.",
-        avatarUrl: formatImageUrl(apiShopData.logo, DEFAULT_PROFILE_IMAGE),
-        coverUrl: formatImageUrl(apiShopData.cover_image, DEFAULT_COVER_IMAGE),
-        gallery:
-          galleryList.length > 0
-            ? galleryList
-            : [DEFAULT_COVER_IMAGE, DEFAULT_COVER_IMAGE],
-        facebookUrl: apiShopData.facebook || "https://facebook.com",
-        instagramUrl: apiShopData.instagram || "https://instagram.com",
-        tiktokUrl: apiShopData.tiktok || "https://tiktok.com",
-        whatsapp: apiShopData.whatsapp || "+8801700000000",
-        phone: apiShopData.phone || "+8801700000000",
-        email: apiShopData.email || "shop@barberbay.com",
-      };
-    }
-
-    return {
-      ...MOCK_SHOP_SETTINGS,
-      avatarUrl: DEFAULT_PROFILE_IMAGE,
-      coverUrl: DEFAULT_COVER_IMAGE,
-      gallery: [DEFAULT_COVER_IMAGE, DEFAULT_COVER_IMAGE],
-    };
-  }, [apiShopData, apiGalleryData]);
-
   // Edit Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingField, setEditingField] = useState<{
@@ -125,6 +62,85 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
     title: string;
     value: string;
   } | null>(null);
+
+  // Get data from API responses
+  const apiShopData = shopDetailsResponse?.data;
+  const apiGalleryData = galleryResponse?.data;
+
+  // Get shop data with fallbacks - use userData values
+  const getShopData = useCallback(() => {
+    // Start with userData values as base
+    const baseData = {
+      shopName: userData?.active_shop?.name || "My Barber Shop",
+      location: userData?.active_shop?.location || "Banani, Dhaka",
+      aboutUs: apiShopData?.about_us || "Professional grooming services.",
+      avatarUrl: userData?.active_shop?.logo || DEFAULT_PROFILE_IMAGE,
+      coverUrl: userData?.active_shop?.cover_image || DEFAULT_COVER_IMAGE,
+      gallery: [DEFAULT_COVER_IMAGE, DEFAULT_COVER_IMAGE],
+      facebookUrl: apiShopData?.facebook || "",
+      instagramUrl: apiShopData?.instagram || "",
+      tiktokUrl: apiShopData?.tiktok || "",
+      whatsapp: apiShopData?.whatsapp || "",
+      phone: apiShopData?.phone || "",
+      email: apiShopData?.email || "",
+    };
+
+    // If we have API data, use it (it's more up-to-date)
+    if (apiShopData) {
+      // Extract gallery images from API response
+      let galleryImages: string[] = [];
+
+      if (Array.isArray(apiGalleryData)) {
+        galleryImages = apiGalleryData.map(
+          (g: any) => g.image || DEFAULT_COVER_IMAGE,
+        );
+      }
+
+      // Ensure we have at least 2 gallery images
+      while (galleryImages.length < 2) {
+        galleryImages.push(DEFAULT_COVER_IMAGE);
+      }
+
+      return {
+        shopName: apiShopData.name || baseData.shopName,
+        location: apiShopData.location || baseData.location,
+        aboutUs: apiShopData.about_us || baseData.aboutUs,
+        avatarUrl: apiShopData.logo || baseData.avatarUrl,
+        coverUrl: apiShopData.cover_image || baseData.coverUrl,
+        gallery: galleryImages,
+        facebookUrl: apiShopData.facebook || baseData.facebookUrl,
+        instagramUrl: apiShopData.instagram || baseData.instagramUrl,
+        tiktokUrl: apiShopData.tiktok || baseData.tiktokUrl,
+        whatsapp: apiShopData.whatsapp || baseData.whatsapp,
+        phone: apiShopData.phone || baseData.phone,
+        email: apiShopData.email || baseData.email,
+      };
+    }
+
+    return baseData;
+  }, [apiShopData, apiGalleryData, userData]);
+
+  const shopData = getShopData();
+
+  // Update user data in local storage
+  const updateUserDataInStorage = useCallback((updatedShopData: any) => {
+    try {
+      const currentUserData = getUserData();
+      if (currentUserData) {
+        const updatedUserData = {
+          ...currentUserData,
+          active_shop: {
+            ...currentUserData.active_shop,
+            ...updatedShopData,
+          },
+        };
+        setUserData(updatedUserData);
+        console.log("User data updated in storage:", updatedUserData);
+      }
+    } catch (error) {
+      console.error("Failed to update user data in storage:", error);
+    }
+  }, []);
 
   const handleBack = () => {
     if (onBack) {
@@ -151,7 +167,7 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
     setIsEditModalOpen(true);
   };
 
-  // 📷 Pick & Upload Logo (Avatar)
+  // 📷 Pick & Upload Logo (Profile/Avatar)
   const handlePickLogo = async () => {
     try {
       const permission =
@@ -191,22 +207,29 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
           id: shopId,
           data: formData,
         }).unwrap();
-        toast.show({
-          label: "Success",
-          description: res?.details || "Shop logo updated successfully.",
-          variant: "success",
-          placement: "top",
-        });
-        refetchDetails();
+
+        if (res.success) {
+          // Update userData in storage with new logo
+          updateUserDataInStorage({ logo: res.data?.logo || selectedUri });
+
+          toast.show({
+            label: "Success",
+            description: res?.details || "Shop logo updated successfully.",
+            variant: "success",
+            placement: "top",
+          });
+          refetchDetails();
+        }
       }
-    } catch (_err) {
+    } catch (error: any) {
+      console.error("Logo upload error:", error);
       toast.show({
-        label: "Success",
-        description: "Shop logo updated.",
-        variant: "success",
+        label: "Upload Failed",
+        description:
+          error?.data?.details || error?.message || "Failed to update logo.",
+        variant: "danger",
         placement: "top",
       });
-      refetchDetails();
     } finally {
       setIsUploadingImage(false);
     }
@@ -252,22 +275,31 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
           id: shopId,
           data: formData,
         }).unwrap();
-        toast.show({
-          label: "Success",
-          description: res?.details || "Cover image updated successfully.",
-          variant: "success",
-          placement: "top",
-        });
-        refetchDetails();
+
+        if (res.success) {
+          const coverImageUrl = res.data?.cover_image || selectedUri;
+          updateUserDataInStorage({ cover_image: coverImageUrl });
+
+          toast.show({
+            label: "Success",
+            description: res?.details || "Cover image updated successfully.",
+            variant: "success",
+            placement: "top",
+          });
+          refetchDetails();
+        }
       }
-    } catch (_err) {
+    } catch (error: any) {
+      console.error("Cover upload error:", error);
       toast.show({
-        label: "Success",
-        description: "Cover image updated.",
-        variant: "success",
+        label: "Upload Failed",
+        description:
+          error?.data?.details ||
+          error?.message ||
+          "Failed to update cover image.",
+        variant: "danger",
         placement: "top",
       });
-      refetchDetails();
     } finally {
       setIsUploadingImage(false);
     }
@@ -307,28 +339,34 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
           name: filename,
           type,
         } as any);
-        formData.append("shop", String(shopId));
 
         const res = await updateGalleryApi({
           id: shopId,
           data: formData,
         }).unwrap();
-        toast.show({
-          label: "Success",
-          description: res?.details || "Gallery image uploaded successfully.",
-          variant: "success",
-          placement: "top",
-        });
-        refetchGallery();
+
+        if (res.success) {
+          toast.show({
+            label: "Success",
+            description: res?.details || "Gallery image uploaded successfully.",
+            variant: "success",
+            placement: "top",
+          });
+          refetchGallery();
+          refetchDetails();
+        }
       }
-    } catch (_err) {
+    } catch (error: any) {
+      console.error("Gallery upload error:", error);
       toast.show({
-        label: "Success",
-        description: "Gallery image uploaded.",
-        variant: "success",
+        label: "Upload Failed",
+        description:
+          error?.data?.details ||
+          error?.message ||
+          "Failed to upload gallery image.",
+        variant: "danger",
         placement: "top",
       });
-      refetchGallery();
     } finally {
       setIsUploadingImage(false);
     }
@@ -349,24 +387,45 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
         data: payload,
       }).unwrap();
 
-      toast.show({
-        label: "Shop Updated!",
-        description:
-          res?.details || `${editingField.title} updated successfully.`,
-        variant: "success",
-        placement: "top",
-      });
+      if (res.success) {
+        const updatedData: any = {};
+        if (apiKey === "name") updatedData.name = editingField.value;
+        else if (apiKey === "location")
+          updatedData.location = editingField.value;
+        else if (apiKey === "about_us")
+          updatedData.about_us = editingField.value;
+        else if (apiKey === "facebook")
+          updatedData.facebook = editingField.value;
+        else if (apiKey === "instagram")
+          updatedData.instagram = editingField.value;
+        else if (apiKey === "tiktok") updatedData.tiktok = editingField.value;
+        else if (apiKey === "whatsapp")
+          updatedData.whatsapp = editingField.value;
+        else if (apiKey === "phone") updatedData.phone = editingField.value;
+        else if (apiKey === "email") updatedData.email = editingField.value;
 
-      refetchDetails();
-      refetchGallery();
-    } catch (_err) {
+        updateUserDataInStorage(updatedData);
+
+        toast.show({
+          label: "Shop Updated!",
+          description:
+            res?.details || `${editingField.title} updated successfully.`,
+          variant: "success",
+          placement: "top",
+        });
+
+        refetchDetails();
+        refetchGallery();
+      }
+    } catch (error: any) {
+      console.error("Field update error:", error);
       toast.show({
-        label: "Shop Updated!",
-        description: `${editingField.title} updated successfully.`,
-        variant: "success",
+        label: "Update Failed",
+        description:
+          error?.data?.details || error?.message || "Failed to update field.",
+        variant: "danger",
         placement: "top",
       });
-      refetchDetails();
     } finally {
       setIsEditModalOpen(false);
       setEditingField(null);
@@ -410,12 +469,14 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Cover & Profile Picture Container */}
+          {/* Cover Image Section */}
           <View className="mb-6 pt-1">
-            {/* Cover Photo */}
+            <Text className="font-bold text-base text-gray-900 mb-2">
+              Cover Image
+            </Text>
             <View className="h-44 w-full rounded-2xl overflow-hidden bg-gray-200 relative">
               <Image
-                className="h-full w-full"
+                style={{ width: "100%", height: "100%" }}
                 contentFit="cover"
                 source={{ uri: shopData.coverUrl }}
               />
@@ -435,11 +496,26 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
                 )}
               </Pressable>
             </View>
+            <Text className="mt-1 text-gray-400 text-xs">
+              Tap the camera icon to change cover image
+            </Text>
+          </View>
 
-            {/* Profile Avatar overlapping */}
-            <View className="-mt-12 self-center relative">
+          {/* Logo (Profile Avatar) Section */}
+          <View className="mb-6">
+            <Text className="font-bold text-base text-gray-900 mb-2">
+              Shop Logo
+            </Text>
+            <View className="self-center relative">
               <Image
-                className="h-24 w-24 rounded-full border-4 border-white bg-gray-200"
+                style={{
+                  width: 96, // 24 * 4 = 96
+                  height: 96, // 24 * 4 = 96
+                  borderRadius: 48, // Half of width/height for full circle
+                  borderWidth: 4,
+                  borderColor: "#ffffff",
+                  backgroundColor: "#e5e7eb", // gray-200
+                }}
                 contentFit="cover"
                 source={{ uri: shopData.avatarUrl }}
               />
@@ -459,6 +535,9 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
                 )}
               </Pressable>
             </View>
+            <Text className="mt-1 text-center text-gray-400 text-xs">
+              Tap the camera icon to change logo
+            </Text>
           </View>
 
           {/* Section 1: Shop Name */}
@@ -520,7 +599,7 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
               }
             >
               <Text className="font-medium text-sm text-gray-500 flex-1 mr-3 leading-5">
-                {shopData.aboutUs}
+                {shopData.aboutUs || "No description provided"}
               </Text>
               <StyledIcons
                 className="text-gray-900 mt-0.5"
@@ -557,7 +636,7 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
                   key={index}
                 >
                   <Image
-                    className="h-full w-full"
+                    style={{ width: "100%", height: "100%" }}
                     contentFit="cover"
                     source={{ uri: imgUri }}
                   />
@@ -590,7 +669,7 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
                   className="font-medium text-xs text-gray-600 flex-1"
                   numberOfLines={1}
                 >
-                  {shopData.facebookUrl}
+                  {shopData.facebookUrl || "Not set"}
                 </Text>
               </View>
               <StyledIcons
@@ -618,7 +697,7 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
                   className="font-medium text-xs text-gray-600 flex-1"
                   numberOfLines={1}
                 >
-                  {shopData.instagramUrl}
+                  {shopData.instagramUrl || "Not set"}
                 </Text>
               </View>
               <StyledIcons
@@ -644,7 +723,7 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
                   className="font-medium text-xs text-gray-600 flex-1"
                   numberOfLines={1}
                 >
-                  {shopData.tiktokUrl}
+                  {shopData.tiktokUrl || "Not set"}
                 </Text>
               </View>
               <StyledIcons
@@ -679,7 +758,7 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
                   className="font-medium text-xs text-gray-700 flex-1"
                   numberOfLines={1}
                 >
-                  {shopData.whatsapp}
+                  {shopData.whatsapp || "Not set"}
                 </Text>
               </View>
               <StyledIcons
@@ -701,7 +780,7 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
                   className="font-medium text-xs text-gray-700 flex-1"
                   numberOfLines={1}
                 >
-                  {shopData.phone}
+                  {shopData.phone || "Not set"}
                 </Text>
               </View>
               <StyledIcons
@@ -723,7 +802,7 @@ export function ShopSettingsScreen({ onBack }: ShopSettingsProps) {
                   className="font-medium text-xs text-gray-700 flex-1"
                   numberOfLines={1}
                 >
-                  {shopData.email}
+                  {shopData.email || "Not set"}
                 </Text>
               </View>
               <StyledIcons
